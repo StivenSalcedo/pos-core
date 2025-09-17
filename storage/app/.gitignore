@@ -1,0 +1,4 @@
+livewire-tmp/
+files/
+public/images/logos
+!.gitignore
