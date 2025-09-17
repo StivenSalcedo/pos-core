@@ -1,0 +1,117 @@
+.table {
+    @apply w-full;
+}
+
+.table thead {
+    @apply bg-gray-100 font-normal sm:uppercase text-xs sm:text-xs text-slate-500 border border-slate-200;
+}
+
+.table thead tr th {
+    @apply py-1.5 sm:py-2 md:py-3  px-2 sm:px-4;
+}
+
+.table thead tr [left] {
+    @apply text-left;
+}
+
+.table thead tr [right] {
+    @apply text-right;
+}
+
+.table tbody {
+    @apply divide-y divide-slate-200 text-slate-600 text-center;
+}
+
+.table tbody tr{
+    @apply hover:bg-slate-100 cursor-default;
+}
+
+.table tbody tr td{
+    @apply py-1 px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm md:text-tiny;
+}
+
+.table tbody tr [actions]{
+    @apply text-center space-x-1;
+}
+
+.table tbody tr [left]{
+    @apply text-left;
+}
+
+.table tbody tr [right]{
+    @apply text-right;
+}
+
+.table-sm {
+    @apply w-full;
+}
+
+.table-sm thead {
+    @apply bg-gray-100 font-normal sm:uppercase text-xs sm:text-xs text-slate-500 border border-slate-200;
+}
+
+.table-sm thead tr th {
+    @apply py-1.5 sm:py-2 md:py-1 px-2 sm:px-2;
+}
+
+.table-sm thead tr [left] {
+    @apply text-left;
+}
+
+.table-sm thead tr [right] {
+    @apply text-right;
+}
+
+.table-sm tbody {
+    @apply divide-y divide-slate-200 text-slate-600 text-center;
+}
+
+.table-sm tbody tr{
+    @apply hover:bg-slate-100 cursor-default;
+}
+
+.table-sm tbody tr td{
+    @apply py-1 px-2 sm:px-2 whitespace-nowrap text-sm ;
+}
+
+.table-sm tbody tr [actions]{
+    @apply text-center space-x-1;
+}
+
+.table-sm tbody tr [left]{
+    @apply text-left;
+}
+
+.container{
+    @apply text-gray-700 max-w-7xl mx-auto px-4 pb-14;
+}
+
+
+/* Works on Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(69, 69, 70, .6);
+  }
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    scroll-behavior: smooth;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: rgba(69, 69, 70, .6);
+    border-radius: 20px;
+}
+
+/* Works on Chrome, Edge, and Safari */
+.scroll::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(69, 69, 70, .6);
+    border-radius: 20px;
+}

@@ -16,7 +16,7 @@ public_html/storage
 public_html/hot
 
 storage/*.key
-.env
+
 Homestead.yaml
 Homestead.json
 /.vagrant
@@ -24,7 +24,19 @@ Homestead.json
 
 /public/build
 /storage/pail
-.env.backup
-.env.production
+
 .phpactor.json
 auth.json
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+/node_modules
+composer-setup.php
+pendientes
+
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
+composer.lock
