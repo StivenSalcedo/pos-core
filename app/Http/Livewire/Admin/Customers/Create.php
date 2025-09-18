@@ -28,9 +28,9 @@ class Create extends Component
 
     public $identification_document_id = IdentificationDocument::CEDULA;
 
-    //public $legal_organization = LegalOrganization::NATURAL_PERSON->value;
+    public $legal_organization;
 
-    //public $tribute = CustomerTributes::NOT_RESPONSIBLE->value;
+   public $tribute;
 
     public $no_identification;
 
@@ -49,6 +49,8 @@ class Create extends Component
         $this->identificationDocuments = IdentificationDocument::enabled()->get()->pluck('name', 'id');
         $this->tributes = CustomerTributes::getCasesLabel();
         $this->legalOrganizations = LegalOrganization::getCasesLabel();
+        $this->legal_organization = LegalOrganization::NATURAL_PERSON->value;
+        $this->tribute = CustomerTributes::NOT_RESPONSIBLE->value;
     }
 
     public function render()
