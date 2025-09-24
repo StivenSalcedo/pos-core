@@ -80,7 +80,8 @@ class HttpService
     public function get(string $endpoint, array $data = []): Response
     {
         $response = self::$http->get($this->formatEnpoint($endpoint), $data);
-        $this->checkResponseErrors($response);
+        //se puso comentario para manejar los errores en cada llamado y no de manera general;
+        //$this->checkResponseErrors($response);
 
         return $response;
     }
@@ -88,7 +89,8 @@ class HttpService
     public function post(string $endpoint, array $data = []): Response
     {
         $response = self::$http->post($this->formatEnpoint($endpoint), $data);
-        $this->checkResponseErrors($response);
+          //se puso comentario para manejar los errores en cada llamado y no de manera general;
+        //$this->checkResponseErrors($response);
 
         return $response;
     }

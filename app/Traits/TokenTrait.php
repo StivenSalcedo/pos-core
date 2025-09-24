@@ -24,8 +24,13 @@ trait TokenTrait
         $response = Http::acceptJson()->post($apiConfiguration['url'].'oauth/token', $data);
 
         $access_token = $response->json();
-
-        if ($response->status() !== 200) {
+        AccessToken::whereNotNull('id')->delete();
+        if($access_token==null)
+        {
+            throw new Exception('Error al consumir API null');
+        }
+        else if ($response->status() !== 200 ) {
+             
             if (array_key_exists('error', $access_token) && $access_token['error'] === 'invalid_client') {
                 throw new Exception('Error al autenticarse con la API');
             } else {
@@ -33,7 +38,7 @@ trait TokenTrait
             }
         }
 
-        AccessToken::whereNotNull('id')->delete();
+       
 
         $access_token = AccessToken::create([
             'access_token' => $access_token['access_token'],

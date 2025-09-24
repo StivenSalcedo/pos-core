@@ -1,7 +1,7 @@
 <div class="container">
 
     <x-commons.header>
-        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.terminals.create', 'openCreate')"  text="Crear sede" />
+        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.terminals.create', 'openCreate')"  text="Crear Sede" />
     </x-commons.header>
 
     <x-commons.table-responsive>

@@ -30,7 +30,7 @@
     <x-slot:header>
       <x-wireui.search placeholder="Buscar..." />
       <x-wireui.native-select optionKeyValue label="Buscar por" wire:model="filter" :options="$filters" width="13" />
-      <x-wireui.native-select optionKeyValue label="Terminal" wire:model="terminal_id" :options="$terminals" placeholder="Todas" width="8" />
+      <x-wireui.native-select optionKeyValue label="Sede" wire:model="terminal_id" :options="$terminals" placeholder="Todas" width="8" />
       <x-wireui.native-select optionKeyValue label="Estado" wire:model="status" :options="[0 => 'Todas', 1 => 'Activas', 2 => 'Anuladas']" width="8" />
       @if ($filterDate == 8)
         <x-wireui.input label="Desde" wire:model="startDate" type="date" onkeydown="return false" />

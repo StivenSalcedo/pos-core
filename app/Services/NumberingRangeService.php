@@ -20,7 +20,7 @@ class NumberingRangeService
         }
 
         if ($terminal->count() >= 2) {
-            throw new CustomException('Este usuario cuenta con más de dos terminales asignadas');
+            throw new CustomException('Este usuario cuenta con más de dos sedes asignadas');
         }
 
         $range = $terminal->first()->numberingRange;

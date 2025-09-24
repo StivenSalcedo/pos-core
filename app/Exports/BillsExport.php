@@ -35,7 +35,7 @@ class BillsExport implements FromQuery, WithMapping, WithHeadings, ShouldAutoSiz
             'Email',
             'Fecha',
             'N° Factura',
-            'Terminal',
+            'Sede',
             'Servicio voluntario',
             'Subtotal',
             'Descuento',

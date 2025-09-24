@@ -5,7 +5,7 @@
             @if ($cashClosing->user)
               <div class="grid grid-cols-2 gap-6">
                 <x-wireui.input label="Responsable" :value="$cashClosing->user->name" readonly />
-                <x-wireui.input label="Terminal" :value="$cashClosing->terminal->name" readonly />
+                <x-wireui.input label="Sede" :value="$cashClosing->terminal->name" readonly />
               </div>
             @endif
 

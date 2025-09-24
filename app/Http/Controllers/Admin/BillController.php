@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bill;
+use App\Models\Terminal;
 use App\Services\CompanyService;
 use App\Traits\UtilityTrait;
 use Illuminate\Support\Facades\View;
@@ -87,6 +88,11 @@ class BillController extends Controller
         $range = $bill->numberingRange;
         $products = $bill->details->transform(fn ($item) => $item->only(['name', 'amount', 'total']));
         $company = CompanyService::companyData();
+        $terminal = Terminal::findOrFail($bill->terminal_id);
+
+        $company['name']=!empty($terminal->name) ? $terminal->name : $company['name'];
+        $company['direction']=!empty($terminal->address) ? $terminal->address: $company['direction'];
+        $company['phone']=!empty($terminal->phone) ? $terminal->phone :  $company['phone'];
 
         $data = [
 

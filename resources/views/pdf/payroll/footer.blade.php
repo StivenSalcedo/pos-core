@@ -37,7 +37,7 @@
         </tr>
         <tr>
             <td class="text-center text-sm">
-                {{ "Hecho en Colombia con <3 por Halltec" }}
+                {{ "Hecho en Colombia" }}
             </td>
         </tr>
         <tr>

@@ -19,6 +19,7 @@ class ApiService
         $response = HttpService::apiHttp()->get('numbering-ranges', $filters);
 
         if ($response->status() !== 200) {
+            return [];
             throw new Exception('Ha ocurrido un error inesperado al consultar los rangos de numeración');
         }
 
