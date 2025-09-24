@@ -24,7 +24,7 @@
 
             window.open(`${response.domain}/external-authentication?${params}`, '_blank');
           } else {
-            alert('Ha ocurrido un error al abrir Factus');
+            alert('Ha ocurrido un error al abrir Factus.');
           }
         },
 

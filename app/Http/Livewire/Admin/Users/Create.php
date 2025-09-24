@@ -21,7 +21,7 @@ class Create extends Component {
     public $name, $phone, $role='', $email, $password, $password_confirmation;
 
     public function mount(){
-        $this->roles = Role::orderBy('id', 'ASC')->get()->pluck('name', 'name')->except(['Administrador']);
+        $this->roles = Role::orderBy('id', 'ASC')->get()->pluck('name', 'name');
     }
 
     public function render() {

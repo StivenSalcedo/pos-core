@@ -51,6 +51,7 @@ class Create extends Component
         $this->legalOrganizations = LegalOrganization::getCasesLabel();
         $this->legal_organization = LegalOrganization::NATURAL_PERSON->value;
         $this->tribute = CustomerTributes::NOT_RESPONSIBLE->value;
+        
     }
 
     public function render()

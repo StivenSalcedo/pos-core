@@ -181,19 +181,19 @@
           </button>
         </div>
 
-        @if (App\Services\FactusConfigurationService::isApiEnabled())
+       <!--   @if (App\Services\FactusConfigurationService::isApiEnabled())
           <div x-data="authenticatedFactus()">
-            <button @click="openFactus()" class="flex h-full items-center" title="Abrir Factus">
+            <button class="flex h-full items-center" title="Abrir Factus">
               <x-icons.factus class="h-6 w-6 text-indigo-800" title="Factus activo" />
             </button>
           </div>
         @endif
 
-        @if (isRoot())
+      @if (isRoot()) solo un icono que muestra si es root
           <div class="flex h-full items-center">
             <i class="ico icon-user-config text-2xl text-red-700"></i>
           </div>
-        @endif
+        @endif-->
 
         <x-dropdown align="right" width="56">
           <x-slot name="trigger">
@@ -241,16 +241,18 @@
                 </x-dropdown-link>
               @endcan
 
-              @if (isRoot())
+             @can('HavePermissionTo', [App\Models\Module::class, 'activar o desactivar modulos'])
                 <x-dropdown-link :href="route('admin.modules.index')" class="flex items-center">
                   <i class="ti ti-layout-dashboard mr-2"></i>
                   Módulos
                 </x-dropdown-link>
+               
+            @endcan
+               
                 <x-dropdown-link :href="route('admin.factus.connection')" class="flex items-center">
                   <i class="ti ti-api mr-2"></i>
                   Factus
                 </x-dropdown-link>
-              @endif
 
               @can('isEnabled', [App\Models\Module::class, 'configuraciones'])
                 <x-dropdown-link :href="route('admin.companies.settings')" class="flex items-center">
@@ -277,7 +279,7 @@
 
         async openFactus() {
           response = await this.getTokenFactus();
-
+          console.log('response',response);
           if (response.token) {
             params = new URLSearchParams({
               token: response.token,

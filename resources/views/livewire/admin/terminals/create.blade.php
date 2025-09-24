@@ -1,6 +1,6 @@
 <div>
     <x-wireui.modal wire:model.defer="openCreate" max-width="3xl" >
-        <x-wireui.card title="Nueva terminal">
+        <x-wireui.card title="Nueva sede">
             <x-wireui.errors />
             <div class="space-y-6">
                 <x-wireui.input label="Nombre" wire:model.defer="name" />
@@ -10,7 +10,9 @@
                   <x-wireui.native-select label="Rango de númeración" wire:model.defer="numbering_range_id"  optionKeyValue="true" placeholder="Seleccionar" :options="$ranges"  class="w-full" />
                 @endif
             </div>
-
+        <x-wireui.input label="Direccion" wire:model.defer="address" />
+        <x-wireui.input label="Contacto" wire:model.defer="phone" />
+        <x-wireui.input label="Email" wire:model.defer="email" />
             <div x-data="mainTerminalsCreate()" class="mt-6">
                 <x-wireui.label label="Selecciona los usuarios que usaran esta terminal" />
                 <ul class="mt-3 pl-4">

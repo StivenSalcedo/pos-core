@@ -19,7 +19,7 @@ class Edit extends Component {
 
     public function mount(){
         $this->user = new User();
-        $this->roles = Role::orderBy('id', 'ASC')->get()->pluck('name', 'name')->except(['Administrador']);
+        $this->roles = Role::orderBy('id', 'ASC')->get()->pluck('name', 'name');
     }
 
     protected function rules(){
@@ -57,9 +57,11 @@ class Edit extends Component {
             $this->user->status = 0;
         }
 
-        if ($this->role !== 'Administrador' && $this->user->role !== 'Administrador'){
+       
+
+       // if ( $this->role !== 'Administrador' && $this->user->role !== 'Administrador'){
             $this->user->syncRoles($this->role);
-        }
+       // }
 
         $this->user->save();
 
