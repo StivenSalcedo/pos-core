@@ -6,10 +6,12 @@ use App\Models\NumberingRange;
 use App\Models\Terminal;
 use App\Models\User;
 use App\Services\Factus\ApiService;
+use App\Rules\Phone;
 use App\Services\FactusConfigurationService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+
 
 class Edit extends Component
 {
@@ -44,6 +46,9 @@ class Edit extends Component
         return [
             'terminal.name' => 'required|string|min:5|max:50|unique:terminals,name,'.$this->terminal->id,
             'terminal.numbering_range_id' => 'required|integer|exists:numbering_ranges,id',
+            'terminal.address' => 'nullable|string|max:250',
+            'terminal.phone' => ['nullable', 'string', new Phone],
+            'terminal.email' => 'nullable|string|email|max:250',
             'terminal.factus_numbering_range_id' => $this->isApiFactusEnabled ? 'required|integer' : 'nullable',
             'terminal.status' => 'required|integer|min:0|max:1',
             'usersSelected' => 'array',
@@ -85,7 +90,7 @@ class Edit extends Component
         $this->factusRanges = collect(ApiService::numberingRanges())->transform(function ($item) {
             return [
                 'id' => $item['id'],
-                'name' => $item['prefix'].'('.$item['from'].'-'.$item['to'].')',
+                'name' =>$item['document'].'-'.$item['prefix'].'('.$item['from'].'-'.$item['to'].')',
             ];
         })->pluck('name', 'id');
     }

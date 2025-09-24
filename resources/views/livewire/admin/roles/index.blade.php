@@ -45,9 +45,10 @@
                                 {{ $item->permissions_count }}
                             </td>
                             <td actions>
-                                @if ($item->name !== 'Administrador')
+                               
                                     <x-buttons.edit wire:click="$emitTo('admin.roles.edit', 'openEdit', {{ $item->id }})" />
-                                    <x-buttons.delete wire:click="$emit('deleteRole', {{ $item->id }})" />
+                                    @if ($item->name !== 'Administrador')
+                                        <x-buttons.delete wire:click="$emit('deleteRole', {{ $item->id }})" />
                                 @endif
                             </td>
                         </tr>

@@ -1,6 +1,6 @@
 <div>
   <x-wireui.modal wire:model.defer="openEdit" max-width="3xl">
-    <x-wireui.card title="Actualizar terminal">
+    <x-wireui.card title="Actualizar sede">
 
       <x-wireui.errors />
 
@@ -13,6 +13,9 @@
         <x-wireui.native-select label="Rango de númeración" wire:model.defer="terminal.numbering_range_id"
           optionKeyValue="true" placeholder="Seleccionar" :options="$ranges" class="w-full" />
         @endif
+        <x-wireui.input label="Direccion" wire:model.defer="terminal.address" />
+        <x-wireui.input label="Contacto" wire:model.defer="terminal.phone" />
+        <x-wireui.input label="Email" wire:model.defer="terminal.email" />
         <x-buttons.switch wire:model.defer="terminal.status" active="Activada" inactive="Desactivada" />
       </div>
 

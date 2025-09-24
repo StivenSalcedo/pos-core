@@ -10,6 +10,7 @@ use App\Services\FactusConfigurationService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use App\Rules\Phone;
 
 class Create extends Component
 {
@@ -47,7 +48,7 @@ class Create extends Component
         $ranges = NumberingRange::where('status', '0')->get();
 
         foreach ($ranges as $value) {
-            $this->ranges[$value->id] = $value->prefix.'('.$value->from.'-'.$value->to.')';
+            $this->ranges[$value->id] = $value->document.'-'.$value->prefix.'('.$value->from.'-'.$value->to.')';
         }
     }
 
@@ -71,7 +72,7 @@ class Create extends Component
         $this->factusRanges = collect(ApiService::numberingRanges())->transform(function ($item) {
             return [
                 'id' => $item['id'],
-                'name' => $item['prefix'].'('.$item['from'].'-'.$item['to'].')',
+                'name' => $item['document'].'-'.$item['prefix'].'('.$item['from'].'-'.$item['to'].')',
             ];
         })->pluck('name', 'id');
     }
@@ -84,6 +85,9 @@ class Create extends Component
         $rules = [
             'name' => 'required|string|min:5|max:50|unique:terminals',
             'numbering_range_id' => 'required|integer|exists:numbering_ranges,id',
+            'address' => 'nullable|string|max:250',
+            'phone' => ['nullable', 'string', new Phone],
+            'email' => 'nullable|string|email|max:250',
             'factus_numbering_range_id' => 'nullable',
             'usersSelected' => 'array',
         ];
@@ -91,6 +95,9 @@ class Create extends Component
         $attributes = [
             'name' => 'nombre',
             'numbering_range_id' => 'rango de numeración',
+            'address' => 'direccion de la sede',
+            'phone' => 'contacto o celular de la sede',
+            'email' => 'email de la sede',
             'factus_numbering_range_id' => 'rango de numeración',
         ];
 

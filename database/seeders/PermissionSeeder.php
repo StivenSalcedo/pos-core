@@ -28,7 +28,10 @@ class PermissionSeeder extends Seeder {
             'productos vendidos',
             'terminales',
             'rangos de numeración',
-            'ver totales de venta'
+            'ver totales de venta',
+            'impuestos',
+            'ventas rapidas',
+            'activar o desactivar modulos',
         ];
 
         foreach ($permissions as $key => $value) {

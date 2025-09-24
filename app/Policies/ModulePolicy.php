@@ -21,4 +21,13 @@ class ModulePolicy
 
         return false;
     }
+
+    public function HavePermissionTo(User $user, string $name)
+    {
+        if ($user->hasPermissionTo($name)) {
+            return true;
+        }
+
+        return false;
+    }
 }

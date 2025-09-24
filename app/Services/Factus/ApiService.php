@@ -11,7 +11,7 @@ class ApiService
     {
         $filters = [
             'filter' => [
-                'document' => '21',
+               // 'id' => '8',//factura electronica
                 'is_active' => '1',
             ],
         ];
@@ -22,7 +22,7 @@ class ApiService
             throw new Exception('Ha ocurrido un error inesperado al consultar los rangos de numeración');
         }
 
-        return $response->json()['data'];
+        return $response->json()['data']['data'];
     }
 
     public static function payrollIsEnabled()

@@ -1,19 +1,19 @@
 <div class="container">
 
     <x-commons.header>
-        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.terminals.create', 'openCreate')"  text="Crear terminal" />
+        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.terminals.create', 'openCreate')"  text="Crear sede" />
     </x-commons.header>
 
     <x-commons.table-responsive>
 
-        <x-slot:top title="Terminales">
+        <x-slot:top title="Sedes">
         </x-slot:top>
 
         <table class="table">
             <thead>
                 <tr>
                     <th left>
-                        Nombres
+                        Nombre
                     </th>
                     <th left>
                         Rango de numeración

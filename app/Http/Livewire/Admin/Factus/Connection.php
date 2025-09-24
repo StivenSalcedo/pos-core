@@ -28,7 +28,7 @@ class Connection extends Component
 
     public function mount()
     {
-        if (!isRoot()) abort(404);
+        //if (!isRoot()) abort(404);
     }
 
     public function render()

@@ -40,7 +40,7 @@ class Index extends Component
         return collect(ApiService::numberingRanges())->transform(function ($item) {
             return [
                 'id' => $item['id'],
-                'name' => $item['prefix'].'('.$item['from'].'-'.$item['to'].')',
+                'name' => $item['document'].'-'.$item['prefix'].'('.$item['from'].'-'.$item['to'].')',
             ];
         })->pluck('name', 'id');
     }
