@@ -26,7 +26,7 @@ class CashClosingExport implements FromQuery, WithMapping, WithHeadings, ShouldA
         return [
             'Fecha y hora',
             'No. cierre de caja',
-            'Terminal',
+            'Sede',
             'Usuario',
             'Efectivo',
             'Tarjeta crédito',

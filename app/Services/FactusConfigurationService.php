@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\FactusConfiguration;
+use App\Models\AccessToken;
 use Illuminate\Support\Facades\Cache;
 
 class FactusConfigurationService
@@ -21,11 +22,12 @@ class FactusConfigurationService
 
     public static function isApiEnabled()
     {
-        if (Cache::has('is_api_enabled')) {
+       /* if (Cache::has('is_api_enabled')) {
             return (bool) Cache::get('is_api_enabled');
-        }
+        }*/
 
         $apiEnabled = FactusConfiguration::first()->is_api_enabled;
+        $apiEnabled =AccessToken::exists();
         Cache::forever('is_api_enabled', $apiEnabled);
 
         return (bool) $apiEnabled;

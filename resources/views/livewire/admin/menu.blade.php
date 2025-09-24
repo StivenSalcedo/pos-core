@@ -171,7 +171,7 @@
 
         @if (hasTerminal())
           <div class="hidden text-sm font-semibold text-slate-600 sm:block">
-            Terminal: {{ getTerminal()->name }}
+            Sede: {{ getTerminal()->name }}
           </div>
         @endif
 
@@ -237,7 +237,7 @@
               @can('isEnabled', [App\Models\Module::class, 'terminales'])
                 <x-dropdown-link :href="route('admin.terminals.index')" class="flex items-center">
                   <i class="ico icon-terminal mr-2"></i>
-                  Terminales
+                  Sedes
                 </x-dropdown-link>
               @endcan
 

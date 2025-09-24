@@ -48,7 +48,7 @@
     <x-slot:header>
 
       <x-wireui.native-select wire:model="terminal_id"
-        label="Terminales"
+        label="Sedes"
         :optionKeyValue="true"
         placeholder="Seleccionar"
         :options="$arrayTerminals"
@@ -81,7 +81,7 @@
             Fecha
           </th>
           <th left>
-            Terminal
+            Sede
           </th>
           <th left>
             Responsable
@@ -178,7 +178,7 @@
       <x-wireui.modal wire:model.defer="openModal"
         max-width="lg">
 
-        <x-wireui.card title="Terminales">
+        <x-wireui.card title="Sedes">
           <div x-on:open-modal.window="show=true">
             <p class="font-semibold">Selecciona la terminal</p>
             <ul class="mt-2 divide-y-2 rounded border shadow">

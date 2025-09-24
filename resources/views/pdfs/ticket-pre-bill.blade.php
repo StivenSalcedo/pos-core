@@ -113,8 +113,8 @@
 
         {{-- footer --}}
         <div class="text-xs mt-4">
-            <p class="text-center leading-4">Elaborador por: HALLTEC</p>
-            <p class="text-center leading-4">www.halltec.co NIT: 900825759-7</p>
+            <p class="text-center leading-4">Elaborador</p>
+            <p class="text-center leading-4">www</p>
         </div>
 
     </div>

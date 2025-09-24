@@ -32,7 +32,7 @@ class OutputsExport implements FromQuery, WithMapping, WithHeadings, ShouldAutoS
         return [
             'N° pago',
             'Fecha',
-            'Terminal',
+            'Sede',
             'Responsable',
             'Caja',
             'Motivo',

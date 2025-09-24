@@ -30,6 +30,12 @@ class Create extends Component
 
     public $factus_numbering_range_id = '';
 
+    public $address;
+    
+    public $phone;
+    
+    public $email;
+
     public $isApiFactusEnabled = false;
 
     public function mount()

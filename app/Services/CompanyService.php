@@ -12,7 +12,7 @@ class CompanyService
 
     public static function companyData(): array
     {
-        if (FactusConfigurationService::isApiEnabled()) {
+       /* if (FactusConfigurationService::isApiEnabled()) {
             $companyData = ApiService::companyData();
 
             $company = [
@@ -21,7 +21,7 @@ class CompanyService
                 'direction' => (in_array($companyData['nit'], self::$companyPosNitWhiteList)? session('config')->direction : $companyData['address']),
                 'phone' => $companyData['phone'],
             ];
-        } else {
+        } else {*/
 
             $company = [
                 'name' => session('config')->name,
@@ -29,7 +29,7 @@ class CompanyService
                 'direction' => session('config')->direction,
                 'phone' => session('config')->phone,
             ];
-        }
+       /* }*/
 
         return $company;
     }

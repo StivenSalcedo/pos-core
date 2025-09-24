@@ -11,10 +11,10 @@ class CompanySeeder extends Seeder {
     public function run() {
         Company::create([
             'nit' => '12345678-6',
-            'name' => 'Halltec',
-            'direction' => 'cra 10 # 9-04',
-            'phone' => '3165584659',
-            'email' => 'halltec@halltec.com',
+            'name' => 'Comapañia',
+            'direction' => 'calle 48 p bis',
+            'phone' => '3144521111',
+            'email' => 'test@test.com',
             'type_bill' => '1',
             'barcode' => '0',
             'percentage_tip' => 0
