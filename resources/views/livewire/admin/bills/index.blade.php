@@ -60,13 +60,13 @@
             Financiación
           </th>
 
-          @if (App\Services\FactusConfigurationService::isApiEnabled())
+          @if (App\Services\FactusConfigurationService::isApiEnabled(true))
             <th>
               Factura
             </th>
           @endif
 
-          @if (App\Services\FactusConfigurationService::isApiEnabled())
+          @if (App\Services\FactusConfigurationService::isApiEnabled(true))
             <th>
               Nota
             </th>
@@ -112,7 +112,7 @@
               @endif
             </td>
 
-            @if (App\Services\FactusConfigurationService::isApiEnabled())
+            @if (App\Services\FactusConfigurationService::isApiEnabled(true))
               <td class="text-center">
                 <div class="flex justify-center">
                   @if ($item->isValidated)
@@ -126,7 +126,7 @@
               </td>
             @endif
 
-            @if (App\Services\FactusConfigurationService::isApiEnabled())
+            @if (App\Services\FactusConfigurationService::isApiEnabled(true))
               <td class="text-center">
                 <div class="flex justify-center">
                   @if ($item->electronicCreditNote)
@@ -151,7 +151,7 @@
             <td x-data actions>
               <x-buttons.download @click="$dispatch('print-ticket', {{ $item->id }})" href='#' title="Descargar" />
               <x-buttons.show href="{{ route('admin.bills.show', $item->id) }}" title="Visualizar" />
-              @if ($item->status === '0' && (!App\Services\FactusConfigurationService::isApiEnabled() || ($item->electronicBill && $item->electronicBill->is_validated)))
+              @if ($item->status === '0' && (!App\Services\FactusConfigurationService::isApiEnabled(true) || ($item->electronicBill && $item->electronicBill->is_validated)))
                 <x-buttons.ban wire:click="$emit('cancelBill', {{ $item->id }})" title="Anular" />
               @endif
             </td>

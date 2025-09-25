@@ -7,6 +7,7 @@ use App\Http\Controllers\Log;
 use App\Models\Product;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\Terminal;
 use Maatwebsite\Excel\Facades\Excel;
 
 class Index extends Component {
@@ -21,12 +22,17 @@ class Index extends Component {
 
     public $totalCost;
 
+    public $terminals;
+
+    public $terminal_id = '';
+
     public $filters = [
         1 => 'Referencia',
         2 => 'Nombre'
     ];
 
     public function mount(){
+        $this->terminals = Terminal::all()->pluck('name', 'id');
         $this->getTotalCost();
     }
 
@@ -34,11 +40,12 @@ class Index extends Component {
 
         $filter = [1 => 'reference',  2 => 'name'][$this->filter];
 
-        $products = Product::with('taxRates', 'taxRates.tribute')
+        $products = Product::with('taxRates', 'taxRates.tribute', 'terminal')
                     ->where($filter, 'LIKE', '%' . $this->search . '%')
                     ->filterBarcode($filter, $this->search)
+                    ->terminal($this->terminal_id)
                     ->latest()
-                    ->paginate(10);
+                    ->paginate(50);
 
         return view('livewire.admin.products.index', compact('products'))->layoutData(['title' => 'Productos']);
     }

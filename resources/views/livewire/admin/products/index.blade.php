@@ -14,7 +14,8 @@
 
         <x-slot:header>
             <x-wireui.search placeholder="Buscar..." />
-            <x-wireui.native-select wire:model.defer="filter" optionKeyValue="true" :options="$filters" />
+            <x-wireui.native-select wire:model.defer="filter" label="Por:" optionKeyValue="true" :options="$filters" />
+            <x-wireui.native-select optionKeyValue label="Sede" wire:model="terminal_id" :options="$terminals" placeholder="Todas" width="8" />
         </x-slot:header>
 
         <table class="table-sm">
@@ -28,6 +29,9 @@
                     </th>
                     <th left>
                         Nombre
+                    </th>
+                    <th left>
+                        Sede
                     </th>
                     <th>
                         Impuestos(%)
@@ -60,6 +64,9 @@
                         </td>
                         <td left>
                             {{ $item->name }}
+                        </td>
+                        <td left>
+                        {{ $item->terminal?->name ?? 'Sin sede' }}
                         </td>
                         <td class="tooltip">
                           <button class="flex items-center justify-center text-sm text-blue-500">

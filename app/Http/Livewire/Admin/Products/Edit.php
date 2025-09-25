@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
+use App\Models\Terminal;
 
 class Edit extends Component
 {
@@ -22,9 +23,9 @@ class Edit extends Component
 
     public $product, $openEdit = false;
 
-    public $category_id = '';
+    public $category_id = '',$terminal_id='';
 
-    public $presentations, $units, $categories;
+    public $presentations, $units, $categories, $terminals;
 
     public Collection $tax_rates;
 
@@ -60,6 +61,7 @@ class Edit extends Component
             'product.quantity' => 'nullable',
             'product.has_presentations' => 'required',
             'presentations' => 'nullable',
+            'product.terminal_id'=>'required',
         ];
     }
 
@@ -81,6 +83,7 @@ class Edit extends Component
     public function refreshCategories()
     {
         $this->categories = Category::orderBy('name', 'ASC')->get()->pluck('name', 'id');
+        $this->terminals = Terminal::orderBy('name', 'ASC')->get()->pluck('name', 'id');
     }
 
     public function setTaxRates($taxRates)
@@ -94,6 +97,7 @@ class Edit extends Component
         $this->presentations = collect();
         $this->product = $product;
         $this->category_id = $product->category_id == null ? '' : $product->category_id;
+        $this->terminal_id = $product->terminal_id == null ? '' : $product->terminal_id;
 
         if (!intval($product->has_presentations)) {
 
@@ -165,7 +169,7 @@ class Edit extends Component
 
     protected function formatData(): array
     {
-        $arrayProperties = ['product.barcode', 'product.reference', 'product.category_id', 'product.name', 'tax_rates', 'product.cost', 'product.price', 'product.has_inventory', 'product.stock', 'units', 'product.quantity', 'product.has_presentations', 'presentations', 'product.top', 'product.status'];
+        $arrayProperties = ['product.barcode', 'product.reference', 'product.category_id', 'product.name', 'tax_rates', 'product.cost', 'product.price', 'product.has_inventory', 'product.stock', 'units', 'product.quantity', 'product.has_presentations', 'presentations', 'product.top', 'product.status', 'product.terminal_id'];
 
         $this->applyTrim($arrayProperties);
 
@@ -220,6 +224,7 @@ class Edit extends Component
             'tax_rates' => 'array|min:1',
             'tax_rates.*.id' => 'required|integer|exists:tax_rates,id',
             'tax_rates.*.value' => 'required|integer|min:0|max:999999999',
+            'terminal_id' => 'required|exists:terminals,id',
         ];
 
         $attributes = [
@@ -228,6 +233,7 @@ class Edit extends Component
             'quantity' => 'unidades x producto',
             'presentations' => 'presentaciones',
             'tax_rates' => 'impuestos',
+            'terminal_id'=>'sede'
         ];
 
         $messages = [
@@ -274,7 +280,7 @@ class Edit extends Component
             return $this->emit('error', 'Ha ocurrido un error inesperado al actualizar el producto. Vuelve a intentarlo');
         }
 
-        $this->resetExcept('tax_rates', 'categories');
+        $this->resetExcept('tax_rates', 'categories','terminals');
         $this->tax_rates = collect();
         $this->resetValidation();
         $this->presentations = collect();

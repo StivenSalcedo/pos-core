@@ -19,7 +19,7 @@
                     </div>
 
                     <x-wireui.input label="Nombre" name="name" wire:model.defer="product.name" placeholder="Nombre del producto" />
-
+                    <x-wireui.native-select label="Sede" placeholder="Selecciona una sede" wire:model.defer="product.terminal_id" optionKeyValue :options="$terminals" class="min-w-full" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-6 mt-6">
