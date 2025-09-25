@@ -81,4 +81,16 @@ class Product extends Model
             $query->orWhere('barcode', $search);
         }
     }
+
+    public function terminal()
+    {
+        return $this->belongsTo(Terminal::class);
+    }
+
+     public function scopeTerminal($query, $terminal_id)
+    {
+        if ($terminal_id) {
+            return $query->where('terminal_id', $terminal_id);
+        }
+    }
 }

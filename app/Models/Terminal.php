@@ -29,4 +29,9 @@ class Terminal extends Model
     {
         return $query->where('status', self::ACTIVE);
     }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
 }

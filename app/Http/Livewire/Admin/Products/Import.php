@@ -35,9 +35,9 @@ class Import extends Component
 
     public function openImport()
     {
-        if (!Bill::count() && !Purchase::count()) {
+       // if (!Bill::count() && !Purchase::count()) {
             $this->openImport = true;
-        }
+        //}
     }
 
     public function downloadExample()
@@ -48,7 +48,7 @@ class Import extends Component
 
     public function loadProducts()
     {
-        $this->deleteProducts();
+        //$this->deleteProducts();
 
         $url = $this->file->storeAs('files', "products.{$this->file->extension()}");
 

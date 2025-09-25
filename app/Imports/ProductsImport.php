@@ -10,6 +10,8 @@ use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Row;
+use App\Models\Terminal;
+use App\Models\Category;
 
 class ProductsImport implements OnEachRow, WithHeadingRow, SkipsEmptyRows
 {
@@ -37,16 +39,17 @@ class ProductsImport implements OnEachRow, WithHeadingRow, SkipsEmptyRows
             'status' => Product::ACTIVE,
             'has_presentations' => Product::HAS_PRESENTATION_INACTIVE,
             'tax_rate_id' => $row['impuesto'],
-            'ml' => empty($row['mililitros']) ? 0 : $row['mililitros'],
+            'terminal_id' => Terminal::min('id'),
+            'category_id' =>Category::min('id') ?? null,
         ];
 
         $this->validateModel($data);
 
-        $value = $this->calculateTaxValue($data['ml'], $data['tax_rate_id']);
+        //$value = $this->calculateTaxValue($data['ml'], $data['tax_rate_id']);
 
         $product = Product::create($data);
 
-        $product->taxRates()->attach([$data['tax_rate_id'] => ['value' => $value]]);
+        $product->taxRates()->attach([$data['tax_rate_id'] => ['value' => 0]]);
     }
 
     protected function validateModel(array $row): void
@@ -59,22 +62,12 @@ class ProductsImport implements OnEachRow, WithHeadingRow, SkipsEmptyRows
             'cost' => 'required|integer|min:0|max:99999999',
             'price' => 'required|integer|min:0|max:99999999',
             'stock' => 'required|integer|min:0|max:99999999',
-            'tax_rate_id' => 'required|exists:tax_rates,id',
-            'ml' => 'required_if:tax_rate_id,6,7|integer|max:999999999',
+           // 'ml' => 'required_if:tax_rate_id,6,7|integer|max:999999999',
+            'terminal_id' => 'required|integer',
         ];
 
         Validator::make($row, $rules)->validate();
     }
 
-    protected function calculateTaxValue(int $ml, int $tax_rate_id)
-    {
-        if ($tax_rate_id === 6 || $tax_rate_id === 7) {
-
-            $rate = $this->taxRates->find($tax_rate_id)->rate;
-
-            return (int)($ml / 100) * $rate;
-        }
-
-        return 0;
-    }
+    
 }

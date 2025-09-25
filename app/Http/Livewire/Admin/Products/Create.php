@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
+use App\Models\Terminal;
 
 class Create extends Component
 {
@@ -22,13 +23,13 @@ class Create extends Component
 
     public $openCreate = false;
 
-    public $barcode, $reference, $category_id = "", $name, $cost, $price, $has_inventory = '1', $stock, $units = 0, $quantity;
+    public $barcode, $reference, $category_id = "", $name, $cost, $price, $has_inventory = '1', $stock, $units = 0, $quantity,$terminal_id = "";
 
     public $has_presentations = '1';
 
     public Collection $tax_rates;
 
-    public $categories, $presentations;
+    public $categories, $presentations, $terminals;
 
     public $is_inventory_enabled = false;
 
@@ -77,6 +78,7 @@ class Create extends Component
     public function refreshCategories()
     {
         $this->categories = Category::orderBy('name', 'ASC')->get()->pluck('name', 'id');
+        $this->terminals = Terminal::orderBy('name', 'ASC')->get()->pluck('name', 'id');
     }
 
     public function editPresentation($index)
@@ -108,7 +110,7 @@ class Create extends Component
 
     protected function formatData()
     {
-        $arrayProperties = ['barcode', 'reference', 'category_id', 'name', 'cost', 'price', 'has_inventory', 'stock', 'units', 'quantity', 'has_presentations', 'presentations'];
+        $arrayProperties = ['barcode', 'reference', 'category_id', 'name', 'cost', 'price', 'has_inventory', 'stock', 'units', 'quantity', 'has_presentations', 'presentations', 'terminal_id'];
 
         $this->applyTrim($arrayProperties);
 
@@ -156,6 +158,7 @@ class Create extends Component
             'tax_rates' => 'array|min:1',
             'tax_rates.*.id' => 'required|integer|exists:tax_rates,id',
             'tax_rates.*.value' => 'required|integer|min:0|max:999999999',
+            'terminal_id'=>'required|exists:terminals,id',
         ];
 
         $attributes = [
@@ -163,6 +166,7 @@ class Create extends Component
             'quantity' => 'unidades x producto',
             'presentations' => 'presentaciones',
             'tax_rates' => 'impuestos',
+            'terminal_id' => 'sede',
         ];
 
         $messages = [
