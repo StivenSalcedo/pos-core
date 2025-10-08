@@ -21,6 +21,10 @@
                 <x-wireui.native-select label="Técnico Asignado" placeholder="Seleccione técnico" :options="$technicians"
                     wire:model.defer="tech_assigned_id" optionKeyValue="true" />
 
+                <!-- Tipo de equipo -->
+                <x-wireui.native-select label="Tipo de Equipo" placeholder="Seleccione equio" :options="$equipmenttypes"
+                    wire:model.defer="equipment_type_id" optionKeyValue="true" />
+
                 <!-- Cliente -->
                 <div class="col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>

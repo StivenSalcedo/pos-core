@@ -36,7 +36,8 @@ class Edit extends Component
         $this->responsibles = User::pluck('name', 'id');
         $this->technicians = User::pluck('name', 'id');
         $this->states = ServiceState::pluck('name', 'id');
-        $this->equipmentTypes = EquipmentType::pluck('name', 'id');
+       
+        $this->service->load(['details.component', 'details.brand']);
         $this->brands = Brand::pluck('name', 'id');
     }
 
