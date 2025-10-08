@@ -23,4 +23,6 @@ public function responsible()
     return $this->belongsTo(User::class, 'responsible_id');
 }
 
+
+
 }

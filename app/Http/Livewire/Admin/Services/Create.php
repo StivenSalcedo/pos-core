@@ -5,10 +5,12 @@ namespace App\Http\Livewire\Admin\Services;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\EquipmentType;
 use App\Traits\LivewireTrait;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class Create extends Component
 {
@@ -24,13 +26,14 @@ class Create extends Component
     public $responsible_id;
     public $tech_assigned_id;
     public $customer_id;
-
+    public $equipment_type_id;
     public $responsibles;
     public $technicians;
     public $customers;
     public $searchCustomer = '';
-public $customerResults = [];
-public $selectedCustomer = null;
+    public $customerResults = [];
+    public $selectedCustomer = null;
+    public $equipmenttypes;
 
 
     public function mount()
@@ -38,10 +41,10 @@ public $selectedCustomer = null;
         $today = Carbon::now();
         $this->date_entry = $today->format('Y-m-d');
         $this->date_due = $today->copy()->addDays(3)->format('Y-m-d');
-
         $this->responsibles = User::select('id', 'name')->get()->pluck('name', 'id');
         $this->technicians = User::select('id', 'name')->get()->pluck('name', 'id');
         $this->customers = Customer::select('id', 'names')->get()->pluck('names', 'id');
+        $this->equipmenttypes = EquipmentType::select('id', 'name')->get()->pluck('name', 'id');
     }
 
     public function render()
@@ -53,13 +56,13 @@ public $selectedCustomer = null;
     {
         $this->resetValidation();
         $this->openCreate = true;
-       
     }
     protected $validationAttributes = [
         'date_entry' => 'Fecha de Ingreso',
         'date_due' => 'Fecha de Vencimiento',
         'responsible_id' => 'Responsable',
         'customer_id' => 'Cliente',
+        'equipment_type_id' => 'Tipo de Equipo',
     ];
 
     public function store()
@@ -71,6 +74,7 @@ public $selectedCustomer = null;
             'responsible_id'   => 'required|exists:users,id',
             'tech_assigned_id' => 'nullable|exists:users,id',
             'customer_id'      => 'required|exists:customers,id',
+            'equipment_type_id' => 'required|exists:equipment_types,id',
         ];
 
         $this->applyTrim(array_keys($rules));
@@ -86,7 +90,21 @@ public $selectedCustomer = null;
             'customer_id'      => $data['customer_id'],
             'state_id'        => null, // Por defecto “En revisión”
             'model'            => 'N/A',
+            'equipment_type_id' => $data['equipment_type_id'],
         ]);
+        // ✅ Obtener el tipo de equipo con sus componentes por defecto
+        $equipmentType = \App\Models\EquipmentType::with('components')->find($this->equipment_type_id);
+
+        if ($equipmentType && $equipmentType->components->count() > 0) {
+            foreach ($equipmentType->components as $component) {
+                $service->details()->create([
+                    'component_id' => $component->id,
+                    'quantity'     => $component->pivot->default_quantity ?? 1,
+                    'reference'    => 'SIN REFERENCIA',
+                    'capacity'     => 'N/A',
+                ]);
+            }
+        }
 
         // Emitir evento para el componente index
         $this->emit('success', 'Servicio creado con éxito');
@@ -96,7 +114,7 @@ public $selectedCustomer = null;
         $this->openCreate = false;
 
         // Redirigir a editar servicio (detalle)
-        return redirect()->route('services.edit', $service->id);
+        return redirect()->route('admin.services.edit', $service->id);
     }
 
     // búsqueda dinámica
