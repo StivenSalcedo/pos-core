@@ -10,9 +10,9 @@ class FactusConfigurationService
 {
     public static function apiConfiguration()
     {
-        if (Cache::has('api_configuration')) {
+       /* if (Cache::has('api_configuration')) {
             return Cache::get('api_configuration');
-        }
+        }*/
 
         $api = FactusConfiguration::first()->api;
         Cache::forever('api_configuration', $api);

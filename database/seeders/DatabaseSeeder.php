@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder {
         $this->call(ModuleSeeder::class);
         $this->call(OrderSeeder::class);
         $this->call(IdentificationDocumentSeeder::class);
-
+       
 
         Customer::create([
             'identification_document_id' => 3,
@@ -51,6 +51,8 @@ class DatabaseSeeder extends Seeder {
         $this->call(PaymentMethodSeeder::class);
         $this->call(TerminalSeeder::class);
         $this->call(FactusConfigurationSeeder::class);
+        $this->call(ServiceModuleSeeder::class);
+
 
         if(App::environment('production')){
             shell_exec('chmod -R 777 ' . storage_path('app/public/'));

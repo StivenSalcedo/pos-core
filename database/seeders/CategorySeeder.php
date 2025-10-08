@@ -24,7 +24,6 @@ class CategorySeeder extends Seeder
             "Libros",
             "Muebles",
             "Joyería",
-            "Electrónica de consumo",
             "Productos para mascotas",
             "Herramientas",
             "Suministros para oficina",
