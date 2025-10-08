@@ -43,6 +43,13 @@
           'can' => 'facturas',
       ],
       [
+          'name' => 'Servicios',
+          'route' => route('admin.services.index'),
+          'active' => request()->routeIs('admin.services.*'),
+          'icon' => 'quote text-xl',
+          'can' => 'facturas',
+      ],
+      [
           'name' => 'Ventas rápidas',
           'route' => route('admin.quick-sales.create'),
           'active' => request()->routeIs('admin.quick-sales.*'),

@@ -34,6 +34,10 @@ use App\Http\Livewire\Admin\Terminals\Index as TerminalsIndex;
 use App\Http\Livewire\Admin\Users\Index as UsersIndex;
 use App\Http\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\Admin\Services\Index as ServicesIndex;
+use App\Http\Livewire\Admin\Services\Create as ServicesCreate;
+use App\Http\Livewire\Admin\Services\Edit as ServicesEdit;
+use App\Http\Livewire\Admin\Services\Show as ServicesShow;
 
 Route::get('/', Dashboard::class)->name('home');
 
@@ -133,3 +137,15 @@ Route::get('factus/conexion', Connection::class)->name('factus.connection');
 Route::get('logs', LogsIndex::class)->name('logs.index');
 
 Route::get('logs-file', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('logs.file');
+
+//Route::group(['middleware' => ['module:servicios']], function () {
+
+    Route::get('servicios', ServicesIndex::class)->name('services.index');
+
+    Route::get('servicios/nuevo-servicio', ServicesCreate::class)->name('services.create');
+
+    Route::get('servicios/{service}/editar', ServicesEdit::class)->name('services.edit');
+
+    Route::get('servicios/{service}', ServicesShow::class)->name('services.show');
+
+//});
