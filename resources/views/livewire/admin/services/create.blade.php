@@ -31,6 +31,12 @@
                     <div class="relative">
                         <x-wireui.input placeholder="Buscar cliente por nombre o identificación..."
                             wire:model.debounce.400ms="searchCustomer" icon="search" class="w-full" />
+                        {{-- Botón para crear nuevo cliente --}}
+                        <button title="Registrar nuevo cliente"
+                            x-on:click="$wire.emitTo('admin.customers.create', 'openCreate');"
+                            class="p-2 border rounded-md shadow hover:bg-gray-100 transition">
+                            <i class="ico icon-add-user text-xl text-primary-600"></i>
+                        </button>
 
                         <!-- Dropdown resultados -->
                         @if (!empty($customerResults))
@@ -50,13 +56,14 @@
                         @endif
                     </div>
 
+
                     @if ($selectedCustomer)
                         <div class="mt-2 text-sm text-gray-700">
                             <strong>Cliente Seleccionado:</strong> {{ $selectedCustomer->names }}
                             <x-wireui.button flat sm icon="trash" wire:click="clearCustomer" class="ml-2" />
                         </div>
                     @endif
-                   
+
 
                     @error('customer_id')
                         <span class="text-red-500 text-xs">{{ $message }}</span>
@@ -72,4 +79,6 @@
             </x-slot:footer>
         </x-wireui.card>
     </x-wireui.modal>
+    <livewire:admin.customers.create />
 </div>
+

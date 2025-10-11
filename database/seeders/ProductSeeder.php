@@ -12,7 +12,7 @@ class ProductSeeder extends Seeder
 
     public function run()
     {
-        $products = Product::factory(50)->create();
+       /* $products = Product::factory(50)->create();
 
         foreach ($products as $product => $value) {
             $id = TaxRate::all()->random()->id;
@@ -21,7 +21,7 @@ class ProductSeeder extends Seeder
             }else{
                 $value->taxRates()->attach($id);
             }
-        }
+        }*/
 
         $product = Product::create([
             'barcode' => 12345,

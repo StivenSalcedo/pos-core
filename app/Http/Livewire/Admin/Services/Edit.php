@@ -10,43 +10,114 @@ use App\Models\ServiceState;
 use App\Models\EquipmentType;
 use App\Models\Brand;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class Edit extends Component
 {
     public Service $service;
-    public $customers, $responsibles, $technicians, $states, $equipmentTypes, $brands;
+    public  $responsibles, $technicians, $states, $equipmentTypes, $brands;
     public $tab = 'main'; // tab activa
-
+    public $selectedCustomer = [];
+    public $customers = [];
+    public $searchCustomer = '';
+    protected $listeners = [
+        'openEdit',
+        'refreshdata',
+        'set-customer' => 'setCustomerFromModal'
+    ];
     protected $rules = [
         'service.date_entry' => 'required|date',
         'service.date_due' => 'required|date|after_or_equal:service.date_entry',
         'service.customer_id' => 'required|exists:customers,id',
         'service.responsible_id' => 'required|exists:users,id',
         'service.tech_assigned_id' => 'nullable|exists:users,id',
-        'service.state_id' => 'nullable|exists:service_states,id',
+        'service.state_id' => 'required|exists:service_states,id',
         'service.model' => 'required|string|max:150',
-        'service.description' => 'nullable|string|max:500',
+        'service.problem_description' => 'nullable|string|max:500',
         'service.diagnosis' => 'nullable|string|max:500',
+        'service.equipment_type_id' => 'required|exists:equipment_types,id',
+        'service.document_number' => 'nullable|string|max:255',
+        'service.password' => 'nullable|string|max:255',
+        'service.accessories' => 'nullable|string|max:255',
+        'service.user' => 'nullable|string|max:255',
+        'service.brand_id' => 'nullable',
+
     ];
 
     public function mount(Service $service)
     {
         $this->service = $service;
-        $this->customers = Customer::pluck('names', 'id');
+        //dd($this->service);
+        Log::debug('Llegó a setCustomerFromModal', ['data' => $service]);
         $this->responsibles = User::pluck('name', 'id');
         $this->technicians = User::pluck('name', 'id');
         $this->states = ServiceState::pluck('name', 'id');
+        $this->equipmentTypes = EquipmentType::pluck('name', 'id');
        
-        $this->service->load(['details.component', 'details.brand']);
         $this->brands = Brand::pluck('name', 'id');
+         $this->service->load(['details.component', 'details.brand']);
+
+        if ($service->customer) {
+            $this->selectedCustomer = [
+                'id' => $service->customer->id,
+                'names' => $service->customer->names,
+                'no_identification' => $service->customer->no_identification,
+            ];
+        }
+
+        if (is_null($this->service->state_id) && $this->states->isNotEmpty()) {
+            $this->service->state_id = $this->states->keys()->first();
+             $this->service->load(['details.component', 'details.brand']);
+        }
     }
 
-    public function save()
+    public function refreshdata()
+    {
+        $this->equipmentTypes = EquipmentType::orderBy('id', 'desc')->pluck('name', 'id');
+        $this->service->equipment_type_id = collect($this->equipmentTypes)->keys()->first();
+    }
+
+    public function update()
     {
         $this->validate();
         $this->service->save();
         $this->emit('success', 'Servicio actualizado correctamente');
     }
+
+    public function clearCustomer()
+    {
+        $this->selectedCustomer = null;
+        $this->service->customer_id = null;
+        $this->searchCustomer = '';
+    }
+
+    public function setCustomerFromModal($customer)
+    {
+        $this->selectCustomer($customer['id']);
+    }
+
+    public function updatedSearchCustomer()
+    {
+        if (strlen($this->searchCustomer) > 1) {
+            $this->customers = Customer::where('names', 'like', "%{$this->searchCustomer}%")
+                ->orWhere('no_identification', 'like', "%{$this->searchCustomer}%")
+                ->limit(10)->get();
+        } else {
+            $this->customers = [];
+        }
+    }
+
+    public function selectCustomer($id)
+    {
+        $customer = Customer::find($id);
+        if ($customer) {
+            $this->selectedCustomer = $customer->only(['id', 'names', 'no_identification']);
+            $this->service->customer_id = $customer->id;
+            $this->customers = [];
+            $this->searchCustomer = $customer->names;
+        }
+    }
+
 
     public function render()
     {
