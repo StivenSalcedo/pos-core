@@ -16,7 +16,9 @@ class Create extends Component
 {
     use LivewireTrait;
 
-    protected $listeners = ['openCreate'];
+    protected $listeners = [
+        'openCreate'
+    ];
 
     public $openCreate = false;
 
@@ -30,7 +32,7 @@ class Create extends Component
 
     public $legal_organization;
 
-   public $tribute;
+    public $tribute;
 
     public $no_identification;
 
@@ -51,7 +53,6 @@ class Create extends Component
         $this->legalOrganizations = LegalOrganization::getCasesLabel();
         $this->legal_organization = LegalOrganization::NATURAL_PERSON->value;
         $this->tribute = CustomerTributes::NOT_RESPONSIBLE->value;
-        
     }
 
     public function render()
@@ -103,12 +104,14 @@ class Create extends Component
         $data = $this->validate($rules, $messages, $attributes);
 
         $customer = Customer::create($data);
-
-        $this->dispatchBrowserEvent('set-customer', $customer->only(['id', 'no_identification', 'names', 'phone']));
-
+        $payload = $customer->only(['id', 'names', 'no_identification', 'phone']);
+        //$this->dispatchBrowserEvent('set-customer', $customer->only(['id', 'no_identification', 'names', 'phone']));
+        $this->emitTo('admin.services.create', 'set-customer', $payload);
+        $this->emitTo('admin.services.edit',  'set-customer', $payload);
         $this->emit('success', 'Cliente creado con éxito');
         $this->emitTo('admin.customers.index', 'render');
-
         $this->resetExcept('identificationDocuments', 'tributes', 'legalOrganizations');
     }
+
+   
 }

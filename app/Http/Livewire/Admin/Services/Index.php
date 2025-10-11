@@ -19,7 +19,7 @@ class Index extends Component
 
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['confirmDelete'];
+    protected $listeners = ['confirmDelete','render'];
 
     public function updatingSearch()
     {

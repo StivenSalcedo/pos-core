@@ -1,8 +1,8 @@
 <div class="p-6">
     <x-commons.header>
         <x-wireui.button icon="plus" primary text="Nuevo Servicio"
-            x-on:click="$wire.emitTo('admin.services.create', 'openCreate');console.log('emit lanzado')" />
-    </x-commons.header>
+            x-on:click="$wire.emitTo('admin.services.create', 'openCreate');" />
+        </x-commons.header>
     <div class="flex justify-between mb-4 items-center">
         <h2 class="text-2xl font-bold text-gray-800">Servicios Técnicos</h2>
 

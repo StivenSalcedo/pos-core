@@ -16,7 +16,10 @@ class Create extends Component
 {
     use LivewireTrait;
 
-    protected $listeners = ['openCreate'];
+    protected $listeners = [
+        'openCreate',
+        'set-customer' => 'setCustomerFromModal'
+    ];
 
     public $openCreate = false;
 
@@ -29,12 +32,17 @@ class Create extends Component
     public $equipment_type_id;
     public $responsibles;
     public $technicians;
-    public $customers;
+    public $customers = [];
     public $searchCustomer = '';
     public $customerResults = [];
     public $selectedCustomer = null;
     public $equipmenttypes;
 
+
+    public function reopenModal()
+    {
+        $this->openCreate = true;
+    }
 
     public function mount()
     {
@@ -144,5 +152,13 @@ class Create extends Component
         $this->selectedCustomer = null;
         $this->customer_id = null;
         $this->searchCustomer = '';
+    }
+    public function setCustomerFromModal($customer)
+    {
+        $this->selectCustomer($customer['id']);
+      /*  $this->selectedCustomer = \App\Models\Customer::find();
+       // $this->selectedCustomer = $customer;
+        $this->customer_id = $customer['id'];
+        $this->searchCustomer = $customer['names'];*/
     }
 }
