@@ -33,6 +33,9 @@
 
             <x-wireui.native-select label="Marca" placeholder="Seleccione una marca" :options="$brands" wire:model.defer="service.brand_id"
                 optionKeyValue="true" />
+                 <button wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")' class="h-10 w-10 bg-indigo-500 text-white rounded-lg" title="Crear Marca">
+                            <i class="ico icon-add"></i>
+                        </button>
         </div>
 
         {{-- 🔹 Cliente (buscador) --}}
@@ -132,4 +135,5 @@
     </x-wireui.card>
     <livewire:admin.customers.create />
     <livewire:admin.equipment-types.create />
+     <livewire:admin.brands.create />
 </div>

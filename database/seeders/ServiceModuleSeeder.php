@@ -23,17 +23,6 @@ class ServiceModuleSeeder extends Seeder
             'tablet',
             'iphone',
             'smartphone',
-            'samsung_galaxy',
-            'xiaomi',
-            'huawei',
-            'motorola',
-            'lg_phone',
-            'playstation',
-            'ps4',
-            'ps5',
-            'xbox',
-            'xbox360',
-            'xbox_one',
             'nintendo_switch',
             'smart_tv',
             'led_tv',
@@ -60,9 +49,6 @@ class ServiceModuleSeeder extends Seeder
             'reproductor_bluray',
             'scanner',
             'proyector',
-            'lavadora',
-            'refrigerador',
-            'aire_acondicionado',
             'consola_portatil'
         ];
 

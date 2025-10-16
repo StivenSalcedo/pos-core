@@ -14,6 +14,7 @@ class ServiceDetail extends Model
     'quantity',
     'reference',
     'capacity',
+    'brand_id'
 ];
 
  // 🔹 Relación hacia el servicio

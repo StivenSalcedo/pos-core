@@ -1,14 +1,15 @@
 <?php
 
 namespace App\Http\Livewire\Admin\EquipmentTypes;
+
 use App\Models\EquipmentType;
 use Livewire\Component;
 use Livewire\WithPagination;
-
+use Illuminate\Support\Facades\DB;
 class Create extends Component
 {
 
-     use WithPagination;
+    use WithPagination;
 
     protected $listeners = ['openCreate'];
 
@@ -16,7 +17,7 @@ class Create extends Component
 
     public $equipment_type_id, $name;
 
-    public $componentName='';
+    public $componentName = '';
 
     protected $validationAttributes = ['name' => 'nombre'];
 
@@ -25,7 +26,7 @@ class Create extends Component
         $equipmenttypes = EquipmentType::latest()->paginate(10);
         return view('livewire.admin.equipment-types.create', compact('equipmenttypes'));
     }
-     public function openCreate($componentName)
+    public function openCreate($componentName)
     {
         $this->componentName = $componentName;
         $this->openCreate = true;
@@ -41,15 +42,31 @@ class Create extends Component
 
         $this->validate($rules);
 
-        EquipmentType::create([
+        $equipment_type = EquipmentType::create([
             'name' => $this->name
         ]);
 
+        $componentIds = \App\Models\Component::orderBy('id')
+        ->take(2)
+        ->pluck('id')
+        ->toArray();
+
+    foreach ($componentIds as $compId) {
+        DB::table('equipment_type_component')->insert([
+            'equipment_type_id' => $equipment_type->id,
+            'component_id'      => $compId,
+            'default_quantity'  => 1,
+            'created_at'        => now(),
+            'updated_at'        => now(),
+        ]);
+    }
+
         $this->emit('success', 'Tipo de equipo creado con éxito');
 
-        $this->emitTo('admin.services.edit', 'refreshdata');
+        $this->emitTo('admin.services.edit', 'refreshdata', $equipment_type->id);
 
         $this->resetForm();
+        $this->openCreate = false;
     }
 
     public function edit(EquipmentType $equipment_type)
@@ -74,7 +91,7 @@ class Create extends Component
 
         $this->emit('success', 'Tipo de equipo actualizado con éxito');
 
-        $this->emitTo('admin.services.edit', 'refreshdata');
+        $this->emitTo('admin.services.edit', 'refreshdata', $equipment_type->id);
 
         $this->resetForm();
     }
@@ -90,8 +107,5 @@ class Create extends Component
         $this->resetForm();
     }
 
-    protected function emitEventRefresh()
-    {
-
-    }
+    protected function emitEventRefresh() {}
 }

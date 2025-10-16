@@ -1,7 +1,12 @@
 <div>
   <div class="flex justify-between mb-3">
     <h3 class="text-lg font-semibold text-gray-700">Productos utilizados</h3>
-    <x-wireui.button sm icon="plus" primary wire:click="addProductRow" text="Agregar producto" />
+   <x-wireui.button
+            primary
+            sm icon="plus"
+            text="Agregar producto"
+            x-on:click="$wire.emitTo('admin.services.add-product', 'openAddProduct', {{ $service->id }})"
+        />
   </div>
 
   <div class="overflow-x-auto">
@@ -17,15 +22,15 @@
         </tr>
       </thead>
       <tbody>
-        @forelse($service->products as $item)
+        @forelse($products as $item)
           <tr class="border-b">
-            <td class="px-3 py-2">{{ $item->product->name ?? 'N/A' }}</td>
-            <td class="px-3 py-2 text-right">{{ $item->quantity }}</td>
-            <td class="px-3 py-2 text-right">{{ number_format($item->unit_price, 0, ',', '.') }}</td>
-            <td class="px-3 py-2 text-right">{{ number_format($item->discount, 0, ',', '.') }}</td>
-            <td class="px-3 py-2 text-right font-semibold">{{ number_format($item->total, 0, ',', '.') }}</td>
+            <td class="px-3 py-2">{{ $item['product']['name'] ?? 'N/A' }}</td>
+            <td class="px-3 py-2 text-right">{{ $item['quantity'] }}</td>
+            <td class="px-3 py-2 text-right">{{ number_format($item['unit_price'], 0, ',', '.') }}</td>
+            <td class="px-3 py-2 text-right">{{ number_format($item['discount'], 0, ',', '.') }}</td>
+            <td class="px-3 py-2 text-right font-semibold">{{ number_format($item['total'], 0, ',', '.') }}</td>
             <td class="px-3 py-2 text-center">
-              <x-wireui.button sm icon="trash" red wire:click="removeProduct({{ $item->id }})" />
+              <x-wireui.button sm icon="trash" red wire:click="deleteProduct({{ $item['id'] }})" />
             </td>
           </tr>
         @empty
@@ -34,4 +39,5 @@
       </tbody>
     </table>
   </div>
+    <livewire:admin.services.add-product />
 </div>

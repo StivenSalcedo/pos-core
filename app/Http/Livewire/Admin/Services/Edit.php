@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\ServiceState;
 use App\Models\EquipmentType;
 use App\Models\Brand;
+use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -19,11 +20,16 @@ class Edit extends Component
     public $tab = 'main'; // tab activa
     public $selectedCustomer = [];
     public $customers = [];
+    public $details = [];
+    public $products=[];
     public $searchCustomer = '';
     protected $listeners = [
         'openEdit',
         'refreshdata',
-        'set-customer' => 'setCustomerFromModal'
+        'refreshBrands',
+        'set-customer' => 'setCustomerFromModal',
+        'refreshServiceDetails',
+        'refreshProductDetails'
     ];
     protected $rules = [
         'service.date_entry' => 'required|date',
@@ -53,9 +59,9 @@ class Edit extends Component
         $this->technicians = User::pluck('name', 'id');
         $this->states = ServiceState::pluck('name', 'id');
         $this->equipmentTypes = EquipmentType::pluck('name', 'id');
-       
+
         $this->brands = Brand::pluck('name', 'id');
-         $this->service->load(['details.component', 'details.brand']);
+        $this->service->load(['details.component', 'details.brand']);
 
         if ($service->customer) {
             $this->selectedCustomer = [
@@ -67,14 +73,38 @@ class Edit extends Component
 
         if (is_null($this->service->state_id) && $this->states->isNotEmpty()) {
             $this->service->state_id = $this->states->keys()->first();
-             $this->service->load(['details.component', 'details.brand']);
+            $this->service->load(['details.component', 'details.brand']);
+        }
+        $this->refreshServiceDetails();
+        $this->refreshProductDetails();
+    }
+
+    public function refreshdata($newEquipmentTypeId = null)
+    {
+        $this->equipmentTypes = EquipmentType::orderBy('id', 'desc')->pluck('name', 'id')->toArray();
+        // Si se envió un ID válido, seleccionarlo automáticamente
+        if ($newEquipmentTypeId && isset($this->equipmentTypes[$newEquipmentTypeId])) {
+            $this->service->equipment_type_id = $newEquipmentTypeId;
         }
     }
 
-    public function refreshdata()
+    public function refreshBrands($newBrandId = null)
     {
-        $this->equipmentTypes = EquipmentType::orderBy('id', 'desc')->pluck('name', 'id');
-        $this->service->equipment_type_id = collect($this->equipmentTypes)->keys()->first();
+        $this->brands = Brand::orderBy('id', 'desc')->pluck('name', 'id')->toArray();
+        // Si se envió un ID válido, seleccionarlo automáticamente
+        if ($newBrandId && isset($this->brands[$newBrandId])) {
+            $this->service->brand_id = $newBrandId;
+        }
+    }
+
+    public function refreshServiceDetails()
+    {
+        $this->details = $this->service->details()->with('component', 'brand')->get()->toArray();
+    }
+
+    public function refreshProductDetails()
+    {
+        $this->products = $this->service->products()->with('product')->get()->toArray();
     }
 
     public function update()
@@ -117,6 +147,29 @@ class Edit extends Component
             $this->searchCustomer = $customer->names;
         }
     }
+
+    public function deleteDetail($id)
+    {
+        $detail = $this->service->details()->find($id);
+
+        if ($detail) {
+            $detail->delete();
+            $this->refreshServiceDetails();
+        }
+    }
+
+    public function deleteProduct($id)
+    {
+        $product = $this->service->products()->find($id);
+
+        if ($product) {
+            $product->delete();
+            $this->refreshProductDetails();
+             Product::where('id', $product->product_id)->increment('stock', $product->quantity);
+        }
+    }
+
+    
 
 
     public function render()
