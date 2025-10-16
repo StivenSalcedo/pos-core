@@ -1,9 +1,12 @@
 <div>
   <div class="flex justify-between mb-3">
     <h3 class="text-lg font-semibold text-gray-700">Componentes del servicio</h3>
-
-    {{-- Botón opcional para añadir un nuevo componente manualmente --}}
-    <x-wireui.button sm icon="plus" primary wire:click="addComponentRow" text="Agregar componente" />
+   <x-wireui.button 
+        primary 
+        sm icon="plus"
+        text="Agregar componente"
+        x-on:click="$wire.emitTo('admin.services.add-component', 'openAddComponent', {{ $service->id }})" 
+    />
   </div>
 
   {{-- Tabla de componentes --}}
@@ -22,20 +25,20 @@
       </thead>
 
       <tbody>
-        @forelse($service->details as $index => $detail)
+        @forelse($details as $detail)
           <tr class="border-b hover:bg-gray-50">
-            <td class="px-3 py-2">{{ $index + 1 }}</td>
-            <td class="px-3 py-2">{{ $detail->component->name ?? 'N/A' }}</td>
-            <td class="px-3 py-2">{{ $detail->brand->name ?? 'Sin marca' }}</td>
-            <td class="px-3 py-2">{{ $detail->reference ?? 'SIN REFERENCIA' }}</td>
-            <td class="px-3 py-2">{{ $detail->capacity ?? 'N/A' }}</td>
-            <td class="px-3 py-2 text-right">{{ $detail->quantity ?? 1 }}</td>
+            <td class="px-3 py-2">{{ $loop->iteration }}</td>
+            <td class="px-3 py-2">{{ $detail['component']['name'] ?? 'N/A' }}</td>
+            <td class="px-3 py-2">{{ $detail['brand']['name'] ?? 'Sin marca' }}</td>
+            <td class="px-3 py-2">{{ $detail['reference'] ?? 'SIN REFERENCIA' }}</td>
+            <td class="px-3 py-2">{{ $detail['capacity'] ?? 'N/A' }}</td>
+            <td class="px-3 py-2 text-right">{{ $detail['quantity'] ?? 1 }}</td>
             <td class="px-3 py-2 text-center">
               <x-wireui.button
                 sm
                 icon="trash"
                 red
-                wire:click="removeComponent({{ $detail->id }})"
+                wire:click="deleteDetail({{$detail['id']}})"
                 tooltip="Eliminar componente"
               />
             </td>
@@ -50,4 +53,5 @@
       </tbody>
     </table>
   </div>
+  <livewire:admin.services.add-component />
 </div>
