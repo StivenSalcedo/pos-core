@@ -114,6 +114,11 @@ class ModuleSeeder extends Seeder
                 'name' => 'inventario',
                 'is_enabled' => 0,
                 'is_functionality' => 1
+            ],
+            [
+                'name' => 'servicios',
+                'is_enabled' => 0,
+                'is_functionality' => 0
             ]
         ];
 

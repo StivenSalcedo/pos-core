@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('service_id')->constrained('services')->cascadeOnDelete();
             $table->decimal('amount', 18, 2);
+            $table->foreignId('payment_method_id')->constrained('payment_methods');
             $table->string('method')->nullable(); // ej: efectivo, tarjeta, transferencia
             $table->string('reference')->nullable(); // numero de transacción
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete(); // quien registró el pago

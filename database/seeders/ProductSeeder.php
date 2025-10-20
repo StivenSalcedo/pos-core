@@ -38,7 +38,7 @@ class ProductSeeder extends Seeder
 
         $product->taxRates()->attach(3);
 
-        $product->presentations()->create([
+        /*$product->presentations()->create([
             'name' => 'Pastilla',
             'quantity' => 1,
             'price' => 500,
@@ -54,7 +54,7 @@ class ProductSeeder extends Seeder
             'name' => 'Caja x20',
             'quantity' => 20,
             'price' => 5000,
-        ]);
+        ]);*/
 
         $product = Product::create([
             'barcode' => 123456,
@@ -71,7 +71,7 @@ class ProductSeeder extends Seeder
 
         $product->taxRates()->attach(3);
 
-        $product->presentations()->create([
+       /* $product->presentations()->create([
             'name' => 'Pastilla',
             'quantity' => 1,
             'price' => 600,
@@ -87,6 +87,6 @@ class ProductSeeder extends Seeder
             'name' => 'Caja x30',
             'quantity' => 30,
             'price' => 6000,
-        ]);
+        ]);*/
     }
 }

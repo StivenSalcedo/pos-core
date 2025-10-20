@@ -68,6 +68,6 @@ class Index extends Component
 
         return view('livewire.admin.services.index', [
             'services' => $query->paginate($this->perPage),
-        ]);
+        ])->layoutData(['title' => 'Servicios Tec.']);
     }
 }
