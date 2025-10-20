@@ -46,8 +46,8 @@
           'name' => 'Servicios',
           'route' => route('admin.services.index'),
           'active' => request()->routeIs('admin.services.*'),
-          'icon' => 'quote text-xl',
-          'can' => 'facturas',
+          'icon' => 'new-order text-xl',
+          'can' => 'servicios',
       ],
       [
           'name' => 'Ventas rápidas',

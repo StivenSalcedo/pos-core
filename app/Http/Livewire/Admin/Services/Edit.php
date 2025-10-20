@@ -22,6 +22,7 @@ class Edit extends Component
     public $customers = [];
     public $details = [];
     public $products=[];
+     public $payments=[];
     public $searchCustomer = '';
     protected $listeners = [
         'openEdit',
@@ -29,7 +30,8 @@ class Edit extends Component
         'refreshBrands',
         'set-customer' => 'setCustomerFromModal',
         'refreshServiceDetails',
-        'refreshProductDetails'
+        'refreshProductDetails',
+        'refreshPaymentDetails'
     ];
     protected $rules = [
         'service.date_entry' => 'required|date',
@@ -77,6 +79,7 @@ class Edit extends Component
         }
         $this->refreshServiceDetails();
         $this->refreshProductDetails();
+        $this->refreshPaymentDetails();
     }
 
     public function refreshdata($newEquipmentTypeId = null)
@@ -105,6 +108,10 @@ class Edit extends Component
     public function refreshProductDetails()
     {
         $this->products = $this->service->products()->with('product')->get()->toArray();
+    }
+    public function refreshPaymentDetails()
+    {
+        $this->payments = $this->service->payments()->with('payment','user')->get()->toArray();
     }
 
     public function update()
@@ -174,6 +181,6 @@ class Edit extends Component
 
     public function render()
     {
-        return view('livewire.admin.services.edit');
+        return view('livewire.admin.services.edit')->layoutData(['title' => 'Detalle Servicio']);
     }
 }

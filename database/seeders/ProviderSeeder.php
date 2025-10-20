@@ -9,6 +9,6 @@ use Illuminate\Database\Seeder;
 class ProviderSeeder extends Seeder {
 
     public function run() {
-        Provider::factory(20)->create();
+       // Provider::factory(20)->create();
     }
 }

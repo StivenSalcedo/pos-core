@@ -32,6 +32,7 @@ class PermissionSeeder extends Seeder {
             'impuestos',
             'ventas rapidas',
             'activar o desactivar modulos',
+            'servicios',
         ];
 
         foreach ($permissions as $key => $value) {
