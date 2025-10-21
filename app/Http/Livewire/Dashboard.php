@@ -25,24 +25,24 @@ class Dashboard extends Component
 
     public function mount()
     {
-        if (in_array(request()->getHost(), $this->enableDomains)) {
+       // if (in_array(request()->getHost(), $this->enableDomains)) {
             $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
             $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
-        }
+       // }
     }
 
     public function render()
     {
-        if (in_array(request()->getHost(), $this->enableDomains)) {
+       // if (in_array(request()->getHost(), $this->enableDomains)) {
             $this->getData();
-        }
+       // }
 
         return view('livewire.dashboard')->with('enableDomains', $this->enableDomains)->layoutData(['title' => 'Dashboard']);
     }
 
     protected function getData()
     {
-        $dataFrom = Carbon::parse('31-07-2024')->startOfDay();
+        $dataFrom = now()->startOfYear();
 
         $bills = Bill::select(DB::raw('sum(cost) as cost, sum(total) as total'))
             ->where('created_at', '>=', $dataFrom)

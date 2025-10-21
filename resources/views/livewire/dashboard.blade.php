@@ -1,5 +1,5 @@
 <div class="px-2 pt-2 pb-10">
-  @if (in_array(request()->getHost(), $enableDomains))
+ 
 
   <div class="flex justify-end items-end gap-x-4">
 
@@ -18,8 +18,7 @@
   <p class="text-center text-xl text-red-600 font-semibold">Importante</p>
 
   <h1 class="text-center font-semibold">
-    Los datos presentados en esta vista se están calculando basándose en las ventas realizadas a partir de 31 de julio
-    de 2024
+    Los datos presentados en esta vista se están calculando basándose en las ventas realizadas del año en curso.
   </h1>
 
   <div class="flex flex-wrap justify-center gap-8 mt-10">
@@ -37,5 +36,5 @@
     </div>
 
   </div>
-  @endif
+ 
 </div>
