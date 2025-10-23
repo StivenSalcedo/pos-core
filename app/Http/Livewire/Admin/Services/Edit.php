@@ -12,18 +12,26 @@ use App\Models\Brand;
 use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
+use App\Models\ServiceAttachment;
+use Illuminate\Support\Str;
 
 class Edit extends Component
 {
+    use WithFileUploads;
     public Service $service;
     public  $responsibles, $technicians, $states, $equipmentTypes, $brands;
     public $tab = 'main'; // tab activa
     public $selectedCustomer = [];
     public $customers = [];
     public $details = [];
-    public $products=[];
-     public $payments=[];
+    public $products = [];
+    public $payments = [];
     public $searchCustomer = '';
+    public $photo;
+    public $openUploadModal = false;
+    public $cameraPhoto;
     protected $listeners = [
         'openEdit',
         'refreshdata',
@@ -31,7 +39,9 @@ class Edit extends Component
         'set-customer' => 'setCustomerFromModal',
         'refreshServiceDetails',
         'refreshProductDetails',
-        'refreshPaymentDetails'
+        'refreshPaymentDetails',
+        'refreshAttachments' => '$refresh',
+        'uploadCameraPhoto'  => 'saveCameraPhoto',
     ];
     protected $rules = [
         'service.date_entry' => 'required|date',
@@ -51,6 +61,101 @@ class Edit extends Component
         'service.brand_id' => 'nullable',
 
     ];
+
+    public function validatePhoto()
+    {
+        $this->validate([
+            'photo' => 'required|image|max:4096',
+        ]);
+    }
+
+    protected $messages = [
+        'photo.required' => 'Debe seleccionar una imagen.',
+        'photo.image' => 'El archivo debe ser una imagen válida.',
+        'photo.max' => 'La imagen no debe superar los 4MB.',
+    ];
+
+    public function openPhotoUpload()
+    {
+        $this->reset('photo');
+        $this->resetValidation();
+        $this->openUploadModal = true;
+    }
+
+    public function saveCameraPhoto($base64Image)
+    {
+        try {
+            if (!$base64Image) {
+                $this->emit('error', 'No se pudo obtener la imagen de la cámara.');
+
+                return;
+            }
+
+            // Quitar encabezado "data:image/png;base64,..."
+            $imageData = explode(',', $base64Image)[1] ?? null;
+            if (!$imageData) throw new \Exception("Formato inválido de imagen");
+
+            $binary = base64_decode($imageData);
+
+            // Crear nombre y ruta
+            $filename = 'camera_' . Str::random(8) . '.jpg';
+            $path = 'services/' . $this->service->id . '/' . $filename;
+
+            Storage::disk('public')->put($path, $binary);
+
+            // Guardar registro
+            ServiceAttachment::create([
+                'service_id' => $this->service->id,
+                'path'       => $path,
+                'filename'   => $filename,
+            ]);
+
+
+            $this->emit('success', 'La imagen capturada se subió correctamente.');
+
+
+            $this->emitSelf('refreshAttachments');
+        } catch (\Exception $e) {
+            $this->emit('error', 'Error al guardar:' + $e->getMessage());
+        }
+    }
+
+    public function savePhoto()
+    {
+        $this->validatePhoto();
+        $path =$this->photo->storeAs('images/services',$this->service->id .'_' . $this->photo->getClientOriginalName(),'public');
+        //$path = $this->photo->store('services/' . $this->service->id, 'public');
+
+        ServiceAttachment::create([
+            'service_id' => $this->service->id,
+            'path' => $path,
+            'filename' => $this->photo->getClientOriginalName(),
+        ]);
+
+        $this->emit('success', 'La imagen se guardó correctamente.');
+
+
+        $this->reset('photo');
+        $this->openUploadModal = false;
+        $this->emitSelf('refreshAttachments');
+    }
+
+    public function removePhoto($id)
+    {
+        $attachment = ServiceAttachment::findOrFail($id);
+
+        // Eliminar archivo del disco
+        if (Storage::disk('public')->exists($attachment->path)) {
+            Storage::disk('public')->delete($attachment->path);
+        }
+
+        $attachment->delete();
+
+        $this->emit('success', 'La imagen fue eliminada correctamente.');
+
+
+        $this->emitSelf('refreshAttachments');
+    }
 
     public function mount(Service $service)
     {
@@ -111,7 +216,7 @@ class Edit extends Component
     }
     public function refreshPaymentDetails()
     {
-        $this->payments = $this->service->payments()->with('payment','user')->get()->toArray();
+        $this->payments = $this->service->payments()->with('payment', 'user')->get();
     }
 
     public function update()
@@ -172,11 +277,22 @@ class Edit extends Component
         if ($product) {
             $product->delete();
             $this->refreshProductDetails();
-             Product::where('id', $product->product_id)->increment('stock', $product->quantity);
+            Product::where('id', $product->product_id)->increment('stock', $product->quantity);
         }
     }
 
-    
+    public function removePayment($id)
+    {
+
+        $payment = $this->service->payments()->find($id);
+
+        if ($payment) {
+            $payment->delete();
+            $this->refreshPaymentDetails();
+        }
+    }
+
+
 
 
     public function render()

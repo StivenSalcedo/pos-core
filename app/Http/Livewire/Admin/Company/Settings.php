@@ -42,15 +42,16 @@ class Settings extends Component {
     public function updatedPreLogo($value){
         $this->validate(['preLogo' => 'required|image|mimes:png|max:512|dimensions:max_width=500,max_height=250']);
         $this->logo = $value;
+        $this->logo->storeAs('images/system', 'logo.png','public');
     }
 
     public function getUrlLogo(){
         if ($this->logo) {
             return $this->logo->temporaryUrl();
-        }else if (Storage::exists('public/images/logos/logo.png')) {
-            return Storage::url('images/logos/logo.png');
+        }else if (Storage::exists('images/system/logo.png')) {
+            return Storage::url('images/system/logo.png');
         }else{
-            return Storage::url('images/system/logo-default.png');
+            return Storage::url('images/system/logo.png');
         }
     }
 
