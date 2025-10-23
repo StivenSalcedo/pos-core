@@ -148,7 +148,11 @@ class AddProduct extends Component
             'total'       => $this->total,
         ]);
 
-         Product::where('id', $this->product->id)->decrement('stock', $this->quantity);
+        if (!$this->product->has_inventory)
+        {
+        Product::where('id', $this->product->id)->decrement('stock', $this->quantity);
+        }
+        
 
         $this->emit('success', 'El producto fue agregado correctamente al servicio.');
          $this->emitTo('admin.services.edit', 'refreshProductDetails');

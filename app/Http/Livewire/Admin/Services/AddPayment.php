@@ -62,12 +62,10 @@ class AddPayment extends Component
             'user_id'           => auth()->id(),
         ]);
 
-        $this->notification()->success(
-            title: 'Pago registrado',
-            description: 'El pago fue agregado correctamente al servicio.'
-        );
+              $this->emit('success', 'El pago fue agregado correctamente.');
+       
 
-        $this->emitTo('admin.services.payments', 'refreshPayments');
+        $this->emitTo('admin.services.edit', 'refreshPaymentDetails');
         $this->open = false;
     }
 

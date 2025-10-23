@@ -9,7 +9,7 @@ use Mockery\Generator\Method;
 class ServicePayment extends Model
 {
     use HasFactory;
-
+    protected $guarded = ['id'];
     public function payment()
     {
         return $this->belongsTo(PaymentMethod::class);

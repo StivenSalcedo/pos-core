@@ -24,8 +24,8 @@ if (! function_exists('formatToCop')) {
 if (! function_exists('getUrlLogo')) {
     function getUrlLogo()
     {
-        if (Storage::exists('public/images/logos/logo.png')) {
-            return Storage::url('images/logos/logo.png');
+        if (Storage::exists('public/images/system/logo.png')) {
+            return Storage::url('images/system/logo.png');
         } else {
             return Storage::url('images/system/logo-default.png');
         }

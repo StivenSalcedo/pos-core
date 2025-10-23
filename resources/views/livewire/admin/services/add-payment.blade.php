@@ -19,6 +19,7 @@
                     placeholder="Seleccione un método"
                     :options="$paymentMethods"
                     wire:model.defer="payment_method_id"
+                     optionKeyValue="true"
                 />
 
                 <x-wireui.input 
@@ -31,8 +32,8 @@
 
             <x-slot:footer>
                 <div class="flex justify-end space-x-3">
-                    <x-wireui.button flat label="Cancelar" x-on:click="$set('open', false)" />
-                    <x-wireui.button primary label="Guardar Pago" wire:click="save" />
+                   <x-wireui.button secondary x-on:click="$wire.open = false" text="Cerrar" />
+                    <x-wireui.button wire:click="save" text="Agregar" primary />
                 </div>
             </x-slot:footer>
 

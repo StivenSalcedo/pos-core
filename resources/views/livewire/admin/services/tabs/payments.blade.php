@@ -8,10 +8,10 @@
     <table class="min-w-full border text-sm text-gray-700">
         <thead class="bg-gray-100">
             <tr>
-                <th class="px-3 py-2">Fecha</th>
-                <th class="px-3 py-2 text-right">Valor</th>
-                <th class="px-3 py-2">Método</th>
-                <th class="px-3 py-2">Usuario</th>
+                <th class="px-3 py-2 text-left">Fecha</th>
+                <th class="px-3 py-2 text-left">Valor</th>
+                <th class="px-3 py-2 text-left">Método</th>
+                <th class="px-3 py-2 text-left">Usuario</th>
                 <th class="px-3 py-2 text-center">Acciones</th>
             </tr>
         </thead>
@@ -19,11 +19,11 @@
             @forelse($payments as $payment)
                 <tr class="border-b">
                     <td class="px-3 py-2">{{ $payment->created_at->format('d/m/Y H:i') }}</td>
-                    <td class="px-3 py-2 text-right">{{ number_format($payment->amount, 0, ',', '.') }}</td>
-                    <td class="px-3 py-2">{{ ucfirst($payment->method ?? 'N/A') }}</td>
-                    <td class="px-3 py-2">{{ $payment->user->name ?? 'N/A' }}</td>
+                    <td class="px-3 py-2 text-left">{{ number_format($payment['amount'], 0, ',', '.') }}</td>
+                    <td class="px-3 py-2">{{ $payment->payment->name ?? 'N/A' }}</td>
+                    <td class="px-3 py-2">{{ $payment['user']['name'] ?? 'N/A' }}</td>
                     <td class="px-3 py-2 text-center">
-                        <x-wireui.button sm icon="trash" red wire:click="removePayment({{ $payment->id }})" />
+                        <x-wireui.button sm icon="trash" red wire:click="removePayment({{ $payment['id'] }})" />
                     </td>
                 </tr>
             @empty
