@@ -4,26 +4,22 @@
         <div class="flex space-x-2">
             <!-- Botón para subir desde archivos -->
             <x-wireui.button sm icon="upload" primary wire:click="openPhotoUpload" label="Subir desde archivos" />
-            
+
             <!-- Botón para capturar desde cámara -->
             <x-wireui.button sm icon="camera" secondary x-on:click="$dispatch('openCameraCapture')" label="Tomar foto" />
         </div>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        @forelse($service->attachments as $photo)
-            <div class="relative border rounded-lg overflow-hidden group">
-                <img 
-                    src="{{ asset('storage/'.$photo->path) }}" 
-                    alt="{{ $photo->filename }}" 
+        @forelse($service->attachments as $photoShow)
+            <div style="width: 200px" class="relative border rounded-lg overflow-hidden group">
+                <img src="{{ asset('storage/' . $photoShow->path) }}" alt="{{ $photoShow->filename }}"
                     class="object-cover h-40 w-full cursor-pointer"
-                    x-on:click="$dispatch('open-photo-preview', { src: '{{ asset('storage/'.$photo->path) }}' })"
-                >
+                    x-on:click="$dispatch('open-photo-preview', { src: '{{ asset('storage/' . $photoShow->path) }}' })">
 
-                <button wire:click="removePhoto({{ $photo->id }})"
-                    class="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-red-600 opacity-0 group-hover:opacity-100 transition">
-                
-                </button>
+                <x-wireui.button sm icon="trash" red wire:click="removePhoto({{ $photoShow->id }})"
+                    tooltip="Eliminar foto" />
+
             </div>
         @empty
             <p class="text-gray-400">No hay imágenes registradas.</p>
@@ -36,23 +32,17 @@
             <x-wireui.errors />
 
             <div class="space-y-4">
-                <x-wireui.input
-                    type="file"
-                    label="Seleccionar imagen"
-                    wire:model="photo"
-                    accept="image/*"
-                />
+                <x-wireui.input type="file" label="Seleccionar imagen" wire:model="photo" accept="image/*" />
 
                 @if ($photo)
-                    <div class="text-center">
-                       <!-- <img src="$photo->temporaryUrl() }}" class="mx-auto h-40 rounded-lg shadow">-->
-                    </div>
+                    <div class="text-center"> <img src="{{ $photo->temporaryUrl() }}"
+                            class="mx-auto h-40 rounded-lg shadow"> </div>
                 @endif
             </div>
 
             <x-slot:footer>
                 <div class="flex justify-end space-x-3">
-                    <x-wireui.button flat text="Cancelar" x-on:click="$wire.openUploadModal = false"  />
+                    <x-wireui.button flat text="Cancelar" x-on:click="$wire.openUploadModal = false" />
                     <x-wireui.button primary text="Guardar" wire:click="savePhoto" />
                 </div>
             </x-slot:footer>
@@ -60,10 +50,7 @@
     </x-wireui.modal>
 
     <!-- Modal de previsualización -->
-    <div 
-        x-data="{ open: false, src: '' }" 
-        x-on:open-photo-preview.window="open = true; src = $event.detail.src"
-    >
+    <div x-data="{ open: false, src: '' }" x-on:open-photo-preview.window="open = true; src = $event.detail.src">
         <x-wireui.modal x-model="open" max-width="4xl">
             <div class="text-center">
                 <img :src="src" class="rounded-lg mx-auto max-h-[80vh]">
@@ -71,12 +58,9 @@
         </x-wireui.modal>
     </div>
 </div>
+
 <!-- Modal de cámara -->
-<div 
-    x-data="cameraHandler()" 
-    x-on:openCameraCapture.window="openCamera()" 
-    x-on:closeCamera.window="stopCamera()"
->
+<div x-data="cameraHandler()" x-on:openCameraCapture.window="openCamera()" x-on:closeCamera.window="stopCamera()">
     <x-wireui.modal wire:model.defer="cameraPhoto" name="cameraModal" max-width="2xl">
         <x-wireui.card title="Capturar foto con cámara">
 
@@ -98,42 +82,43 @@
 </div>
 
 <script>
-function cameraHandler() {
-    return {
-        stream: null,
-        openCamera() {
-            Livewire.emit('refreshAttachments');
-            let modal = new bootstrap.Modal(document.querySelector('[wire\\:model\\.defer="cameraPhoto"]'));
-            modal.show();
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(s => {
-                    this.stream = s;
-                    document.getElementById('camera-stream').srcObject = s;
-                })
-                .catch(err => alert('No se pudo acceder a la cámara: ' + err.message));
-        },
-        stopCamera() {
-            if (this.stream) {
-                this.stream.getTracks().forEach(track => track.stop());
+    function cameraHandler() {
+        return {
+            stream: null,
+            openCamera() {
+                Livewire.emit('refreshAttachments');
+                let modal = new bootstrap.Modal(document.querySelector('[wire\\:model\\.defer="cameraPhoto"]'));
+                modal.show();
+                navigator.mediaDevices.getUserMedia({
+                        video: true
+                    })
+                    .then(s => {
+                        this.stream = s;
+                        document.getElementById('camera-stream').srcObject = s;
+                    })
+                    .catch(err => alert('No se pudo acceder a la cámara: ' + err.message));
+            },
+            stopCamera() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                }
+                this.stream = null;
+            },
+            capturePhoto() {
+                let video = document.getElementById('camera-stream');
+                let canvas = document.getElementById('camera-canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                let dataUrl = canvas.toDataURL('image/jpeg');
+                Livewire.emit('uploadCameraPhoto', dataUrl);
+                this.stopCamera();
+
+                // Cierra el modal de cámara
+                document.querySelector('[wire\\:model\\.defer="cameraPhoto"]').dispatchEvent(new CustomEvent('close'));
             }
-            this.stream = null;
-        },
-        capturePhoto() {
-            let video = document.getElementById('camera-stream');
-            let canvas = document.getElementById('camera-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            let ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            let dataUrl = canvas.toDataURL('image/jpeg');
-            Livewire.emit('uploadCameraPhoto', dataUrl);
-            this.stopCamera();
-
-            // Cierra el modal de cámara
-            document.querySelector('[wire\\:model\\.defer="cameraPhoto"]').dispatchEvent(new CustomEvent('close'));
         }
     }
-}
 </script>
-
