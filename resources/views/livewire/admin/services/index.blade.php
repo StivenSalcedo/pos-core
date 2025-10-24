@@ -1,12 +1,107 @@
-<div class="p-6">
+<div class="container">
+    
+
     <x-commons.header>
-        <x-wireui.button icon="plus" primary text="Nuevo Servicio"
-            x-on:click="$wire.emitTo('admin.services.create', 'openCreate');" />
-        </x-commons.header>
+        <x-wireui.button icon="file" x-on:click="$wire.emitTo('admin.services.create', 'openCreate');" text="Nuevo servicio" />
+    </x-commons.header>
+    <x-commons.table-responsive>
+        <x-slot:top title="Servicios técnicos"></x-slot:top>
+        <x-slot:header>
+            <input wire:model.debounce.500ms="search" type="text" placeholder="Buscar por modelo o cliente..."
+            class="border-gray-300 rounded-lg w-full md:w-1/3 focus:ring focus:ring-blue-200" />
+            <select wire:model="selectedState" class="border-gray-300 rounded-lg">
+                <option value="">Todos los estados</option>
+                <option value="recibido">Recibido</option>
+                @foreach (\App\Models\ServiceState::orderBy('order')->get() as $state)
+                <option value="{{ $state->id }}">{{ $state->name }}</option>
+                @endforeach
+            </select>
+            <select wire:model="perPage" class="border-gray-300 rounded-lg">
+                <option value="10">10 por página</option>
+                <option value="25">25 por página</option>
+                <option value="50">50 por página</option>
+            </select>
+        </x-slot:header>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th left>
+                        #
+                    </th>
+                    <th left>
+                        Cliente
+                    </th>
+                    <th left>
+                        Responsable
+                    </th>
+                    <th left>
+                        Fecha ingreso
+                    </th>
+                    <th>
+                        Fecha vencimiento
+                    </th>
+                    <th>
+                        Equipo
+                    </th>
+                    <th>
+                        Marca
+                    </th>
+                    <th>
+                        Modelo
+                    </th>
+                    <th>
+                        Estado
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($services as $service)
+                    <tr>
+                        <td>{{ $service->id }}</td>
+                        <td>{{ $service->customer->names ?? 'Sin cliente' }}</td>
+                        <td>
+                            {{ $service->responsible?->name ?? 'No asignado' }}
+                        </td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($service->date_entry)->format('d/m/Y') }}
+                        </td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($service->date_due)->format('d/m/Y') }}
+                        </td>
+                        <td>{{ $service->equipmentType->name ?? 'N/A' }}</td>
+                        <td>{{ $service->brand->name ?? 'N/A' }}</td>
+                        <td>{{ $service->model ?? '-' }}</td>
+                        <td>
+                            <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">
+                                {{ $service->state->name ?? 'Recibido' }}
+                            </span>
+                        </td>
+                        <td actions>
+                            <x-buttons.edit wire:click="" title="Editar"/>
+                            <x-buttons.delete wire:click="confirmDelete({{ $service->id }})" title="Eliminar"/>
+                        </td>
+                        {{-- <td class="px-4 py-2 text-right">
+                            <a href="{{ route('admin.services.edit', $service->id) }}"
+                                class="text-blue-600 hover:underline">Editar</a>
+                            <button wire:click="confirmDelete({{ $service->id }})"
+                                class="text-red-600 hover:underline ml-3">Eliminar</button>
+                        </td> --}}
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-gray-500">No hay servicios registrados.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </x-commons.table-responsive>
+
+
     <div class="flex justify-between mb-4 items-center">
         <h2 class="text-2xl font-bold text-gray-800">Servicios Técnicos</h2>
-
-
     </div>
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
