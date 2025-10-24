@@ -3,41 +3,57 @@
     {{-- 🔹 Tarjeta principal: Datos iniciales --}}
     <x-wireui.card title="Datos del servicio">
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {{-- Fecha de ingreso --}}
-            <x-wireui.input label="Fecha de ingreso" wire:model.defer="service.date_entry" type="date" disabled />
+            <x-wireui.input class="w-full" label="Fecha de ingreso" wire:model.defer="service.date_entry" type="date"
+                disabled />
 
             {{-- Fecha de vencimiento --}}
-            <x-wireui.input label="Fecha de vencimiento" wire:model.defer="service.date_due" type="date" />
+            <x-wireui.input class="w-full" label="Fecha de vencimiento" wire:model.defer="service.date_due"
+                type="date" />
 
             {{-- Número de documento --}}
-            <x-wireui.input label="N° Documento" wire:model.defer="service.document_number" placeholder="(opcional)" />
+            {{-- <x-wireui.input label="N° Documento" wire:model.defer="service.document_number" placeholder="(opcional)" /> --}}
 
             {{-- Responsable --}}
-            <x-wireui.native-select label="Responsable" placeholder="Seleccione un responsable" :options="$responsibles"
-                wire:model.defer="service.responsible_id" optionKeyValue="true" />
+            <x-wireui.native-select class="w-full" label="Responsable" placeholder="Seleccione un responsable"
+                :options="$responsibles" wire:model.defer="service.responsible_id" optionKeyValue="true" />
 
             {{-- Técnico asignado --}}
-            <x-wireui.native-select label="Técnico Asignado" placeholder="Seleccione un técnico" :options="$technicians"
-                wire:model.defer="service.tech_assigned_id" optionKeyValue="true" />
+            <x-wireui.native-select class="w-full" label="Técnico Asignado" placeholder="Seleccione un técnico"
+                :options="$technicians" wire:model.defer="service.tech_assigned_id" optionKeyValue="true" />
 
             {{-- Tipo de equipo --}}
-            <x-wireui.native-select label="Tipo de Equipo" placeholder="Seleccione un tipo" :options="$equipmentTypes"
-                wire:model.defer="service.equipment_type_id" optionKeyValue="true" />
-                 <button wire:click='$emitTo("admin.equipment-types.create", "openCreate", "{{ $this->getName() }}")' class="h-10 w-10 bg-indigo-500 text-white rounded-lg" title="Crear Tipo">
-                            <i class="ico icon-add"></i>
-                        </button>
+            <div class="relative">
+                <x-wireui.native-select class="w-full" label="Tipo de Equipo" placeholder="Seleccione un tipo"
+                    :options="$equipmentTypes" wire:model.defer="service.equipment_type_id" optionKeyValue="true" />
+                {{-- Botón para crear nuevo cliente --}}
+                <button class="absolute top-0 right-0" title="Crear nuevo tipo" wire:click='$emitTo("admin.equipment-types.create", "openCreate", "{{ $this->getName() }}")'>
+                    <i class="ico icon-add text-blue-600 text-lg"></i>
+                </button>
+            </div>
+            {{-- Marca --}}
+            <div class="relative">
+                <x-wireui.native-select class="w-full" label="Marca" placeholder="Seleccione una marca" :options="$brands"
+                wire:model.defer="service.brand_id" optionKeyValue="true" />
+                {{-- Botón para crear nuevo cliente --}}
+                <button class="absolute top-0 right-0" title="Crear nuevo tipo" wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
+                    <i class="ico icon-add text-blue-600 text-lg"></i>
+                </button>
+            </div>
 
-            <x-wireui.native-select label="Estado" :options="$states" wire:model.defer="service.state_id"
-                optionKeyValue="true" />
+            <x-wireui.native-select class="w-full" label="Estado" :options="$states" wire:model.defer="service.state_id"
+                optionKeyValue="true" />            
 
-            <x-wireui.native-select label="Marca" placeholder="Seleccione una marca" :options="$brands" wire:model.defer="service.brand_id"
-                optionKeyValue="true" />
-                 <button wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")' class="h-10 w-10 bg-indigo-500 text-white rounded-lg" title="Crear Marca">
-                            <i class="ico icon-add"></i>
-                        </button>
         </div>
-
+        {{-- <button wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'
+            class="h-10 w-10 bg-indigo-500 text-white rounded-lg" title="Crear Marca">
+            <i class="ico icon-add"></i>
+        </button>
+        <button wire:click='$emitTo("admin.equipment-types.create", "openCreate", "{{ $this->getName() }}")'
+            class="h-10 w-10 bg-indigo-500 text-white rounded-lg" title="Crear Tipo">
+            <i class="ico icon-add"></i>
+        </button> --}}
         {{-- 🔹 Cliente (buscador) --}}
         <div class="mt-6">
             <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
@@ -135,5 +151,5 @@
     </x-wireui.card>
     <livewire:admin.customers.create />
     <livewire:admin.equipment-types.create />
-     <livewire:admin.brands.create />
+    <livewire:admin.brands.create />
 </div>
