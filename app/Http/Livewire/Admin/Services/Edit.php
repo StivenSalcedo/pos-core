@@ -214,6 +214,7 @@ class Edit extends Component
     {
         $this->products = $this->service->products()->with('product')->get()->toArray();
     }
+    
     public function refreshPaymentDetails()
     {
         $this->payments = $this->service->payments()->with('payment', 'user')->get();
