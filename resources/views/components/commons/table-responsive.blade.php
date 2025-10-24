@@ -1,4 +1,4 @@
-<div {{ $attributes }} class="bg-white border border-slate-200 shadow-sm overflow-x-auto rounded-lg">
+<div {{ $attributes }} class="bg-white border border-slate-200 shadow-sm rounded-lg">
 
     @if (isset($top))
         <div class="flex items-end justify-between py-1.5 px-2 bg-slate-100 border text-xs sm:text-sm md:text-tiny border-b shadow">
@@ -11,12 +11,12 @@
         </div>
     @endif
 
-    @if (isset($header))
-        <div class="flex w-full items-end p-4 space-x-3">
-            {{ $header  }}
-        </div>
-    @endif
-
-    {{ $slot }}
-
+    <div class="overflow-x-auto">
+        @if (isset($header))
+            <div class="flex w-full items-end p-4 space-x-3">
+                {{ $header  }}
+            </div>
+        @endif
+        {{ $slot }}
+    </div>
 </div>
