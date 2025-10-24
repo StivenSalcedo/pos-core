@@ -46,7 +46,7 @@
           'name' => 'Servicios',
           'route' => route('admin.services.index'),
           'active' => request()->routeIs('admin.services.*'),
-          'icon' => 'new-order text-xl',
+          'icon' => 'computer text-xl',
           'can' => 'servicios',
       ],
       [
@@ -117,9 +117,10 @@
 @endphp
 <div class="">
 
-  <nav class="fixed inset-y-0 z-50 h-auto overflow-hidden">
+  <nav class="fixed inset-y-0 h-auto overflow-hidden" style="top: 50px; z-index: 30;">
 
-    <div class="{{ request()->routeIs('admin.quick-sales.create') ? '' : 'w-52' }} flex h-full flex-col border bg-white pt-1 shadow shadow-gray-400">
+    {{-- <div class="{{ request()->routeIs('admin.quick-sales.create') ? '' : 'w-52' }} flex h-full flex-col border bg-white pt-1 shadow shadow-gray-400"> --}}
+    <div class="w-full md:w-52 flex h-full flex-col border bg-white pt-1 shadow shadow-gray-400">
 
       {{-- links menu --}}
       <div class="overflow-hidden overflow-y-auto pb-3 pt-2">
@@ -134,15 +135,16 @@
         </ul>
       </div>
     </div>
+    
 
   </nav>
 
-  <nav id="menu-top" class="{{ request()->routeIs('admin.quick-sales.create') ? 'pl-14' : 'pl-52' }} fixed top-0 z-40 flex h-14 w-full border bg-white shadow">
+  <nav id="menu-top" style="padding-left: 0" class="{{ request()->routeIs('admin.quick-sales.create') ? 'pl-14' : 'pl-52' }} fixed top-0 z-40 flex h-14 w-full border bg-white shadow">
 
     <div class="flex w-full px-2">
 
       {{-- Accesos directos --}}
-      <div class="flex items-center">
+      {{-- <div class="flex items-center">
         <ul class="flex space-x-3">
           @can('isEnabled', [App\Models\Module::class, 'facturas'])
             <li class="text-gray-600">
@@ -172,7 +174,7 @@
           @endcan
 
         </ul>
-      </div>
+      </div> --}}
 
       <div class="ml-auto flex h-full items-center space-x-3">
 

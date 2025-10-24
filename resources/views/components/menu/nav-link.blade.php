@@ -9,9 +9,10 @@
 
     <a href="{{ $route }}" class="inline-flex items-center font-medium w-full px-2 h-9" title="{{$name}}">
         <i class="ico icon-{{ $icon }}"></i>
-        @if (!request()->routeIs('admin.quick-sales.create'))
+        {{-- @if (!request()->routeIs('admin.quick-sales.create'))
             <span class="whitespace-nowrap text-sm ml-4"> {{ $name }} </span>
-        @endif
+        @endif --}}
+        <span class="hidden md:block whitespace-nowrap text-sm ml-4"> {{ $name }} </span>
     </a>
 
 </div>

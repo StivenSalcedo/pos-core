@@ -52,7 +52,11 @@
 
     <livewire:admin.menu>
 
-      <main class="{{ request()->routeIs('admin.quick-sales.create') ? 'pl-14' : 'pl-52' }} pt-14 min-h-screen">
+      {{-- <main class="{{ request()->routeIs('admin.quick-sales.create') ? 'pl-14' : 'pl-52' }} pt-14 min-h-screen">
+        {{ $slot }}
+      </main> --}}
+
+      <main class="pl-14 md:pl-52 pt-14 min-h-screen">
         {{ $slot }}
       </main>
 
