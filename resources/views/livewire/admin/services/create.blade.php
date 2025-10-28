@@ -1,42 +1,45 @@
 <div>
     <x-wireui.modal wire:model.defer="openCreate" max-width="4xl">
-        <x-wireui.card title="Nuevo Servicio Técnico">
-            <x-wireui.errors />
+        <x-wireui.card title="Nuevo servicio técnico">
+            <x-wireui.errors class="mb-6" />
 
-            <div class="grid sm:grid-cols-2 gap-6">
+            <div class="grid sm:grid-cols-3 gap-6">
                 <!-- Fecha ingreso -->
-                <x-wireui.input label="Fecha de ingreso" type="date" wire:model.defer="date_entry" class="w-full" />
+                <x-wireui.input class="w-full" label="Fecha de ingreso" type="date" wire:model.defer="date_entry" />
 
                 <!-- Fecha vencimiento -->
-                <x-wireui.input label="Fecha de vencimiento" type="date" wire:model.defer="date_due" class="w-full" />
+                <x-wireui.input class="w-full" label="Fecha de vencimiento" type="date" wire:model.defer="date_due" />
 
                 <!-- Número de documento -->
-                <x-wireui.input label="N° Documento" wire:model.defer="document_number" placeholder="Opcional" />
+                {{-- <x-wireui.input label="N° Documento" wire:model.defer="document_number" placeholder="Opcional" /> --}}
 
                 <!-- Responsable -->
-                <x-wireui.native-select label="Responsable" placeholder="Seleccione un responsable" :options="$responsibles"
+                <x-wireui.native-select class="w-full" label="Responsable" placeholder="Seleccione un responsable" :options="$responsibles"
                     wire:model.defer="responsible_id" optionKeyValue="true" />
 
                 <!-- Técnico asignado -->
-                <x-wireui.native-select label="Técnico Asignado" placeholder="Seleccione técnico" :options="$technicians"
+                <x-wireui.native-select class="w-full" label="Técnico asignado" placeholder="Seleccione técnico" :options="$technicians"
                     wire:model.defer="tech_assigned_id" optionKeyValue="true" />
 
                 <!-- Tipo de equipo -->
-                <x-wireui.native-select label="Tipo de Equipo" placeholder="Seleccione equio" :options="$equipmenttypes"
+                <x-wireui.native-select class="w-full" label="Tipo de equipo" placeholder="Seleccione equipo" :options="$equipmenttypes"
                     wire:model.defer="equipment_type_id" optionKeyValue="true" />
 
                 <!-- Cliente -->
-                <div class="col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                <div class="col-span-3">
+                    <div class="flex justify-between">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                        {{-- Botón para crear nuevo cliente --}}
+                        <button title="Crear nuevo cliente"
+                            x-on:click="$wire.emitTo('admin.customers.create', 'openCreate');">
+                            <i class="ico icon-add-user text-blue-600 text-xl"></i>
+                        </button>
+                    </div>
+
                     <div class="relative">
                         <x-wireui.input placeholder="Buscar cliente por nombre o identificación..."
                             wire:model.debounce.400ms="searchCustomer" icon="search" class="w-full" />
-                        {{-- Botón para crear nuevo cliente --}}
-                        <button title="Registrar nuevo cliente"
-                            x-on:click="$wire.emitTo('admin.customers.create', 'openCreate');"
-                            class="p-2 border rounded-md shadow hover:bg-gray-100 transition">
-                            <i class="ico icon-add-user text-xl text-primary-600"></i>
-                        </button>
+
 
                         <!-- Dropdown resultados -->
                         @if (!empty($customerResults))
@@ -81,4 +84,3 @@
     </x-wireui.modal>
     <livewire:admin.customers.create />
 </div>
-

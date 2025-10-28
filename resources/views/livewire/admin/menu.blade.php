@@ -117,7 +117,7 @@
 @endphp
 <div class="">
 
-  <nav class="fixed inset-y-0 h-auto overflow-hidden" style="top: 50px; z-index: 30;">
+  <nav class="fixed inset-y-0 h-auto overflow-hidden top-14 z-30">
 
     {{-- <div class="{{ request()->routeIs('admin.quick-sales.create') ? '' : 'w-52' }} flex h-full flex-col border bg-white pt-1 shadow shadow-gray-400"> --}}
     <div class="w-full md:w-52 flex h-full flex-col border bg-white pt-1 shadow shadow-gray-400">
@@ -139,7 +139,9 @@
 
   </nav>
 
-  <nav id="menu-top" style="padding-left: 0" class="{{ request()->routeIs('admin.quick-sales.create') ? 'pl-14' : 'pl-52' }} fixed top-0 z-40 flex h-14 w-full border bg-white shadow">
+  {{-- <nav id="menu-top" style="padding-left: 0" class="{{ request()->routeIs('admin.quick-sales.create') ? 'pl-14' : 'pl-52' }} fixed top-0 z-40 flex h-14 w-full border bg-white shadow"> --}}
+
+  <nav id="menu-top" class="fixed top-0 z-40 flex h-14 w-full border bg-white shadow">
 
     <div class="flex w-full px-2">
 
