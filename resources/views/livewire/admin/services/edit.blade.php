@@ -1,26 +1,26 @@
 <div>
-    <x-wireui.card title="Editar servicio #{{ $service->id }}" separator>
+    <x-wireui.card title="{{ $service->id ? 'Editar servicio: ':'Crear Servicio '}} {{ $service->id }}" separator>
 
         {{-- Tabs de navegación --}}
         <div class="border-b border-gray-200 mb-4">
             <nav class="-mb-px flex flex-wrap gap-2">
                 <button wire:click="$set('tab', 'create')"
                     class="px-3 py-2 font-medium text-sm {{ $tab === 'create' ? 'border-b-2 border-primary-500 text-primary-600' : 'text-gray-500 hover:text-gray-700' }}">
-                    Datos principales
+                    Datos iniciales
                 </button>
 
                 <button wire:click="{{ $service->id ? '$set(\'tab\', \'main\')' : '' }}"
                     @if (!$service->id) disabled @endif
                     class="px-3 py-2 font-medium text-sm 
         {{ $tab === 'main' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
-                    Detalles
+                    Detalles técnicos
                 </button>
 
                 <button wire:click="{{ $service->id ? '$set(\'tab\', \'details\')' : '' }}"
                     @if (!$service->id) disabled @endif
                     class="px-3 py-2 font-medium text-sm 
         {{ $tab === 'details' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
-                    Detalles técnicos
+                    Componentes
                 </button>
 
                 <button wire:click="{{ $service->id ? '$set(\'tab\', \'products\')' : '' }}"

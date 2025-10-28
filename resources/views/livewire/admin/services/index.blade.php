@@ -2,7 +2,7 @@
     
 
     <x-commons.header>
-        <x-wireui.button icon="file" x-on:click="$wire.emitTo('admin.services.create', 'openCreate');" text="Nuevo servicio" />
+        <x-wireui.button icon="file"  href="{{ route('admin.services.create') }}"  text="Nuevo servicio" />
     </x-commons.header>
     <x-commons.table-responsive>
         <x-slot:top title="Servicios técnicos"></x-slot:top>
