@@ -21,7 +21,7 @@
   @endcan
   <x-commons.table-responsive>
 
-    <x-slot:top title="Facturas">
+    <x-slot:top title="Facturasxx">
       @can('ver totales de venta')
       <x-commons.tag tooltip="Total de facturas" label="Total" :value="formatToCop($total)" />
       @endcan
