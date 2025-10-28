@@ -22,7 +22,7 @@ class Edit extends Component
     use WithFileUploads;
     public Service $service;
     public  $responsibles, $technicians, $states, $equipmentTypes, $brands;
-    public $tab = 'main'; // tab activa
+    public $tab = 'create'; // tab activa
     public $selectedCustomer = [];
     public $customers = [];
     public $details = [];
