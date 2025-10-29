@@ -64,7 +64,7 @@
                             {{ $service->responsible?->name ?? 'No asignado' }}
                         </td>
                         <td>
-                            {{ \Carbon\Carbon::parse($service->date_entry)->format('d/m/Y') }}
+                            {{ \Carbon\Carbon::parse($service['date_entry'])->format('d/m/Y h:i:s a') }}
                         </td>
                         <td>
                             {{ \Carbon\Carbon::parse($service->date_due)->format('d/m/Y') }}
@@ -128,5 +128,5 @@
             });
         });
     </script>
-    <livewire:admin.services.create />
+   
 </div>

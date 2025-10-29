@@ -1,10 +1,11 @@
-<div class="container mt-4">
-    {{-- <div class="container relative">
+{{-- <div class="container mt-4">
+     <div class="container relative">
      <div class="sticky bg-gray-100 z-30 top-14">
         <x-commons.header>
             <x-wireui.button class="mr-3" icon="check" text="Guardar entrada" />
         </x-commons.header>
-    </div> --}}
+</div> --}}
+<div class="container mt-4">
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
 
         {{-- Tabs de navegación --}}
@@ -84,6 +85,11 @@
         {{ $tab === 'notifications' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
                     Notificaciones
                 </button>
+                <button wire:click="goToHistoriesTab" @if (!$service->id) disabled @endif
+                    class="px-3 py-2 font-medium text-sm 
+        {{ $tab === 'histories' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
+                    Historial Cliente
+                </button>
             </nav>
         </div>
 
@@ -103,8 +109,18 @@
                 @include('livewire.admin.services.tabs.photos')
             @elseif ($tab === 'notifications')
                 @include('livewire.admin.services.tabs.notifications')
+            @elseif ($tab === 'histories')
+                @include('livewire.admin.services.tabs.histories')
             @endif
         </div>
 
     </x-wireui.card>
 </div>
+@push('js')
+    <script>
+        window.addEventListener('open-new-tab', event => {
+            const url = event.detail.url;
+            window.open(url, '_blank'); // Abre en nueva pestaña
+        });
+    </script>
+@endpush
