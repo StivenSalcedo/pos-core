@@ -100,12 +100,10 @@
                 <span class="text-red-500 text-xs">{{ $message }}</span>
             @enderror
         </div>
-
     </div>
     <livewire:admin.customers.create />
     <livewire:admin.equipment-types.create />
-      <livewire:admin.brands.create />
-
+    <livewire:admin.brands.create />
 </div>
 @push('js')
     <script>

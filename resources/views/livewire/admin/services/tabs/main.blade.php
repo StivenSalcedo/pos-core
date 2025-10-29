@@ -51,15 +51,4 @@
             <x-wireui.textarea label="Diagnóstico" wire:model.defer="service.diagnosis" rows="4" />
         </div>
     </div>
-    {{-- <livewire:admin.customers.create />
-    <livewire:admin.equipment-types.create />
-    <livewire:admin.brands.create />
-
-        <div class="mt-6 text-right">
-            <x-wireui.button primary wire:click="update" text="Actualizar" icon="check" spinner="update" />
-        </div>
-    </x-wireui.card> --}}
-
-
-  
 </div>

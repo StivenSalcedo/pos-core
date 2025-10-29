@@ -5,7 +5,12 @@
             <x-wireui.button class="mr-3" icon="check" text="Guardar entrada" />
         </x-commons.header>
 </div> --}}
-<div class="container mt-4">
+<div class="container relative">
+    <div class="sticky bg-gray-100 z-30 top-14">
+        <x-commons.header>
+            <x-wireui.button class="mr-3" icon="check" text="Guardar entrada" />
+        </x-commons.header>
+    </div>
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
 
         {{-- Tabs de navegación --}}
