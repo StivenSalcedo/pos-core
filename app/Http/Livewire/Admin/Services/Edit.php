@@ -16,13 +16,16 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ServiceAttachment;
 use Illuminate\Support\Str;
+use App\Traits\LivewireTrait;
 
 class Edit extends Component
 {
+    use LivewireTrait;
     use WithFileUploads;
+
     public Service $service;
     public  $responsibles, $technicians, $states, $equipmentTypes, $brands;
-    public $tab = 'main'; // tab activa
+    public $tab = 'create'; // tab activa
     public $selectedCustomer = [];
     public $customers = [];
     public $details = [];
@@ -32,6 +35,10 @@ class Edit extends Component
     public $photo;
     public $openUploadModal = false;
     public $cameraPhoto;
+    public $date_entry;
+    public $date_due;
+
+
     protected $listeners = [
         'openEdit',
         'refreshdata',
@@ -43,6 +50,9 @@ class Edit extends Component
         'refreshAttachments' => '$refresh',
         'uploadCameraPhoto'  => 'saveCameraPhoto',
     ];
+
+
+
     protected $rules = [
         'service.date_entry' => 'required|date',
         'service.date_due' => 'required|date|after_or_equal:service.date_entry',
@@ -58,8 +68,29 @@ class Edit extends Component
         'service.password' => 'nullable|string|max:255',
         'service.accessories' => 'nullable|string|max:255',
         'service.user' => 'nullable|string|max:255',
-        'service.brand_id' => 'nullable',
+        'service.brand_id' => 'required|exists:brands,id',
 
+    ];
+
+    public $rulesCreate = [
+        'service.date_entry'       => 'required|date',
+        'service.date_due'         => 'required|date|after_or_equal:date_entry',
+        'service.responsible_id'   => 'required|exists:users,id',
+        'service.tech_assigned_id' => 'nullable|exists:users,id',
+        'service.customer_id'      => 'required|exists:customers,id',
+        'service.equipment_type_id' => 'required|exists:equipment_types,id',
+        'service.state_id'          => 'required|exists:service_states,id',
+    ];
+
+
+
+    protected $validationAttributes = [
+        'service.date_entry' => 'Fecha de Ingreso',
+        'service.date_due' => 'Fecha de Vencimiento',
+        'service.responsible_id' => 'Responsable',
+        'service.customer_id' => 'Cliente',
+        'service.equipment_type_id' => 'Tipo de Equipo',
+        'service.brand_id' => 'Marca',
     ];
 
     public function validatePhoto()
@@ -123,7 +154,7 @@ class Edit extends Component
     public function savePhoto()
     {
         $this->validatePhoto();
-        $path =$this->photo->storeAs('images/services',$this->service->id .'_' . $this->photo->getClientOriginalName(),'public');
+        $path = $this->photo->storeAs('images/services', $this->service->id . '_' . $this->photo->getClientOriginalName(), 'public');
         //$path = $this->photo->store('services/' . $this->service->id, 'public');
 
         ServiceAttachment::create([
@@ -160,7 +191,13 @@ class Edit extends Component
     public function mount(Service $service)
     {
         $this->service = $service;
-        //dd($this->service);
+
+        if (!$this->service->id) {
+            $today = Carbon::now();
+            $this->service->date_entry = $today->format('Y-m-d');
+            $this->service->date_due = $today->copy()->addDays(3)->format('Y-m-d');
+        }
+
         Log::debug('Llegó a setCustomerFromModal', ['data' => $service]);
         $this->responsibles = User::pluck('name', 'id');
         $this->technicians = User::pluck('name', 'id');
@@ -214,7 +251,7 @@ class Edit extends Component
     {
         $this->products = $this->service->products()->with('product')->get()->toArray();
     }
-    
+
     public function refreshPaymentDetails()
     {
         $this->payments = $this->service->payments()->with('payment', 'user')->get();
@@ -222,9 +259,47 @@ class Edit extends Component
 
     public function update()
     {
-        $this->validate();
-        $this->service->save();
-        $this->emit('success', 'Servicio actualizado correctamente');
+
+        if (!$this->service->id) {
+
+
+            $this->applyTrim(array_keys($this->rulesCreate));
+            $data = $this->validate($this->rulesCreate);
+            $service = Service::create([
+                'date_entry'       => $data['service']['date_entry'],
+                'date_due'         => $data['service']['date_due'],
+                'document_number'  => null,
+                'responsible_id'   => $data['service']['responsible_id'],
+                'tech_assigned_id' => $data['service']['tech_assigned_id'] ?? null,
+                'customer_id'      => $data['service']['customer_id'],
+                'state_id'        =>  $data['service']['state_id'],
+                'model'            => 'N/A',
+                'equipment_type_id' => $data['service']['equipment_type_id'],
+            ]);
+            // ✅ Obtener el tipo de equipo con sus componentes por defecto
+            $equipmentType = \App\Models\EquipmentType::with('components')->find($this->service->equipment_type_id);
+
+            if ($equipmentType && $equipmentType->components->count() > 0) {
+                foreach ($equipmentType->components as $component) {
+                    $service->details()->create([
+                        'component_id' => $component->id,
+                        'quantity'     => $component->pivot->default_quantity ?? 1,
+                        'reference'    => 'SIN REFERENCIA',
+                        'capacity'     => 'N/A',
+                    ]);
+                }
+            }
+
+            // Emitir evento para el componente index
+            $this->emit('success', 'Servicio creado con éxito');
+            $this->dispatchBrowserEvent('redirect-after-success', [
+                'url' => route('admin.services.edit', $service->id)
+            ]);
+        } else {
+            $this->validate();
+            $this->service->save();
+            $this->emit('success', 'Servicio actualizado correctamente');
+        }
     }
 
     public function clearCustomer()
