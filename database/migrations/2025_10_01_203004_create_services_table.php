@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
 
             // core fields
-            $table->date('date_entry')->nullable(false);
+            $table->datetime('date_entry')->nullable(false);
             $table->date('date_due')->nullable(false);
             $table->string('document_number')->nullable();
             
