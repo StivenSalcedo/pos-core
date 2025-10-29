@@ -1,16 +1,21 @@
 <div>
-    <div class="flex justify-between mb-3">
-        <h3 class="text-lg font-semibold text-gray-700">Registro fotográfico</h3>
-        <div class="flex space-x-2">
-            <!-- Botón para subir desde archivos -->
-            <x-wireui.button sm icon="upload" primary wire:click="openPhotoUpload" label="Subir desde archivos" />
-
-            <!-- Botón para capturar desde cámara -->
-            <x-wireui.button sm icon="camera" secondary x-on:click="$dispatch('openCameraCapture')" label="Tomar foto" />
+    <div class="flex items-center justify-between border-b pb-4 mb-4">
+        <h3 class="font-medium whitespace-normal text-lg">Registro fotográfico</h3>
+        <div class="text-right">
+            <x-wireui.button primary
+                wire:click="openPhotoUpload"
+                text="Agregar fotografía" icon="add" spinner="update" />
         </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    {{-- <div class="flex justify-between mb-3">
+        <h3 class="text-lg font-semibold text-gray-700"></h3>
+        <div class="flex space-x-2">
+            <x-wireui.button sm icon="camera" secondary x-on:click="$dispatch('openCameraCapture')" label="Tomar foto" />
+        </div>
+    </div> --}}
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         @forelse($service->attachments as $photoShow)
             <div style="width: 200px" class="relative border rounded-lg overflow-hidden group">
                 <img src="{{ asset('storage/' . $photoShow->path) }}" alt="{{ $photoShow->filename }}"
@@ -22,7 +27,10 @@
 
             </div>
         @empty
-            <p class="text-gray-400">No hay imágenes registradas.</p>
+            <div class="col-span-4">
+                <p class="text-center text-gray-400">No hay imágenes registradas.</p>
+            </div>
+            
         @endforelse
     </div>
 

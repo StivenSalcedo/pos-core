@@ -1,8 +1,6 @@
 <div class="container">
-    
-
     <x-commons.header>
-        <x-wireui.button icon="file" x-on:click="$wire.emitTo('admin.services.create', 'openCreate');" text="Nuevo servicio" />
+        <x-wireui.button icon="file"  href="{{ route('admin.services.create') }}"  text="Nuevo servicio" />
     </x-commons.header>
     <x-commons.table-responsive>
         <x-slot:top title="Servicios técnicos"></x-slot:top>
@@ -83,7 +81,7 @@
                             <x-buttons.edit wire:click="redirectToEdit({{ $service->id }})" title="Editar"/>
                             <x-buttons.delete wire:click="confirmDelete({{ $service->id }})" title="Eliminar"/>
                         </td>
-                      
+
                     </tr>
                 @empty
                     <tr>
@@ -111,7 +109,7 @@
                     confirmButtonText: 'Sí, eliminar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        
+
                         Livewire.emit('deleteService');
                         Swal.fire('Eliminado!', 'El servicio ha sido eliminado.', 'success');
                     }

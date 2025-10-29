@@ -142,7 +142,7 @@ Route::get('logs-file', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::clas
 
     Route::get('servicios', ServicesIndex::class)->name('services.index');
 
-    Route::get('servicios/nuevo-servicio', ServicesCreate::class)->name('services.create');
+    Route::get('servicios/crear', ServicesEdit::class)->name('services.create');
 
     Route::get('servicios/{service}/editar', ServicesEdit::class)->name('services.edit');
 
