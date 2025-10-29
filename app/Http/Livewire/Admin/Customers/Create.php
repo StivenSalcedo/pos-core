@@ -106,7 +106,7 @@ class Create extends Component
         $customer = Customer::create($data);
         $payload = $customer->only(['id', 'names', 'no_identification', 'phone']);
         //$this->dispatchBrowserEvent('set-customer', $customer->only(['id', 'no_identification', 'names', 'phone']));
-        $this->emitTo('admin.services.create', 'set-customer', $payload);
+       
         $this->emitTo('admin.services.edit',  'set-customer', $payload);
         $this->emit('success', 'Cliente creado con éxito');
         $this->emitTo('admin.customers.index', 'render');

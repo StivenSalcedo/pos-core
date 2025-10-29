@@ -130,5 +130,5 @@
             });
         });
     </script>
-    <livewire:admin.services.create />
+   
 </div>
