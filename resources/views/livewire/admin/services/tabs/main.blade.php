@@ -10,15 +10,7 @@
         </div>
         <x-wireui.errors class="mb-6" />
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {{-- Marca --}}
-            <div class="relative">
-                <x-wireui.native-select class="w-full" label="Marca" placeholder="Seleccione una marca" :options="$brands"
-                wire:model.defer="service.brand_id" optionKeyValue="true" />
-                {{-- Botón para crear nuevo cliente --}}
-                <button class="absolute top-0 right-0" title="Crear nueva marca" wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
-                    <i class="ico icon-add text-blue-600 text-sm"></i>
-                </button>
-            </div>
+            
 
             <x-wireui.input label="Modelo" wire:model.defer="service.model" />
             <x-wireui.input label="Usuario" wire:model.defer="service.user" />
@@ -59,7 +51,15 @@
             <x-wireui.textarea label="Diagnóstico" wire:model.defer="service.diagnosis" rows="4" />
         </div>
     </div>
-    <livewire:admin.customers.create />
+    {{-- <livewire:admin.customers.create />
     <livewire:admin.equipment-types.create />
     <livewire:admin.brands.create />
+
+        <div class="mt-6 text-right">
+            <x-wireui.button primary wire:click="update" text="Actualizar" icon="check" spinner="update" />
+        </div>
+    </x-wireui.card> --}}
+
+
+  
 </div>

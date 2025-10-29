@@ -23,6 +23,7 @@ class Edit extends Component
     use LivewireTrait;
     use WithFileUploads;
 
+
     public Service $service;
     public  $responsibles, $technicians, $states, $equipmentTypes, $brands;
     public $tab = 'create'; // tab activa
@@ -31,12 +32,13 @@ class Edit extends Component
     public $details = [];
     public $products = [];
     public $payments = [];
+    public $histories = [];
     public $searchCustomer = '';
     public $photo;
     public $openUploadModal = false;
     public $cameraPhoto;
-    public $date_entry;
-    public $date_due;
+    public $date_entry_time;
+
 
 
     protected $listeners = [
@@ -70,6 +72,7 @@ class Edit extends Component
         'service.user' => 'nullable|string|max:255',
         'service.brand_id' => 'required|exists:brands,id',
 
+
     ];
 
     public $rulesCreate = [
@@ -80,6 +83,7 @@ class Edit extends Component
         'service.customer_id'      => 'required|exists:customers,id',
         'service.equipment_type_id' => 'required|exists:equipment_types,id',
         'service.state_id'          => 'required|exists:service_states,id',
+        'service.brand_id' => 'required|exists:brands,id',
     ];
 
 
@@ -105,6 +109,95 @@ class Edit extends Component
         'photo.image' => 'El archivo debe ser una imagen válida.',
         'photo.max' => 'La imagen no debe superar los 4MB.',
     ];
+
+    public function mount(Service $service)
+    {
+        $this->service = $service;
+
+        if (!$this->service->id) {
+            $today = Carbon::now();
+            $this->service->date_entry = $today->format('Y-m-d');
+            $this->service->date_due = $today->copy()->addDays(3)->format('Y-m-d');
+        } else {
+            $this->date_entry_time = $this->service->date_entry;
+            $this->service->date_entry = Carbon::parse($this->service->date_entry)->format('Y-m-d');
+        }
+
+        Log::debug('Llegó a setCustomerFromModal', ['data' => $service]);
+        $this->responsibles = User::pluck('name', 'id');
+        $this->technicians = User::pluck('name', 'id');
+        $this->states = ServiceState::pluck('name', 'id');
+        $this->equipmentTypes = EquipmentType::pluck('name', 'id');
+
+        $this->brands = Brand::pluck('name', 'id');
+        $this->service->load(['details.component', 'details.brand']);
+
+        if ($service->customer) {
+            $this->selectedCustomer = [
+                'id' => $service->customer->id,
+                'names' => $service->customer->names,
+                'no_identification' => $service->customer->no_identification,
+            ];
+        }
+
+        if (is_null($this->service->state_id) && $this->states->isNotEmpty()) {
+            $this->service->state_id = $this->states->keys()->first();
+            $this->service->load(['details.component', 'details.brand']);
+        }
+        $this->refreshServiceDetails();
+        $this->refreshProductDetails();
+        $this->refreshPaymentDetails();
+    }
+
+
+    public function update()
+    {
+
+        if (!$this->service->id) {
+
+
+            $this->applyTrim(array_keys($this->rulesCreate));
+            $data = $this->validate($this->rulesCreate);
+            $service = Service::create([
+                'date_entry'       => Carbon::parse($data['service']['date_entry'])->setTimeFromTimeString(now()->format('H:i:s')),
+                'date_due'         => $data['service']['date_due'],
+                'document_number'  => null,
+                'responsible_id'   => $data['service']['responsible_id'],
+                'tech_assigned_id' => $data['service']['tech_assigned_id'] ?? null,
+                'customer_id'      => $data['service']['customer_id'],
+                'state_id'        =>  $data['service']['state_id'],
+                'model'            => 'N/A',
+                'equipment_type_id' => $data['service']['equipment_type_id'],
+                'brand_id' => $data['service']['brand_id'],
+            ]);
+            // ✅ Obtener el tipo de equipo con sus componentes por defecto
+            $equipmentType = \App\Models\EquipmentType::with('components')->find($this->service->equipment_type_id);
+
+            if ($equipmentType && $equipmentType->components->count() > 0) {
+                foreach ($equipmentType->components as $component) {
+                    $service->details()->create([
+                        'component_id' => $component->id,
+                        'quantity'     => $component->pivot->default_quantity ?? 1,
+                        'reference'    => 'SIN REFERENCIA',
+                        'capacity'     => 'N/A',
+                    ]);
+                }
+            }
+
+            // Emitir evento para el componente index
+            $this->emit('success', 'Servicio creado con éxito');
+            $this->dispatchBrowserEvent('redirect-after-success', [
+                'url' => route('admin.services.edit', $service->id)
+            ]);
+        } else {
+            $this->validate();
+            $this->service->date_entry = Carbon::parse($this->service->date_entry)->setTimeFromTimeString(Carbon::parse($this->date_entry_time)->format('H:i:s'));
+            $this->service->save();
+            $this->service->date_entry = Carbon::parse($this->service->date_entry)->format('Y-m-d');
+            $this->emit('success', 'Servicio actualizado correctamente');
+        }
+    }
+
 
     public function openPhotoUpload()
     {
@@ -188,41 +281,6 @@ class Edit extends Component
         $this->emitSelf('refreshAttachments');
     }
 
-    public function mount(Service $service)
-    {
-        $this->service = $service;
-
-        if (!$this->service->id) {
-            $today = Carbon::now();
-            $this->service->date_entry = $today->format('Y-m-d');
-            $this->service->date_due = $today->copy()->addDays(3)->format('Y-m-d');
-        }
-
-        Log::debug('Llegó a setCustomerFromModal', ['data' => $service]);
-        $this->responsibles = User::pluck('name', 'id');
-        $this->technicians = User::pluck('name', 'id');
-        $this->states = ServiceState::pluck('name', 'id');
-        $this->equipmentTypes = EquipmentType::pluck('name', 'id');
-
-        $this->brands = Brand::pluck('name', 'id');
-        $this->service->load(['details.component', 'details.brand']);
-
-        if ($service->customer) {
-            $this->selectedCustomer = [
-                'id' => $service->customer->id,
-                'names' => $service->customer->names,
-                'no_identification' => $service->customer->no_identification,
-            ];
-        }
-
-        if (is_null($this->service->state_id) && $this->states->isNotEmpty()) {
-            $this->service->state_id = $this->states->keys()->first();
-            $this->service->load(['details.component', 'details.brand']);
-        }
-        $this->refreshServiceDetails();
-        $this->refreshProductDetails();
-        $this->refreshPaymentDetails();
-    }
 
     public function refreshdata($newEquipmentTypeId = null)
     {
@@ -252,55 +310,58 @@ class Edit extends Component
         $this->products = $this->service->products()->with('product')->get()->toArray();
     }
 
+    public function goToHistoriesTab()
+    {
+        if (!$this->service->id) {
+            return; // Previene acción si no se ha guardado aún
+        }
+
+        $this->tab = 'histories';
+        $this->changeTab('histories'); // Reutiliza tu función existente
+    }
+
+    public function changeTab($newTab)
+    {
+
+        $this->tab = $newTab;
+
+        if ($newTab === 'histories') {
+            $this->refreshHistories();
+        }
+    }
+
+    public function refreshHistories()
+    {
+
+        if (!$this->service->customer_id) {
+            $this->histories = [];
+            return;
+        }
+
+        $this->histories = Service::with(['customer', 'equipmentType', 'brand', 'state'])
+            ->where('customer_id', $this->service->customer_id)
+            ->where('id', '!=', $this->service->id)
+            ->latest()
+            ->take(20)
+            ->get()
+            ->toArray();
+    }
+
+    public function redirectToEdit($id)
+    {
+        $url = route('admin.services.edit', $id);
+        $this->dispatchBrowserEvent('open-new-tab', ['url' => $url]);
+    }
+
+
+
+
     public function refreshPaymentDetails()
     {
         $this->payments = $this->service->payments()->with('payment', 'user')->get();
     }
 
-    public function update()
-    {
 
-        if (!$this->service->id) {
-
-
-            $this->applyTrim(array_keys($this->rulesCreate));
-            $data = $this->validate($this->rulesCreate);
-            $service = Service::create([
-                'date_entry'       => $data['service']['date_entry'],
-                'date_due'         => $data['service']['date_due'],
-                'document_number'  => null,
-                'responsible_id'   => $data['service']['responsible_id'],
-                'tech_assigned_id' => $data['service']['tech_assigned_id'] ?? null,
-                'customer_id'      => $data['service']['customer_id'],
-                'state_id'        =>  $data['service']['state_id'],
-                'model'            => 'N/A',
-                'equipment_type_id' => $data['service']['equipment_type_id'],
-            ]);
-            // ✅ Obtener el tipo de equipo con sus componentes por defecto
-            $equipmentType = \App\Models\EquipmentType::with('components')->find($this->service->equipment_type_id);
-
-            if ($equipmentType && $equipmentType->components->count() > 0) {
-                foreach ($equipmentType->components as $component) {
-                    $service->details()->create([
-                        'component_id' => $component->id,
-                        'quantity'     => $component->pivot->default_quantity ?? 1,
-                        'reference'    => 'SIN REFERENCIA',
-                        'capacity'     => 'N/A',
-                    ]);
-                }
-            }
-
-            // Emitir evento para el componente index
-            $this->emit('success', 'Servicio creado con éxito');
-            $this->dispatchBrowserEvent('redirect-after-success', [
-                'url' => route('admin.services.edit', $service->id)
-            ]);
-        } else {
-            $this->validate();
-            $this->service->save();
-            $this->emit('success', 'Servicio actualizado correctamente');
-        }
-    }
 
     public function clearCustomer()
     {
@@ -373,6 +434,6 @@ class Edit extends Component
 
     public function render()
     {
-        return view('livewire.admin.services.edit')->layoutData(['title' => 'Detalle Servicio']);
+        return view('livewire.admin.services.edit')->layoutData(['title' => 'Detalle Servicio ' . $this->service->id]);
     }
 }
