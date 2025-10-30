@@ -22,6 +22,10 @@ public function responsible()
 {
     return $this->belongsTo(User::class, 'responsible_id');
 }
+public function techassigned()
+{
+    return $this->belongsTo(User::class, 'tech_assigned_id');
+}
 
 
 

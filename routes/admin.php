@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DailySaleController;
 use App\Http\Controllers\Admin\OutputController;
 use App\Http\Controllers\Admin\PayrollController;
 use App\Http\Controllers\Admin\PurchaseController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Livewire\Admin\Bills\Create as BillsCreate;
 use App\Http\Livewire\Admin\Bills\Index as BillsIndex;
 use App\Http\Livewire\Admin\Bills\Show as BillsShow;
@@ -148,4 +149,7 @@ Route::get('logs-file', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::clas
 
     Route::get('servicios/{service}', ServicesShow::class)->name('services.show');
 
+    Route::get('servicios/pdf/{service}', [ServiceController::class, 'show'])->name('service-detail.pdf');
+     
+     Route::get('servicios-download/{service}', [BillController::class, 'download'])->name('service.download');
 //});
