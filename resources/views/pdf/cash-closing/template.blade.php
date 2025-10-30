@@ -7,7 +7,7 @@
         <table width="100%">
             <tr>
                 <td class="pt-10" width="80%">
-                    <img style="max-height: 100; max-width: 200px" src="{{ getUrlLogo() }}">
+                    <img class="h-28" src="{{ getUrlLogo() }}" >
                 </td>
                 <td class="pt-10">
                     <table>

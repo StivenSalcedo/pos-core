@@ -4,7 +4,7 @@ use App\Models\Terminal;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\App;
 if (! function_exists('rounded')) {
     function rounded($value, $decimals = 0): string
     {
@@ -24,11 +24,16 @@ if (! function_exists('formatToCop')) {
 if (! function_exists('getUrlLogo')) {
     function getUrlLogo()
     {
-        if (Storage::exists('public/images/system/logo.png')) {
+         if (App::isLocal()) {
+            return 'https://farmavivi.site/storage/images/system/logo-default.png';
+         }
+         else{
+        if (Storage::exists('images/system/logo.png')) {
             return Storage::url('images/system/logo.png');
         } else {
             return Storage::url('images/system/logo-default.png');
         }
+    }
     }
 }
 

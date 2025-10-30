@@ -146,7 +146,6 @@
       </div>
     </template>
 
-    {{-- cude --}}
     <template x-if="isElectronic">
       <div class="flex justify-center mt-1">
         <img class="max-w-[140px]" :src="electronic_bill.qr_image">
@@ -159,12 +158,7 @@
       </div>
     </template>
 
-    {{-- footer
-    <div class="text-xs mt-4">
-      <p class="text-center leading-4">Elaborador </p>
-      <p class="text-center leading-4">www</p>
-    </div>
- --}}
+   
   </div>
 </div>
 @endpush

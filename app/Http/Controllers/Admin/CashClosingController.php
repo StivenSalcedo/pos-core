@@ -17,8 +17,8 @@ class CashClosingController extends Controller {
 
     public function show(CashClosing $cashClosing) {
 
-        $company = session('config');
-
+       $company = session('config');
+ 
         if ($company->type_bill === '0') {
             $pdf = $this->initMPdf();
             $pdf->setFooter('{PAGENO}');
