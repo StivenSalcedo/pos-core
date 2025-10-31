@@ -151,5 +151,7 @@ Route::get('logs-file', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::clas
 
     Route::get('servicios/pdf/{service}', [ServiceController::class, 'show'])->name('service-detail.pdf');
      
-     Route::get('servicios-download/{service}', [BillController::class, 'download'])->name('service.download');
-//});
+    Route::get('servicios/informacion/{service}', [ServiceController::class, 'getService'])->name('service.information');
+
+
+     //});
