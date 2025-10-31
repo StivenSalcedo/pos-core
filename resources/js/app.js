@@ -15,6 +15,8 @@ import ticketOpenCashRegister from './pdfs/ticket-open-cash-register.js'
 import ticketPreBill from './pdfs/ticket-pre-bill.js'
 import ticketCommandBill from './pdfs/ticket-command-bill.js'
 import ticketFinancePaid from './pdfs/ticket-finance-paid.js'
+import ticketService from './pdfs/ticket-service.js'
+import labelService from './pdfs/label-service.js'
 import config from './config.js'
 import Alpine from 'alpinejs' //..
 
@@ -30,6 +32,8 @@ Alpine.data('alpineTicketOpenCashRegister', ticketOpenCashRegister)
 Alpine.data('alpineTicketPreBill', ticketPreBill)
 Alpine.data('alpineTicketCommandBill', ticketCommandBill)
 Alpine.data('alpineTicketFinancePaid', ticketFinancePaid)
+Alpine.data('alpineTicketService', ticketService)
+Alpine.data('alpineLabelService', labelService)
 Alpine.store('config', config())
 
 window.Alpine = Alpine

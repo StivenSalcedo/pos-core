@@ -19,23 +19,23 @@ class ServiceController extends Controller
 
         $company = session('config');
 
-        
+
 
         //if ($company->type_bill === '0') {
-            $pdf = $this->initMPdf();
-            $pdf->setFooter('{PAGENO}');
-            $pdf->SetHTMLFooter(View::make('pdf.service.footer'));
-            $pdf->WriteHTML(View::make('pdf.service.template-detail', compact('company', 'service')), HTMLParserMode::HTML_BODY);
-       /* } else {
+        $pdf = $this->initMPdf();
+        $pdf->setFooter('{PAGENO}');
+        $pdf->SetHTMLFooter(View::make('pdf.service.footer'));
+        $pdf->WriteHTML(View::make('pdf.service.template-detail', compact('company', 'service')), HTMLParserMode::HTML_BODY);
+        /* } else {
             $height = $this->getHeigth($service->details, $range);
             $pdf = $this->initMPdfTicket($height);
             $pdf->SetHTMLFooter(View::make('pdf.ticket.footer'));
             $pdf->WriteHTML(View::make('pdf.ticket.template', compact('company', 'bill', 'range')), HTMLParserMode::HTML_BODY);
         }*/
 
-        $pdf->SetTitle('Servicio '.$service->id);
+        $pdf->SetTitle('Servicio ' . $service->id);
 
-        return $pdf->Output('Servicio '.$service->id.'.pdf', $dest);
+        return $pdf->Output('Servicio ' . $service->id . '.pdf', $dest);
     }
 
     public function show(Service $service)
@@ -82,59 +82,29 @@ class ServiceController extends Controller
     /**
      * Este funcion devuelve la informacion de la factura para la impresion en el frontend
      */
-    public function getBill(Service $service)
+    public function getService(Service $service)
     {
-        $customer = $service->customer;
-        $range = $service->numberingRange;
-        $products = $service->details->transform(fn ($item) => $item->only(['name', 'amount', 'total']));
+        $service->load([
+            'products.product', // 👈 trae el componente dentro de cada detalle
+            'customer'
+        ]);
         $company = CompanyService::companyData();
-        $terminal = Terminal::findOrFail($service->terminal_id);
 
-        $company['name']=!empty($terminal->name) ? $terminal->name : $company['name'];
-        $company['direction']=!empty($terminal->address) ? $terminal->address: $company['direction'];
-        $company['phone']=!empty($terminal->phone) ? $terminal->phone :  $company['phone'];
+        // Calcular totales
+        $subtotal = $service->products->sum(fn($p) => $p->unit_price * $p->quantity);
+        $discount = $service->products->sum(fn($p) => $p->discount ?? 0);
+        $total    = $subtotal - $discount;
+
+        // Agregar los campos calculados directamente al objeto Service
+        $service->subtotal = round($subtotal, 2);
+        $service->discount = round($discount, 2);
+        $service->total    = round($total, 2);
 
         $data = [
-
-            'is_electronic' => $service->isElectronic,
             'company' => $company,
-            'customer' => [
-                'identification' => $customer->no_identification,
-                'names' => $customer->names,
-            ],
-            'bill' => [
-                'cash' => $service->cash,
-                'change' => $service->change,
-                'format_created_at' => $service->format_created_at,
-                'discount' => $service->discount,
-                'tip' => $service->tip,
-                'number' => $service->number,
-                'subtotal' => $service->subtotal,
-                'total' => $service->total,
-                'final_total' => $service->final_total,
-                'user_name' => $service->user->name,
-                'payment_method' => $service->paymentMethod->name,
-            ],
-            'products' => $products,
-            'range' => [
-                'prefix' => $range->prefix,
-                'from' => $range->from,
-                'to' => $range->to,
-                'resolution_number' => $range->resolution_number,
-                'date_authorization' => $range->format_date_authorization,
-            ],
-            'taxes' => $service->documentTaxes->map(function ($item) {
-                return [
-                    'tribute_name' => $item->tribute_name,
-                    'tax_amount' => $item->tax_amount,
-                ];
-            }),
+            'service' => $service,
         ];
 
-        if ($service->isElectronic) {
-            $data['range'] = $service->electronicBill->numbering_range;
-            $data['electronic_bill'] = $service->electronicBill->toArray();
-        }
 
         return response()->json(['data' => $data]);
     }
