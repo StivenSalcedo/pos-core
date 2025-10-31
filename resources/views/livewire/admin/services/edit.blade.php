@@ -9,12 +9,9 @@
     <div class="sticky bg-gray-100 z-30 top-14">
         <x-commons.header>
             <x-wireui.button class="mr-3" icon="check" text="Guardar entrada" />
-             <x-buttons.icon icon="pdf"
-                class="text-red-600"
-                :href="route('admin.service-detail.pdf', $service->id)"
-                target="_blank"
-                title="Descargar PDF"
-                text="Cerrar caja" />
+            <x-buttons.icon icon="pdf" class="text-red-600" :href="route('admin.service-detail.pdf', $service->id)" target="_blank" title="Descargar PDF"
+                text="Detalle servicio" />
+                   <x-buttons.download @click="$dispatch('print-ticket', {{  $service->id }})" href='#' title="Descargar" />
         </x-commons.header>
     </div>
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
@@ -124,7 +121,8 @@
                 @include('livewire.admin.services.tabs.histories')
             @endif
         </div>
-
+        @include('pdfs.ticket-service')
+     
     </x-wireui.card>
 </div>
 @push('js')
