@@ -42,12 +42,13 @@
                     <i class="ico icon-add text-blue-600 text-sm"></i>
                 </button>
             </div>
-             {{-- Marca --}}
+            {{-- Marca --}}
             <div class="relative">
-                <x-wireui.native-select class="w-full" label="Marca" placeholder="Seleccione una marca" :options="$brands"
-                wire:model.defer="service.brand_id" optionKeyValue="true" />
+                <x-wireui.native-select class="w-full" label="Marca" placeholder="Seleccione una marca"
+                    :options="$brands" wire:model.defer="service.brand_id" optionKeyValue="true" />
                 {{-- Botón para crear nuevo cliente --}}
-                <button class="absolute top-0 right-0" title="Crear nuevo tipo" wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
+                <button class="absolute top-0 right-0" title="Crear nuevo tipo"
+                    wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
                     <i class="ico icon-add text-blue-600 text-sm"></i>
                 </button>
             </div>
@@ -62,11 +63,13 @@
             <div class="flex justify-between">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
                 {{-- Botón para crear nuevo cliente --}}
-                <button title="Crear nuevo cliente" x-on:click="setTimeout(() => {Livewire.emitTo('admin.customers.create', 'openCreate');}, 300);">
+                <button title="Crear nuevo cliente"
+                    x-on:click="setTimeout(() => {Livewire.emitTo('admin.customers.create', 'openCreate');}, 300);">
                     <i class="ico icon-add-user text-blue-600 text-xl"></i>
                 </button>
             </div>
-            <x-wireui.input class="w-full" wire:model.debounce.500ms="searchCustomer" placeholder="Buscar cliente por nombre o documento..."/>
+            <x-wireui.input class="w-full" wire:model.debounce.500ms="searchCustomer"
+                placeholder="Buscar cliente por nombre o documento..." />
 
             {{-- Resultados búsqueda --}}
             @if ($customers && count($customers) > 0)
@@ -83,14 +86,15 @@
 
             {{-- Cliente seleccionado --}}
             @if ($selectedCustomer)
-                <div class="bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 flex items-center justify-between my-4">
+                <div
+                    class="bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 flex items-center justify-between my-4">
                     <div>
                         <strong>{{ $selectedCustomer['names'] ?? '' }}</strong>
                         <span class="text-gray-500 text-xs">
                             ({{ $selectedCustomer['no_identification'] ?? '' }})
                         </span>
                     </div>
-                    <x-buttons.delete wire:click="clearCustomer" title="Eliminar"/>
+                    <x-buttons.delete wire:click="clearCustomer" title="Eliminar" />
 
                     {{-- <x-wireui.button flat sm icon="trash"  class="ml-2" /> --}}
 

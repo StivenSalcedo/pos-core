@@ -7,7 +7,7 @@
 }
 
 .table thead tr th {
-    @apply py-1.5 sm:py-2 md:py-3  px-2 sm:px-4;
+    @apply py-1.5 sm:py-2 md:py-3 px-2 sm:px-4;
 }
 
 .table thead tr [left] {
@@ -22,23 +22,23 @@
     @apply divide-y divide-slate-200 text-slate-600 text-center;
 }
 
-.table tbody tr{
+.table tbody tr {
     @apply hover:bg-slate-100 cursor-default;
 }
 
-.table tbody tr td{
+.table tbody tr td {
     @apply py-1 px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm md:text-tiny;
 }
 
-.table tbody tr [actions]{
+.table tbody tr [actions] {
     @apply text-center space-x-1;
 }
 
-.table tbody tr [left]{
+.table tbody tr [left] {
     @apply text-left;
 }
 
-.table tbody tr [right]{
+.table tbody tr [right] {
     @apply text-right;
 }
 
@@ -66,23 +66,23 @@
     @apply divide-y divide-slate-200 text-slate-600 text-center;
 }
 
-.table-sm tbody tr{
+.table-sm tbody tr {
     @apply hover:bg-slate-100 cursor-default;
 }
 
-.table-sm tbody tr td{
-    @apply py-1 px-2 sm:px-2 whitespace-nowrap text-sm ;
+.table-sm tbody tr td {
+    @apply py-1 px-2 sm:px-2 whitespace-nowrap text-sm;
 }
 
-.table-sm tbody tr [actions]{
+.table-sm tbody tr [actions] {
     @apply text-center space-x-1;
 }
 
-.table-sm tbody tr [left]{
+.table-sm tbody tr [left] {
     @apply text-left;
 }
 
-.container{
+.container {
     @apply text-gray-700 max-w-7xl mx-auto px-4 pb-14;
 }
 
@@ -91,7 +91,7 @@
 * {
     scrollbar-width: thin;
     scrollbar-color: rgba(69, 69, 70, .6);
-  }
+}
 
 /* Works on Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
@@ -114,4 +114,28 @@
 .scroll::-webkit-scrollbar-thumb {
     background-color: rgba(69, 69, 70, .6);
     border-radius: 20px;
+}
+
+/*dropdown*/
+
+.button-dropdown {
+    /* background: #d6d5e2;
+    border-radius: 50%; */
+    height: 16px;
+    width: 16px;
+    z-index: 1;
+    position: relative;
+    margin-left: 8px;
+}
+
+.button-dropdown:after {
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #FFF;
+    content: ' ';
+    height: 0;
+    left: 4px;
+    position: absolute;
+    top: 6px;
+    width: 0;
 }
