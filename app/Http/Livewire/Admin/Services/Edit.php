@@ -39,6 +39,10 @@ class Edit extends Component
     public $openUploadModal = false;
     public $cameraPhoto;
     public $date_entry_time;
+    public $subtotal = 0;
+    public $total = 0;
+    public $discount = 0;
+    public $deposit = 0;
 
 
 
@@ -148,6 +152,7 @@ class Edit extends Component
         $this->refreshServiceDetails();
         $this->refreshProductDetails();
         $this->refreshPaymentDetails();
+        $this->calculateTotals();
     }
 
 
@@ -309,6 +314,22 @@ class Edit extends Component
     public function refreshProductDetails()
     {
         $this->products = $this->service->products()->with('product')->get()->toArray();
+         $this->calculateTotals();
+    }
+    public function calculateTotals()
+    {
+         $this->service->refresh();
+        // Asegurar que estén cargados los productos y pagos
+        $this->service->loadMissing(['products', 'payments']);
+        // Calcular subtotal y descuento
+        $this->subtotal = $this->service->products->sum(fn($p) => $p->unit_price * $p->quantity);
+        $this->discount = $this->service->products->sum(fn($p) => $p->discount ?? 0);
+        // Calcular depósitos (pagos)
+        $this->deposit  = $this->service->payments->sum(fn($p) => $p->amount ?? 0);
+        $this->total    = $this->subtotal - $this->discount - $this->deposit;
+
+        
+       
     }
 
     public function goToHistoriesTab()
@@ -360,6 +381,7 @@ class Edit extends Component
     public function refreshPaymentDetails()
     {
         $this->payments = $this->service->payments()->with('payment', 'user')->get();
+         $this->calculateTotals();
     }
 
 
@@ -416,6 +438,7 @@ class Edit extends Component
             $product->delete();
             $this->refreshProductDetails();
             Product::where('id', $product->product_id)->increment('stock', $product->quantity);
+            $this->calculateTotals();
         }
     }
 
@@ -427,6 +450,7 @@ class Edit extends Component
         if ($payment) {
             $payment->delete();
             $this->refreshPaymentDetails();
+            $this->calculateTotals();
         }
     }
 
