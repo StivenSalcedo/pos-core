@@ -9,52 +9,55 @@
     <div class="sticky bg-gray-100 z-30 top-14">
         <x-commons.header>
             {{-- <x-wireui.button class="mr-3" icon="check" text="Guardar entrada" /> --}}
+            @if ($service->id)
+                {{-- dropdown Notification --}}
+                <x-dropdown align="left" width="full">
+                    <x-slot name="trigger">
+                        <button
+                            class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500 disabled:opacity-60"
+                            title="Perfil">
+                            <div class="flex items-center">
+                                <i class="ico icon-bell mr-2"></i>
+                                <div>Notificaciones</div>
+                                <div class="button-dropdown"></div>
+                            </div>
+                        </button>
+                    </x-slot>
+                    <x-slot name="content">
+                        <x-dropdown-link class="flex items-center" target="_blank">
+                            Email
+                        </x-dropdown-link>
+                        <x-dropdown-link class="flex items-center">
+                            WhatsApp
+                        </x-dropdown-link>
+                    </x-slot>
+                </x-dropdown>
 
-            {{-- dropdown Notification --}}
-            <x-dropdown align="left" width="full">
-                <x-slot name="trigger">
-                    <button
-                        class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500 disabled:opacity-60"
-                        title="Perfil">
-                        <div class="flex items-center">
-                            <i class="ico icon-bell mr-2"></i>
-                            <div>Notificaciones</div>
-                            <div class="button-dropdown"></div>
-                        </div>
-                    </button>
-                </x-slot>
-                <x-slot name="content">
-                    <x-dropdown-link class="flex items-center"  target="_blank">
-                        Email
-                    </x-dropdown-link>
-                    <x-dropdown-link class="flex items-center">
-                        WhatsApp
-                    </x-dropdown-link>
-                </x-slot>
-            </x-dropdown>
+                {{-- dropdown print --}}
 
-            {{-- dropdown print --}}
-            {{-- <x-dropdown align="left" width="full">
-                <x-slot name="trigger">
-                    <button
-                        class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500 disabled:opacity-60"
-                        title="Perfil">
-                        <div class="flex items-center">
-                            <i class="ico icon-pdf mr-2"></i>
-                            <div>Impresión</div>
-                            <div class="button-dropdown"></div>
-                        </div>
-                    </button>
-                </x-slot>
-                <x-slot name="content">
-                    <x-dropdown-link class="flex items-center" :href="route('admin.service-detail.pdf', $service->id)" target="_blank">
-                        Imprimir entrada
-                    </x-dropdown-link>
-                    <x-dropdown-link class="flex items-center" @click="$dispatch('print-ticket', {{  $service->id }})" target="_blank">
-                        Imprimir recibo
-                    </x-dropdown-link>
-                </x-slot>
-            </x-dropdown> --}}
+                <x-dropdown align="left" width="full">
+                    <x-slot name="trigger">
+                        <button
+                            class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500 disabled:opacity-60"
+                            title="Perfil">
+                            <div class="flex items-center">
+                                <i class="ico icon-pdf mr-2"></i>
+                                <div>Impresión</div>
+                                <div class="button-dropdown"></div>
+                            </div>
+                        </button>
+                    </x-slot>
+                    <x-slot name="content">
+                        <x-dropdown-link class="flex items-center" :href="route('admin.service-detail.pdf', $service->id)" target="_blank">
+                            Imprimir entrada
+                        </x-dropdown-link>
+                        <x-dropdown-link class="flex items-center"
+                            @click="$dispatch('print-ticket', {{ $service->id }})" target="_blank">
+                            Imprimir recibo
+                        </x-dropdown-link>
+                    </x-slot>
+                </x-dropdown>
+            @endif
         </x-commons.header>
     </div>
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
@@ -146,7 +149,7 @@
                 <div class="block xl:hidden">
                     <x-dropdown align="left" width="full">
                         <x-slot name="trigger">
-                            <button
+                            <button  @if (!$service->id) disabled @endif
                                 class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-gray-500 hover:bg-gray-600 hover:ring-gray-500 disabled:opacity-60"
                                 title="Perfil">
                                 <div class="flex items-center">
@@ -156,25 +159,25 @@
                             </button>
                         </x-slot>
                         <x-slot name="content">
-                            <x-dropdown-link >
+                            <x-dropdown-link wire:click="goToHistoriesTab">
                                 Historial cliente
                             </x-dropdown-link>
-                            <x-dropdown-link>
+                            <x-dropdown-link wire:click="{{ $service->id ? '$set(\'tab\', \'notifications\')' : '' }}">
                                 Notificaciones
                             </x-dropdown-link>
-                            <x-dropdown-link>
+                            <x-dropdown-link wire:click="{{ $service->id ? '$set(\'tab\', \'photos\')' : '' }}">
                                 Fotos
                             </x-dropdown-link>
-                            <x-dropdown-link class="block lg:hidden">
+                            <x-dropdown-link  class="block lg:hidden" wire:click="{{ $service->id ? '$set(\'tab\', \'payments\')' : '' }}">
                                 Pagos
                             </x-dropdown-link>
-                            <x-dropdown-link class="block lg:hidden">
+                            <x-dropdown-link class="block lg:hidden" wire:click="{{ $service->id ? '$set(\'tab\', \'products\')' : '' }}">
                                 Productos
                             </x-dropdown-link>
-                            <x-dropdown-link class="block lg:hidden">
+                            <x-dropdown-link class="block lg:hidden" wire:click="{{ $service->id ? '$set(\'tab\', \'details\')' : '' }}">
                                 Componentes
                             </x-dropdown-link>
-                            <x-dropdown-link class="block sm:hidden">
+                            <x-dropdown-link class="block sm:hidden" wire:click="{{ $service->id ? '$set(\'tab\', \'main\')' : '' }}">
                                 Detalles técnicos
                             </x-dropdown-link>
                         </x-slot>
@@ -205,32 +208,34 @@
             @endif
         </div>
         @include('pdfs.ticket-service')
-     
+
     </x-wireui.card>
+     @if ($service->id)
     <div class="grid sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
         <div
             class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-indigo-700/90 text-white">
             <i class="ico icon-money text-7xl text-indigo-800"></i>
             <span class="-mt-3">Subtotal</span>
-            <span class="font-semibold text-2xl">$4000</span>
+            <span class="font-semibold text-2xl">{{ number_format($subtotal, 2, ',', '.') }}</span>
         </div>
         <div class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-blue-700/90 text-white">
             <i class="ico icon-money text-7xl text-blue-800"></i>
             <span class="-mt-3">Descuentos</span>
-            <span class="font-semibold text-2xl">$4000</span>
+            <span class="font-semibold text-2xl">{{ number_format($discount, 2, ',', '.') }}</span>
         </div>
         <div
             class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-indigo-700/90 text-white">
             <i class="ico icon-money text-7xl text-indigo-800"></i>
             <span class="-mt-3">Abonos</span>
-            <span class="font-semibold text-2xl">$4000</span>
+            <span class="font-semibold text-2xl">{{ number_format($deposit, 2, ',', '.') }}</span>
         </div>
         <div class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-blue-700/90 text-white">
             <i class="ico icon-money text-7xl text-blue-800"></i>
             <span class="-mt-3">Saldos</span>
-            <span class="font-semibold text-2xl">$4000</span>
+            <span class="font-semibold text-2xl">{{ number_format($total, 2, ',', '.') }}</span>
         </div>
     </div>
+    @endif
 </div>
 @push('js')
     <script>
