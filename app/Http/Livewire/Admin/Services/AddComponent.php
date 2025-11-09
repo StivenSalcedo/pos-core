@@ -50,6 +50,10 @@ class AddComponent extends Component
         return view('livewire.admin.services.add-component');
     }
 
+    protected $messages = [
+        'form.component_id.required' => 'Debe escoger el componente.',
+    ];
+
     public function save()
     {
         $this->validate([
@@ -57,6 +61,7 @@ class AddComponent extends Component
             'form.quantity' => 'required|integer|min:1',
             'form.brand_id' => 'nullable|exists:brands,id',
         ]);
+
 
         $service = Service::findOrFail($this->serviceId);
 

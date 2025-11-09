@@ -11,7 +11,7 @@ use App\Exceptions\CustomException;
 
 class AddProduct extends Component
 {
-   
+
 
     public $openModal = false;
     public $serviceId;
@@ -24,7 +24,7 @@ class AddProduct extends Component
     public $discountPercent = 0;
     public $unit_price = 0;
     public $total = 0;
-     
+
 
     protected $listeners = ['openAddProduct' => 'openModalForService'];
 
@@ -45,12 +45,14 @@ class AddProduct extends Component
         95 => 95,
     ];
 
-     protected $messages = [
+    protected $messages = [
         'product_id.required' => 'Debe seleccionar un producto.',
         'product_id.exists'   => 'El producto seleccionado no es válido.',
         'quantity.required'   => 'Debe ingresar una cantidad.',
         'quantity.integer'    => 'La cantidad debe ser un número entero.',
         'quantity.min'        => 'La cantidad debe ser al menos 1.',
+        'unit_price.required'        => 'De ingresar un valor.',
+        'unit_price.min'        => 'De ingresar un valor.',
     ];
 
     protected function rules()
@@ -59,7 +61,7 @@ class AddProduct extends Component
             'product_id' => 'required|integer|exists:products,id',
             'quantity'   => 'required|integer|min:1',
             'discountPercent'   => 'required|numeric|min:0|max:100',
-            'unit_price' =>'required|numeric|min:1',
+            'unit_price' => 'required|numeric|min:1',
         ];
     }
 
@@ -101,7 +103,7 @@ class AddProduct extends Component
         $this->product = Product::find($productId);
 
         if ($this->product) {
-            $this->product_id=$this->product->id;
+            $this->product_id = $this->product->id;
             $this->unit_price = $this->product->price;
             $this->calculateTotal();
             $this->products = [];
@@ -121,17 +123,17 @@ class AddProduct extends Component
 
     private function calculateTotal()
     {
-        $subtotal = $this->quantity * $this->unit_price;
+        $subtotal = (int) ($this->quantity ?? 0) * (float) $this->unit_price;
         $discountValue = ($subtotal * $this->discountPercent) / 100;
         $this->total = $subtotal - $discountValue;
     }
 
     public function save()
-{
-    $this->validate();
- 
+    {
+        $this->validate();
+
         if (!$this->product) {
-             return $this->emit('error', "Debe seleccionar un producto válido.");
+            return $this->emit('error', "Debe seleccionar un producto válido.");
         }
 
         if (!$this->product->has_inventory && $this->product->stock < $this->quantity) {
@@ -148,19 +150,16 @@ class AddProduct extends Component
             'total'       => $this->total,
         ]);
 
-        if (!$this->product->has_inventory)
-        {
-        Product::where('id', $this->product->id)->decrement('stock', $this->quantity);
+        if (!$this->product->has_inventory) {
+            Product::where('id', $this->product->id)->decrement('stock', $this->quantity);
         }
-        
+
 
         $this->emit('success', 'El producto fue agregado correctamente al servicio.');
-         $this->emitTo('admin.services.edit', 'refreshProductDetails');
-       
-        $this->openModal = false;
+        $this->emitTo('admin.services.edit', 'refreshProductDetails');
 
-   
-}
+        $this->openModal = false;
+    }
 
     public function resetForm()
     {
