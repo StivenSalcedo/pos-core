@@ -27,7 +27,7 @@
     {{-- Informacion de la factura --}}
     <div class="overflow-hidden">
       <p x-show="!isElectronic" class="font-bold text-right">Venta: <span x-text="bill.number"></span></p>
-      <p x-show="isElectronic" class="font-bold text-right">Factura de electrónica de venta: <span x-text="bill.number"></span></p>
+      <p x-show="isElectronic" class="font-bold text-right">Factura de electrónica de ventax: <span x-text="bill.number"></span></p>
       <ul class="leading-4 whitespace-nowrap">
         <li>
           <span class="w-14 inline-block">Fecha</span>
