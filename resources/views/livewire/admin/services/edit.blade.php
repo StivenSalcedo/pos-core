@@ -34,7 +34,7 @@
             </x-dropdown>
 
             {{-- dropdown print --}}
-            {{-- <x-dropdown align="left" width="full">
+            <x-dropdown align="left" width="full">
                 <x-slot name="trigger">
                     <button
                         class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500 disabled:opacity-60"
@@ -50,11 +50,11 @@
                     <x-dropdown-link class="flex items-center" :href="route('admin.service-detail.pdf', $service->id)" target="_blank">
                         Imprimir entrada
                     </x-dropdown-link>
-                    <x-dropdown-link class="flex items-center" @click="$dispatch('print-ticket', {{  $service->id }})" target="_blank">
+                    <x-dropdown-link class="flex items-center cursor-pointer" @click="$dispatch('print-ticket', {{  $service->id }})" target="_blank">
                         Imprimir recibo
                     </x-dropdown-link>
                 </x-slot>
-            </x-dropdown> --}}
+            </x-dropdown>
         </x-commons.header>
     </div>
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
