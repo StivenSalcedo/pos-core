@@ -10,18 +10,18 @@
         <table class="min-w-full border text-sm text-gray-700">
             <thead class="bg-gray-100">
                 <tr>
-                    <th class="px-3 py-2">Fecha</th>
-                    <th class="px-3 py-2">Tipo</th>
-                    <th class="px-3 py-2">Destino</th>
-                    <th class="px-3 py-2">Mensaje</th>
+                    <th class="px-3 py-2 text-left">Fecha</th>
+                    <th class="px-3 py-2 text-left">Tipo</th>
+                    <th class="px-3 py-2 text-left">Destino</th>
+                    <th class="px-3 py-2 text-left">Mensaje</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($service->notifications as $note)
                     <tr class="border-b">
                         <td class="px-3 py-2">{{ $note->created_at->format('d/m/Y H:i') }}</td>
-                        <td class="px-3 py-2">{{ strtoupper($note->type ?? '-') }}</td>
-                        <td class="px-3 py-2">{{ $note->recipient ?? '-' }}</td>
+                        <td class="px-3 py-2">{{ strtoupper($note->channel ?? '-') }}</td>
+                        <td class="px-3 py-2">{{ $note->destination ?? '-' }}</td>
                         <td class="px-3 py-2">{{ Str::limit($note->message, 60) }}</td>
                     </tr>
                 @empty
