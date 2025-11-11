@@ -34,6 +34,7 @@ class Edit extends Component
     public $products = [];
     public $payments = [];
     public $histories = [];
+    public $notifications=[];
     public $searchCustomer = '';
     public $photo;
     public $openUploadModal = false;
@@ -43,6 +44,10 @@ class Edit extends Component
     public $total = 0;
     public $discount = 0;
     public $deposit = 0;
+    public $openEmailModal = false;
+    public $emailTo;
+    public $emailMessage;
+    public $attachPdf = true;
 
 
 
@@ -56,6 +61,7 @@ class Edit extends Component
         'refreshPaymentDetails',
         'refreshAttachments' => '$refresh',
         'uploadCameraPhoto'  => 'saveCameraPhoto',
+        'refreshNotifications'
     ];
 
 
@@ -152,6 +158,7 @@ class Edit extends Component
         $this->refreshServiceDetails();
         $this->refreshProductDetails();
         $this->refreshPaymentDetails();
+        $this->refreshNotifications();
         $this->calculateTotals();
     }
 
@@ -311,14 +318,19 @@ class Edit extends Component
         $this->details = $this->service->details()->with('component', 'brand')->get()->toArray();
     }
 
+     public function refreshNotifications()
+    {
+        $this->notifications = $this->service->notifications()->get()->toArray();
+    }
+
     public function refreshProductDetails()
     {
         $this->products = $this->service->products()->with('product')->get()->toArray();
-         $this->calculateTotals();
+        $this->calculateTotals();
     }
     public function calculateTotals()
     {
-         $this->service->refresh();
+        $this->service->refresh();
         // Asegurar que estén cargados los productos y pagos
         $this->service->loadMissing(['products', 'payments']);
         // Calcular subtotal y descuento
@@ -327,9 +339,6 @@ class Edit extends Component
         // Calcular depósitos (pagos)
         $this->deposit  = $this->service->payments->sum(fn($p) => $p->amount ?? 0);
         $this->total    = $this->subtotal - $this->discount - $this->deposit;
-
-        
-       
     }
 
     public function goToHistoriesTab()
@@ -381,7 +390,7 @@ class Edit extends Component
     public function refreshPaymentDetails()
     {
         $this->payments = $this->service->payments()->with('payment', 'user')->get();
-         $this->calculateTotals();
+        $this->calculateTotals();
     }
 
 
@@ -452,6 +461,14 @@ class Edit extends Component
             $this->refreshPaymentDetails();
             $this->calculateTotals();
         }
+    }
+
+    public function openEmailModal()
+    {
+        $this->emailTo = $this->service->customer?->email ?? '';
+        $this->emailMessage = '';
+        $this->attachPdf = true;
+        $this->openEmailModal = true;
     }
 
 

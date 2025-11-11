@@ -18,23 +18,11 @@ class ServiceController extends Controller
     {
 
         $company = session('config');
-
-
-
-        //if ($company->type_bill === '0') {
         $pdf = $this->initMPdf();
         $pdf->setFooter('{PAGENO}');
         $pdf->SetHTMLFooter(View::make('pdf.service.footer'));
         $pdf->WriteHTML(View::make('pdf.service.template-detail', compact('company', 'service')), HTMLParserMode::HTML_BODY);
-        /* } else {
-            $height = $this->getHeigth($service->details, $range);
-            $pdf = $this->initMPdfTicket($height);
-            $pdf->SetHTMLFooter(View::make('pdf.ticket.footer'));
-            $pdf->WriteHTML(View::make('pdf.ticket.template', compact('company', 'bill', 'range')), HTMLParserMode::HTML_BODY);
-        }*/
-
         $pdf->SetTitle('Servicio ' . $service->id);
-
         return $pdf->Output('Servicio ' . $service->id . '.pdf', $dest);
     }
 
