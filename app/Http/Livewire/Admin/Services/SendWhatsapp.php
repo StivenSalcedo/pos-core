@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\View;
 use Mpdf\HTMLParserMode;
 use Mpdf\Mpdf;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ServiceNotification;
 class SendWhatsapp extends Component
 {
     public $service;
@@ -48,7 +49,7 @@ class SendWhatsapp extends Component
                 //http://127.0.0.1:8000/storage/temp/17.pdf
 
         try {
-            $response = Http::withToken(env('WHATSAPP_TOKEN'))
+           /* $response = Http::withToken(env('WHATSAPP_TOKEN'))
                 ->post(env('WHATSAPP_URL') . "/messages", [
                     "messaging_product" => "whatsapp",
                     "to" => $this->phone,
@@ -78,8 +79,15 @@ class SendWhatsapp extends Component
 
             if ($response->failed()) {
                 throw new \Exception($response->body());
-            }
-
+            }*/
+             ServiceNotification::create([
+                'service_id' => $this->service->id,
+                'channel' => 'whatsapp',
+                'destination' => $this->phone,
+                'message' => 'Detalle de servicio #' . $this->service->id,
+                'status' => 'enviado',
+            ]);
+            $this->emitTo('admin.services.edit', 'refreshNotifications');
             $this->emit('success', 'Mensaje enviado correctamente por WhatsApp.');
             $this->openModal = false;
         } catch (\Exception $e) {

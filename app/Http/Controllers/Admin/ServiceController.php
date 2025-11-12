@@ -16,12 +16,72 @@ class ServiceController extends Controller
 
     protected function createDPF(Service $service, $dest)
     {
-
         $company = session('config');
+        // Variables acumuladas
+        $subtotal = 0;
+        $discount = 0;
+        $totalTax = 0;
+        $totalPaid = 0;
+
+        foreach ($service->products as $item) {
+            $quantity = (float) $item->quantity;
+            $discountValue = (float) ($item->discount ?? 0);
+            $unitPrice = (float) ($item->unit_price - ($discountValue / $quantity));
+            // Valor fijo, no porcentaje
+
+            // Obtener el impuesto principal del producto (si tiene varios, tomamos el primero)
+            $taxData = $item->product->taxRates->first();
+            $taxRateValue = 0;
+            $taxIsPercent = true;
+
+            if ($taxData) {
+                $taxRateValue = (float) $taxData->rate;
+                $taxIsPercent = (bool) $taxData->has_percentage;
+            }
+
+            // Desglose de IVA incluido
+            $baseUnit = $unitPrice;
+            $ivaUnit = 0;
+
+            if ($taxIsPercent && $taxRateValue > 0) {
+                // IVA incluido (ej. 19%)
+                $baseUnit = $unitPrice / (1 + ($taxRateValue / 100));
+                $ivaUnit  = $unitPrice - $baseUnit;
+            } elseif (!$taxIsPercent && $taxRateValue > 0) {
+                // IVA fijo (ej. $800 por unidad)
+                $baseUnit = $unitPrice - $taxRateValue;
+                $ivaUnit  = $taxRateValue;
+            }
+
+            // Totales por línea
+            $lineBase = $baseUnit * $quantity;
+            $lineTax  = $ivaUnit * $quantity;
+            // Acumular totales
+            $subtotal += $lineBase;
+            $discount += $discountValue;
+            $totalTax += $lineTax;
+        }
+
+        // Pagos realizados
+        $totalPaid = $service->payments->sum('amount');
+
+        // Total general
+        $total = $subtotal + $totalTax;
+        $balance = $total - $totalPaid;
+
         $pdf = $this->initMPdf();
         $pdf->setFooter('{PAGENO}');
         $pdf->SetHTMLFooter(View::make('pdf.service.footer'));
-        $pdf->WriteHTML(View::make('pdf.service.template-detail', compact('company', 'service')), HTMLParserMode::HTML_BODY);
+        $pdf->WriteHTML(View::make('pdf.service.template-detail', [
+            'company'   => $company,
+            'service'   => $service,
+            'subtotal'  => $subtotal,
+            'discount'  => $discount,
+            'iva'       => $totalTax,
+            'total'     => $total,
+            'pagado'    => $totalPaid,
+            'saldo'     => $balance,
+        ]), HTMLParserMode::HTML_BODY);
         $pdf->SetTitle('Servicio ' . $service->id);
         return $pdf->Output('Servicio ' . $service->id . '.pdf', $dest);
     }
@@ -74,19 +134,70 @@ class ServiceController extends Controller
     {
         $service->load([
             'products.product', // 👈 trae el componente dentro de cada detalle
-            'customer'
+            'customer',
+            'responsible',
+            'equipmentType',
+            'brand',
+            'state'
         ]);
         $company = CompanyService::companyData();
 
-        // Calcular totales
-        $subtotal = $service->products->sum(fn($p) => $p->unit_price * $p->quantity);
-        $discount = $service->products->sum(fn($p) => $p->discount ?? 0);
-        $total    = $subtotal - $discount;
+         // Variables acumuladas
+        $subtotal = 0;
+        $discount = 0;
+        $totalTax = 0;
+        $totalPaid = 0;
+
+        foreach ($service->products as $item) {
+            $quantity = (float) $item->quantity;
+            $discountValue = (float) ($item->discount ?? 0);
+            $unitPrice = (float) ($item->unit_price - ($discountValue / $quantity));
+            // Valor fijo, no porcentaje
+
+            // Obtener el impuesto principal del producto (si tiene varios, tomamos el primero)
+            $taxData = $item->product->taxRates->first();
+            $taxRateValue = 0;
+            $taxIsPercent = true;
+
+            if ($taxData) {
+                $taxRateValue = (float) $taxData->rate;
+                $taxIsPercent = (bool) $taxData->has_percentage;
+            }
+
+            // Desglose de IVA incluido
+            $baseUnit = $unitPrice;
+            $ivaUnit = 0;
+
+            if ($taxIsPercent && $taxRateValue > 0) {
+                // IVA incluido (ej. 19%)
+                $baseUnit = $unitPrice / (1 + ($taxRateValue / 100));
+                $ivaUnit  = $unitPrice - $baseUnit;
+            } elseif (!$taxIsPercent && $taxRateValue > 0) {
+                // IVA fijo (ej. $800 por unidad)
+                $baseUnit = $unitPrice - $taxRateValue;
+                $ivaUnit  = $taxRateValue;
+            }
+
+            // Totales por línea
+            $lineBase = $baseUnit * $quantity;
+            $lineTax  = $ivaUnit * $quantity;
+            // Acumular totales
+            $subtotal += $lineBase;
+            $discount += $discountValue;
+            $totalTax += $lineTax;
+        }
+
+       
+
+        // Total general
+        $total = $subtotal + $totalTax;
+       
 
         // Agregar los campos calculados directamente al objeto Service
         $service->subtotal = round($subtotal, 2);
         $service->discount = round($discount, 2);
         $service->total    = round($total, 2);
+        $service->iva    = round($totalTax, 2);
 
         $data = [
             'company' => $company,
