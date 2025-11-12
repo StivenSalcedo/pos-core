@@ -124,14 +124,14 @@ class Edit extends Component
     public function mount(Service $service)
     {
         $this->service = $service;
-
+       
         if (!$this->service->id) {
             $today = Carbon::now();
             $this->service->date_entry = $today->format('Y-m-d');
             $this->service->date_due = $today->copy()->addDays(3)->format('Y-m-d');
         } else {
             $this->date_entry_time = $this->service->date_entry;
-            $this->service->date_entry = Carbon::parse($this->service->date_entry)->format('Y-m-d');
+  
         }
 
         Log::debug('Llegó a setCustomerFromModal', ['data' => $service]);
@@ -141,7 +141,7 @@ class Edit extends Component
         $this->equipmentTypes = EquipmentType::pluck('name', 'id');
 
         $this->brands = Brand::pluck('name', 'id');
-        $this->service->load(['details.component', 'details.brand']);
+       $this->service->load(['details.component', 'details.brand']);
 
         if ($service->customer) {
             $this->selectedCustomer = [
@@ -320,7 +320,8 @@ class Edit extends Component
 
      public function refreshNotifications()
     {
-        $this->notifications = $this->service->notifications()->get()->toArray();
+        $notifications= $this->service->notifications()->get()->toArray();
+         $this->notifications=$notifications;
     }
 
     public function refreshProductDetails()

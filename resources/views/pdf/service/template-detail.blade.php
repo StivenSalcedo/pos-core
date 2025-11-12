@@ -13,24 +13,20 @@
                     <table class="">
                         <tr>
                             <td class="text-right font-bold">
-                                Nombre de la empresa
+                                {{$company->name}}
                             </td>
                         </tr>
                         <tr>
                             <td class="text-right">
-                                N° Nit - No responsable de IVA
+                                N° Nit - {{$company->nit}} - No responsable de IVA
                             </td>
                         </tr>
                         <tr>
                             <td class="text-right">
-                                Dirección | Teléfono
+                                {{$company->nit}} | {{$company->phone}}
                             </td>
                         </tr>
-                        <tr>
-                            <td class="text-right">
-                                Ciudad
-                            </td>
-                        </tr>
+                        
                     </table>
                 </td>
             </tr>
@@ -48,22 +44,17 @@
                             </tr>
                             <tr>
                                 <td>
-                                    N° Cedula
+                                    N° Cedula:{{ $service->customer->no_identification }}
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    Dirección
+                                    Dirección:{{ $service->customer->direction }}
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    Teléfono
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Ciudad
+                                    Teléfono:{{ $service->customer->phone }}
                                 </td>
                             </tr>
                         </table>
@@ -104,7 +95,7 @@
                     DETALLE DEL EQUIPO
                 </td>
                 <td class="font-bold" width="50%" align="right">
-                    {{ $service->equipmentType->name }} {{ $service->brand->name }} {{ $service->model ?? 'N/A' }}
+                    {{ $service->equipmentType->name }} - {{ $service->brand->name }} - {{ $service->model ?? 'N/A' }}
                 </td>
             </tr>
         </table>
@@ -113,10 +104,10 @@
         <table border="2" cellpadding="10" width="100%" style="border:1px solid black;border-collapse:collapse;">
             <tr>
                 <td style="border:1px solid black;" width="50%">
-                    Estado de servicio:
+                    Estado de servicio:{{ $service->state->name }}
                 </td>
                 <td style="border:1px solid black;" width="50%">
-                    Fecha estimada de entrega:
+                    Fecha estimada de entrega:  {{ \Carbon\Carbon::parse($service->date_due)->format('d/m/Y') }}
                 </td>
             </tr>
             <tr>
@@ -131,7 +122,7 @@
             </tr>
             <tr>
                 <td colspan="2" style="border:1px solid black;" width="50%">
-                    Accesorios: {{ $service->accesories ?? '' }}
+                    Accesorios: {{ $service->accessories ?? '' }}
                 </td>
             </tr>
         </table>
@@ -174,9 +165,6 @@
                             {{ $item->quantity ?? 1 }}
                         </td>
                     </tr>
-                    <tr>
-                        <td colspan="5">Observaciones: No hay</td>
-                    </tr>
                 @endforeach
             <tbody>
         </table>
@@ -202,10 +190,10 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($service->details as $item)
+                @foreach ($service->products as $item)
                     <tr>
                         <td align="center" style="border:1px solid black;">
-                            <small>08000</small>
+                            <small>{{ $item->product->barcode ?? 'N/A' }}</small>
                         </td>
                         <td align="center" style="border:1px solid black;">
                             <small>{{ $item->product->name ?? 'N/A' }}</small>
@@ -214,13 +202,13 @@
                             {{ $item->quantity }}
                         </td>
                         <td align="center" style="border:1px solid black;">
-                            {{ number_format($item['unit_price'], 0, ',', '.') }}
+                           $ {{ number_format($item['unit_price'], 0, ',', '.') }}
                         </td>
                         <td align="center" style="border:1px solid black;">
-                            {{ number_format($item['discount'], 0, ',', '.') }}
+                           $ {{ number_format($item['discount'], 0, ',', '.') }}
                         </td>
                         <td align="center" style="border:1px solid black;">
-                            {{ number_format($item['total'], 0, ',', '.') }}
+                           $ {{ number_format($item['total'], 0, ',', '.') }}
                         </td>
                     </tr>
                 @endforeach
@@ -251,7 +239,7 @@
                         <td align="center" style="border:1px solid black;">
                             {{ $payment->created_at->format('d/m/Y H:i') }}</td>
                         <td align="center" style="border:1px solid black;">
-                            {{ number_format($payment['amount'], 0, ',', '.') }}</td>
+                           $ {{ number_format($payment['amount'], 0, ',', '.') }}</td>
                         <td align="center" style="border:1px solid black;">{{ $payment->payment->name ?? 'N/A' }}
                         </td>
                         <td align="center" style="border:1px solid black;">{{ $payment['user']['name'] ?? 'N/A' }}
@@ -268,32 +256,35 @@
                     <table>
                         <tr>
                             <td class="text-right">
-                                Subtotal:
+                                Subtotal: {{ number_format($subtotal, 2) }}
                             </td>
                         </tr>
                         <tr>
                             <td class="text-right">
-                                IVA:
+                                Descuento: {{ number_format($discount, 2) }}
+                            </td>
+                        </tr>
+                         @if ($iva>0)
+                        <tr>
+                            <td class="text-right">
+                                IVA: {{ number_format($iva, 2) }}
+                            </td>
+                        </tr>
+                        @endif
+                        
+                        <tr>
+                            <td class="font-bold text-right">
+                                TOTAL A PAGAR: {{ number_format($total, 2) }}
                             </td>
                         </tr>
                         <tr>
                             <td class="text-right">
-                                Descuentos
+                                Pagado: {{ number_format($pagado, 2) }}
                             </td>
                         </tr>
                         <tr>
                             <td class="font-bold text-right">
-                                TOTAL A PAGAR
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-right">
-                                Pagado
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="font-bold text-right">
-                                Saldo
+                                Saldo: {{ number_format($saldo, 2) }}
                             </td>
                         </tr>
                     </table>
