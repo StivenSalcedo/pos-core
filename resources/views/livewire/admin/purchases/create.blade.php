@@ -12,7 +12,7 @@
 
             <x-slot:footer>
                 <div class="text-right ">
-                    <button wire:click="$emitTo('admin.providers.modal', 'openModal')" class="bg-indigo-500 hover:bg-indigo-600 text-sm text-white px-4 py-2 rounded font-semibold font-inter inline-flex items-center">
+                    <button wire:click="$emitTo('admin.providers.modal', 'openModal')" class="bg-blue-500 hover:bg-blue-600 text-sm text-white px-4 py-2 rounded font-semibold font-inter inline-flex items-center">
                         <i class="ico icon-user mr-1 text-sm"></i>
                         Seleccionar
                     </button>

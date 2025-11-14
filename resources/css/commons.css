@@ -1,7 +1,6 @@
 .table {
     @apply w-full;
 }
-
 .table thead {
     @apply bg-gray-100 font-normal sm:uppercase text-xs sm:text-xs text-slate-500 border border-slate-200;
 }

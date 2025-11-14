@@ -27,13 +27,13 @@
         class="sticky top-14 z-20 mb-2 flex w-full items-center justify-between space-x-4 border-b bg-white py-1 shadow">
 
         <button @click="$dispatch('verify-block-order')"
-          class="rounded bg-cyan-400 px-4 py-2 font-bold text-white hover:bg-cyan-500">
+          class="rounded bg-sky-400 px-4 py-2 font-bold text-white hover:bg-sky-500">
           <i class="ico icon-arrow-l"></i>
           Mesas
         </button>
 
         <a @click="$dispatch('open-modal-tables', {order: order, view: 'order'})"
-          class="cursor-pointer hover:text-cyan-400 hover:underline">
+          class="cursor-pointer hover:text-sky-400 hover:underline">
           <i class="ti ti-replace"></i>
           <span x-text="order.name"
             class="font-semibold"></span>

@@ -23,14 +23,14 @@
 
   <div class="flex flex-wrap justify-center gap-8 mt-10">
 
-    <div class="w-80 h-36 flex flex-col items-center justify-center border rounded-2xl bg-indigo-700/90 text-white">
-      <i class="ico icon-money text-7xl text-indigo-800"></i>
+    <div class="w-80 h-36 flex flex-col items-center justify-center border rounded-2xl bg-red-600/90 text-white">
+      <i class="ico icon-money text-7xl text-red-900"></i>
       <span class="-mt-3">Costos</span>
       <span class="font-semibold text-2xl">@formatToCop($costTotal)</span>
     </div>
 
-    <div class="w-80 h-36 flex flex-col items-center justify-center border rounded-2xl bg-blue-700/90 text-white">
-      <i class="ico icon-money text-7xl text-blue-800"></i>
+    <div class="w-80 h-36 flex flex-col items-center justify-center border rounded-2xl bg-lime-600/90 text-white">
+      <i class="ico icon-money text-7xl text-lime-900"></i>
       <span class="-mt-3">Ventas</span>
       <span class="font-semibold text-2xl">@formatToCop($saleTotal)</span>
     </div>

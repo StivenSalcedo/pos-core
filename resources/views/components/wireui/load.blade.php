@@ -8,8 +8,8 @@
         case 'blue':
             $color="text-blue-700";
             break;
-        case 'cyan':
-            $color="text-cyan-400";
+        case 'sky':
+            $color="text-sky-400";
             break;
 
         default:
