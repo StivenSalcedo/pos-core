@@ -14,7 +14,7 @@
                 <x-dropdown align="left" width="full">
                     <x-slot name="trigger">
                         <button
-                            class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500 disabled:opacity-60"
+                            class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-blue-500 hover:bg-blue-600 hover:ring-blue-500 disabled:opacity-60"
                             title="Perfil">
                             <div class="flex items-center">
                                 <i class="ico icon-bell mr-2"></i>
@@ -38,7 +38,7 @@
                 <x-dropdown align="left" width="full">
                     <x-slot name="trigger">
                         <button
-                            class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500 disabled:opacity-60"
+                            class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-blue-500 hover:bg-blue-600 hover:ring-blue-500 disabled:opacity-60"
                             title="Perfil">
                             <div class="flex items-center">
                                 <i class="ico icon-pdf mr-2"></i>
@@ -186,24 +186,24 @@
      @if ($service->id)
     <div class="grid sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
         <div
-            class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-indigo-700/90 text-white">
-            <i class="ico icon-money text-7xl text-indigo-800"></i>
+            class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-gray-600/90 text-white">
+            <i class="ico icon-money text-7xl text-gray-900"></i>
             <span class="-mt-3">Subtotal</span>
             <span class="font-semibold text-2xl">{{ number_format($subtotal, 2, ',', '.') }}</span>
         </div>
-        <div class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-blue-700/90 text-white">
-            <i class="ico icon-money text-7xl text-blue-800"></i>
+        <div class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-yellow-600/90 text-white">
+            <i class="ico icon-money text-7xl text-yellow-900"></i>
             <span class="-mt-3">Descuentos</span>
             <span class="font-semibold text-2xl">{{ number_format($discount, 2, ',', '.') }}</span>
         </div>
         <div
-            class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-indigo-700/90 text-white">
-            <i class="ico icon-money text-7xl text-indigo-800"></i>
+            class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-lime-600/90 text-white">
+            <i class="ico icon-money text-7xl text-lime-900"></i>
             <span class="-mt-3">Abonos</span>
             <span class="font-semibold text-2xl">{{ number_format($deposit, 2, ',', '.') }}</span>
         </div>
-        <div class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-blue-700/90 text-white">
-            <i class="ico icon-money text-7xl text-blue-800"></i>
+        <div class="w-full h-36 flex flex-col items-center justify-center border rounded-2xl bg-blue-600/90 text-white">
+            <i class="ico icon-money text-7xl text-blue-900"></i>
             <span class="-mt-3">Saldos</span>
             <span class="font-semibold text-2xl">{{ number_format($total, 2, ',', '.') }}</span>
         </div>
