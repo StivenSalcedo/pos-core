@@ -209,7 +209,7 @@
         <x-dropdown align="right" width="56">
           <x-slot name="trigger">
             <button
-              class="flex items-center whitespace-nowrap text-sm font-medium text-gray-500 transition duration-150 ease-in-out hover:border-gray-300 hover:text-cyan-400 focus:border-gray-300 focus:text-gray-700 focus:outline-none"
+              class="flex items-center whitespace-nowrap text-sm font-medium text-gray-500 transition duration-150 ease-in-out hover:border-gray-300 hover:text-sky-400 focus:border-gray-300 focus:text-gray-700 focus:outline-none"
               title="Perfil">
               <div class="ml-1 min-h-max min-w-max">
                 <img class="h-9 w-9 rounded-full" src="{{ auth()->user()->profile_photo_url }}">

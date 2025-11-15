@@ -13,7 +13,7 @@
                         <div class="w-full">
                             <x-wireui.native-select label="Categoría" placeholder="Selecciona una categoría" wire:model.defer="product.category_id" optionKeyValue :options="$categories" class="min-w-full" />
                         </div>
-                        <button wire:click='$emitTo("admin.categories.index", "openCreate", "{{ $this->getName() }}")' class="h-10 w-10 bg-indigo-500 text-white rounded-lg" title="Crear categoría">
+                        <button wire:click='$emitTo("admin.categories.index", "openCreate", "{{ $this->getName() }}")' class="h-10 w-10 bg-blue-500 text-white rounded-lg" title="Crear categoría">
                             <i class="ico icon-add"></i>
                         </button>
                     </div>
@@ -32,7 +32,7 @@
                     <div class="flex-1">
                       <x-wireui.input label="Impuestos" :value="$tax_rates->implode('format_rate', ', ')" readonly class="w-full"  />
                     </div>
-                        <button wire:click='openTaxRates' class="h-10 w-10 bg-indigo-500 text-white rounded-lg" title="Agregar impuestos">
+                        <button wire:click='openTaxRates' class="h-10 w-10 bg-blue-500 text-white rounded-lg" title="Agregar impuestos">
                             <i class="ico icon-add"></i>
                         </button>
                   </div>

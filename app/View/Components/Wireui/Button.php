@@ -112,7 +112,7 @@ class Button extends Component {
     public function defaultColors() : array{
         return [
             'default' => <<<EOT
-            bg-indigo-500 hover:bg-indigo-600 hover:ring-indigo-500
+            bg-blue-500 hover:bg-blue-600 hover:ring-blue-500
             EOT,
 
             'secondary' => <<<EOT
