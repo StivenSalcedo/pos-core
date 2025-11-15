@@ -12,12 +12,13 @@ use Mpdf\HTMLParserMode;
 use Mpdf\Mpdf;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ServiceNotification;
+
 class SendWhatsapp extends Component
 {
     public $service;
     public $phone;
     public $message;
- 
+
     public $openModal = false;
 
     protected $listeners = ['openWhatsappModal' => 'openModalWindow'];
@@ -26,7 +27,7 @@ class SendWhatsapp extends Component
     {
         $this->resetValidation();
         $this->service = Service::with('customer')->findOrFail($serviceId);
-        $this->phone ='57' . $this->service->customer->phone ?? '';
+        $this->phone = '57' . $this->service->customer->phone ?? '';
         $this->openModal = true;
     }
 
@@ -40,23 +41,24 @@ class SendWhatsapp extends Component
         ]);
 
         $pdf = $this->createPDF($this->service, 'S');
-                $filename = $this->service->id . '.pdf';
-                $pdfPath = storage_path('app/temp/' . $filename);
-               Storage::disk('public')->put('temp/' . $filename, $pdf);
+        $filename = $this->service->id . '.pdf';
+        $pdfPath = storage_path('app/temp/' . $filename);
+        Storage::disk('public')->put('temp/' . $filename, $pdf);
 
-                // Generamos la URL pública
-                $pdfUrl = asset('storage/temp/' . $filename);
-                //http://127.0.0.1:8000/storage/temp/17.pdf
+        // Generamos la URL pública
+        $pdfUrl = asset('storage/temp/' . $filename);
+        //http://127.0.0.1:8000/storage/temp/17.pdf
 
         try {
-           /* $response = Http::withToken(env('WHATSAPP_TOKEN'))
-                ->post(env('WHATSAPP_URL') . "/messages", [
+            $url = rtrim(env('WHATSAPP_URL'), '/') . '/messages';
+            $response = Http::withToken(env('WHATSAPP_TOKEN'))
+                ->post($url, [
                     "messaging_product" => "whatsapp",
                     "to" => $this->phone,
                     "type" => "template",
                     "template" => [
-                        "name" => "service_notification",
-                        "language" => ["code" => "es_ES"],
+                        "name" => "service_confirmation",
+                        "language" => ["code" => "es"],
                         "components" => [
                             [
                                 "type" => "body",
@@ -79,8 +81,8 @@ class SendWhatsapp extends Component
 
             if ($response->failed()) {
                 throw new \Exception($response->body());
-            }*/
-             ServiceNotification::create([
+            }
+            ServiceNotification::create([
                 'service_id' => $this->service->id,
                 'channel' => 'whatsapp',
                 'destination' => $this->phone,
@@ -96,13 +98,77 @@ class SendWhatsapp extends Component
         }
     }
 
-     protected function createPDF(Service $service, $dest)
+    protected function createPDF(Service $service, $dest)
     {
         $company = session('config');
         $pdf = new Mpdf(['format' => 'A4']);
         $pdf->setFooter('{PAGENO}');
         $pdf->SetHTMLFooter(View::make('pdf.service.footer'));
-        $pdf->WriteHTML(View::make('pdf.service.template-detail', compact('company', 'service')), HTMLParserMode::HTML_BODY);
+        // Variables acumuladas
+        $subtotal = 0;
+        $discount = 0;
+        $totalTax = 0;
+        $totalPaid = 0;
+
+        foreach ($service->products as $item) {
+            $quantity = (float) $item->quantity;
+            $discountValue = (float) ($item->discount ?? 0);
+            $unitPrice = (float) ($item->unit_price - ($discountValue / $quantity));
+            // Valor fijo, no porcentaje
+
+            // Obtener el impuesto principal del producto (si tiene varios, tomamos el primero)
+            $taxData = $item->product->taxRates->first();
+            $taxRateValue = 0;
+            $taxIsPercent = true;
+
+            if ($taxData) {
+                $taxRateValue = (float) $taxData->rate;
+                $taxIsPercent = (bool) $taxData->has_percentage;
+            }
+
+            // Desglose de IVA incluido
+            $baseUnit = $unitPrice;
+            $ivaUnit = 0;
+
+            if ($taxIsPercent && $taxRateValue > 0) {
+                // IVA incluido (ej. 19%)
+                $baseUnit = $unitPrice / (1 + ($taxRateValue / 100));
+                $ivaUnit  = $unitPrice - $baseUnit;
+            } elseif (!$taxIsPercent && $taxRateValue > 0) {
+                // IVA fijo (ej. $800 por unidad)
+                $baseUnit = $unitPrice - $taxRateValue;
+                $ivaUnit  = $taxRateValue;
+            }
+
+            // Totales por línea
+            $lineBase = $baseUnit * $quantity;
+            $lineTax  = $ivaUnit * $quantity;
+            // Acumular totales
+            $subtotal += $lineBase;
+            $discount += $discountValue;
+            $totalTax += $lineTax;
+        }
+
+        // Pagos realizados
+        $totalPaid = $service->payments->sum('amount');
+
+        // Total general
+        $total = $subtotal + $totalTax;
+        $balance = $total - $totalPaid;
+
+        $pdf = new Mpdf(['format' => 'A4']);
+        $pdf->setFooter('{PAGENO}');
+        $pdf->SetHTMLFooter(View::make('pdf.service.footer'));
+        $pdf->WriteHTML(View::make('pdf.service.template-detail', [
+            'company'   => $company,
+            'service'   => $service,
+            'subtotal'  => $subtotal,
+            'discount'  => $discount,
+            'iva'       => $totalTax,
+            'total'     => $total,
+            'pagado'    => $totalPaid,
+            'saldo'     => $balance,
+        ]), HTMLParserMode::HTML_BODY);
         $pdf->SetTitle('Servicio ' . $service->id);
         return $pdf->Output('Servicio_' . $service->id . '.pdf', $dest);
     }
