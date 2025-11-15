@@ -10,7 +10,7 @@ class ServicePayment extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-    public function payment()
+    public function paymentMethod()
     {
         return $this->belongsTo(PaymentMethod::class);
     }

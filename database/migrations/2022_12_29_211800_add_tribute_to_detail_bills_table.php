@@ -16,7 +16,8 @@ return new class extends Migration {
 
     public function down() {
         Schema::table('detail_bills', function (Blueprint $table) {
-            $table->dropColumn('tribute');
+            
+           // $table->dropColumn('tribute');
         });
     }
 };

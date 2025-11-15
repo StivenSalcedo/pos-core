@@ -22,8 +22,8 @@ return new class extends Migration {
     
     public function down() {
         Schema::table('bills', function (Blueprint $table) {
-            $table->dropColumn('inc');
-            $table->renameColumn('iva', 'tax');
+            //$table->dropColumn('inc');
+            //$table->renameColumn('iva', 'tax');
         });
     }
 };

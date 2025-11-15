@@ -19,14 +19,16 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($payments as $payment)
+                @forelse($payments as $p)
                     <tr class="border-b">
-                        <td class="px-3 py-2">{{ $payment->created_at->format('d/m/Y H:i') }}</td>
-                        <td class="px-3 py-2 text-left">{{ number_format($payment['amount'], 0, ',', '.') }}</td>
-                        <td class="px-3 py-2">{{ $payment->payment->name ?? 'N/A' }}</td>
-                        <td class="px-3 py-2">{{ $payment['user']['name'] ?? 'N/A' }}</td>
+                        <td class="px-3 py-2">{{ $p->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="px-3 py-2 text-left">{{ number_format($p['amount'], 0, ',', '.') }}</td>
+                        <td class="px-3 py-2">{{ $p['paymentMethod']['name'] ?? 'N/A' }}</td>
+                        <td class="px-3 py-2">{{ $p['user']['name'] ?? 'N/A' }}</td>
                         <td class="px-3 py-2 text-center">
-                            <x-buttons.delete wire:click="removePayment({{ $payment['id'] }})" title="Eliminar" />
+                            @if (!$service->isValidated)
+                                <x-buttons.delete wire:click="removePayment({{ $p['id'] }})" title="Eliminar" />
+                            @endif
                         </td>
                     </tr>
                 @empty

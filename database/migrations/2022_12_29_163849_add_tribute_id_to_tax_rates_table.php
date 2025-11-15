@@ -16,6 +16,7 @@ return new class extends Migration {
 
     public function down(){
         Schema::table('tax_rates', function (Blueprint $table) {
+             $table->dropForeign(['tribute_id']);
             $table->dropColumn('tribute_id');
         });
     }

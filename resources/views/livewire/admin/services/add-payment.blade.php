@@ -28,6 +28,8 @@
                     wire:model.defer="reference"
                     class="sm:col-span-2"
                 />
+                <div><label>Saldo faltante: <br><br>$ {{$balance}}</label></div>
+                
             </div>
 
             <x-slot:footer>

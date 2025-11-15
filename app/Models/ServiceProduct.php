@@ -14,4 +14,9 @@ class ServiceProduct extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function documentTaxes()
+    {
+        return $this->morphMany(DocumentTax::class, 'document_taxeable');
+    }
 }
