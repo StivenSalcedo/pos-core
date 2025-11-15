@@ -5,7 +5,7 @@
             <x-wireui.errors />
 
             <div class="text-right">
-                <button wire:click="$emitTo('admin.staff.modal', 'openModal')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-1 rounded font-semibold text-sm inline-flex items-center">
+                <button wire:click="$emitTo('admin.staff.modal', 'openModal')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded font-semibold text-sm inline-flex items-center">
                     <i class="ico icon-user mr-1"></i>
                     Buscar Empleado
                 </button>

@@ -1,7 +1,7 @@
 @props(['route', 'name', 'icon', 'active'])
 
 @php
-    $class = $active ? 'text-cyan-400 bg-gray-100 rounded-md shadow-inner shadow-slate-300' :
+    $class = $active ? 'text-sky-400 bg-gray-100 rounded-md shadow-inner shadow-slate-300' :
                         'text-gray-600'
 @endphp
 
