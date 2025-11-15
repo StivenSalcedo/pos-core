@@ -1,13 +1,13 @@
 <div>
     <div class="flex items-center justify-between border-b pb-4 mb-4">
         <h3 class="font-medium whitespace-normal text-lg">Productos utilizados</h3>
-        @if (!$service->isValidated)
+        
             <div class="text-right">
-                <x-wireui.button primary
+                <x-wireui.button primary  :disabled="$service->isValidated"
                     x-on:click="$wire.emitTo('admin.services.add-product', 'openAddProduct', {{ $service->id }})"
                     text="Agregar producto" icon="add" spinner="update" />
             </div>
-        @endif
+        
     </div>
 
     <div class="overflow-x-auto border rounded-lg">
