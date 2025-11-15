@@ -1,29 +1,22 @@
 export default () => ({
   show: false,
   company: {},
-  customer: {},
-  bill: {},
-  range: {},
-  products: {},
-  taxes: {},
-  electronic_bill: {},
-  isElectronic: false,
-
+  service: {},
+  customer:{},
   init() {
     window.addEventListener('print-label', (event) => {
       this.show = true
-      this.getBill(`/administrador/facturas/informacion/${event.detail}`).then(() => {
+      this.getService(`/administrador/servicios/informacion/${event.detail}`).then(() => {
         this.$nextTick(() => {
-          this.setHeight()
+         this.setHeight()
           window.print()
-          this.products = {}
           this.show = false
         })
       })
     })
   },
 
-  getBill(url) {
+  getService(url) {
     return fetch(url)
       .then((response) => {
         if (!response.ok) {
@@ -33,13 +26,8 @@ export default () => ({
       })
       .then((data) => {
         this.company = data.data.company
-        this.customer = data.data.customer
-        this.bill = data.data.bill
-        this.range = data.data.range
-        this.products = data.data.products
-        this.taxes = data.data.taxes
-        this.electronic_bill = data.data.electronic_bill
-        this.isElectronic = data.data.is_electronic
+        this.service = data.data.service
+        this.customer = data.data.service.customer
       })
       .catch((error) => {
         console.error('Error al obtener datos:', error)
@@ -48,28 +36,24 @@ export default () => ({
 
   setHeight() {
     let style = document.getElementById('page-rule')
-
-    let oneLine = 0
-    let twoLine = 0
-
-    this.products.forEach((element) => {
-      if (element.name.length <= 31) {
-        oneLine++
-      } else {
-        twoLine++
-      }
-    })
-
-    let height = Object.keys(this.range).length ? 12 : 0
-
-    if (this.isElectronic) {
-      height += 50
-    }
-
-    height += 182 + oneLine * 4.2 + twoLine * 7.7
-
+    let height = 120;
     const width = this.$store.config.widthTicket
-
     style.innerHTML = `@page { size: ${width}mm ${height}mm; margin: 0cm;}`
   },
+  formatDate(date, format = 'DD/MM/YYYY') {
+        const d = new Date(date);
+        const pad = n => String(n).padStart(2, '0');
+        const map = {
+            YYYY: d.getFullYear(),
+            MM: pad(d.getMonth() + 1),
+            DD: pad(d.getDate()),
+            HH: pad(d.getHours()),
+            mm: pad(d.getMinutes()),
+            ss: pad(d.getSeconds()),
+            MMM: d.toLocaleString('es-ES', { month: 'short' }),
+            MMMM: d.toLocaleString('es-ES', { month: 'long' }),
+        };
+
+        return format.replace(/YYYY|MM|DD|HH|mm|ss|MMM|MMMM/g, matched => map[matched]);
+      },
 })

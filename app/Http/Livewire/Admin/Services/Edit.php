@@ -202,6 +202,7 @@ class Edit extends Component
 
             // Emitir evento para el componente index
             $this->emit('success', 'Servicio creado con éxito');
+             $this->dispatchBrowserEvent('print-label', $service->id);
             $this->dispatchBrowserEvent('redirect-after-success', [
                 'url' => route('admin.services.edit', $service->id)
             ]);

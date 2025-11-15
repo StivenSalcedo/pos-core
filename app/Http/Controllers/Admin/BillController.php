@@ -95,7 +95,6 @@ class BillController extends Controller
         $company['phone']=!empty($terminal->phone) ? $terminal->phone :  $company['phone'];
 
         $data = [
-
             'is_electronic' => $bill->isElectronic,
             'company' => $company,
             'customer' => [

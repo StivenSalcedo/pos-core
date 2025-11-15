@@ -55,6 +55,10 @@
                             @click="$dispatch('print-ticket', {{ $service->id }})" target="_blank">
                             Imprimir recibo
                         </x-dropdown-link>
+                        <x-dropdown-link class="flex items-center cursor-pointer"
+                            @click="$dispatch('print-label', {{ $service->id }})" target="_blank">
+                            Imprimir label
+                        </x-dropdown-link>
                     </x-slot>
                 </x-dropdown>
            
@@ -190,6 +194,7 @@
             @endif
         </div>
         @include('pdfs.ticket-service')
+        @include('pdfs.label-service')
 
     </x-wireui.card>
      @if ($service->id)

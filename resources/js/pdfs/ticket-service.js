@@ -2,13 +2,15 @@ export default () => ({
   show: false,
   company: {},
   service: {},
-  customer:{},
+  customer: {},
+  electronic_bill: {},
+  isElectronic: false,
   init() {
     window.addEventListener('print-ticket', (event) => {
       this.show = true
       this.getService(`/administrador/servicios/informacion/${event.detail}`).then(() => {
         this.$nextTick(() => {
-         this.setHeight()
+          this.setHeight()
           window.print()
           this.show = false
         })
@@ -28,6 +30,8 @@ export default () => ({
         this.company = data.data.company
         this.service = data.data.service
         this.customer = data.data.service.customer
+        this.electronic_bill = data.data.electronic_bill
+        this.isElectronic = data.data.is_electronic
       })
       .catch((error) => {
         console.error('Error al obtener datos:', error)
@@ -50,14 +54,16 @@ export default () => ({
 
     let height = 0;
 
-    
-      height += 50
-    
+
+    height += 50;
+
 
     height += 182 + oneLine * 4.2 + twoLine * 7.7
-
+    if (this.isElectronic) {
+      height += 50;
+    }
     const width = this.$store.config.widthTicket
 
     style.innerHTML = `@page { size: ${width}mm ${height}mm; margin: 0cm;}`
-  },
+  }
 })
