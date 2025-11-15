@@ -133,7 +133,7 @@
                     <span>Descuento:</span>
                     <span class="font-medium w-24" x-text="formatToCop(service.discount)"></span>
                 </li>
-                <li  x-if="service.iva>0" class="">
+                <li x-if="service.iva>0" class="">
                     <span>IVA:</span>
                     <span class="font-medium w-24" x-text="formatToCop(service.iva)"></span>
                 </li>
@@ -146,8 +146,34 @@
 
             <h1 class="border-b-2 border-dotted my-3 border-slate-400"></h1>
 
-            <div class="font-bold text-center">*** Gracias por su compra ***</div>
 
+
+            {{-- resolucion rango de numeracion --}}
+            <template x-if="isElectronic && Object.keys(range).length">
+                <div class="mt-1">
+                    <p class="leading-3 text-center">
+                        Resolución DIAN <span x-text="range.resolution_number"></span>
+                        autorizada el <span x-text="range.start_date"></span>
+                        prefijo <span x-text="range.prefix"></span>
+                        del <span x-text="range.from"></span>
+                        al <span x-text="range.to"></span>
+                        Vig <span x-text="range.months"></span> meses
+                    </p>
+                </div>
+            </template>
+
+            <template x-if="isElectronic">
+                <div class="flex justify-center mt-1">
+                    <img class="max-w-[140px]" :src="electronic_bill.qr_image">
+                </div>
+            </template>
+            <template x-if="isElectronic">
+                <div>
+                    <p class="text-center font-semibold text-xs">CUFE</p>
+                    <p class="break-all leading-3" x-text="electronic_bill.cufe"></p>
+                </div>
+            </template>
+            <div class="font-bold text-center">*** Gracias por su compra ***</div>
         </div>
     </div>
 @endpush

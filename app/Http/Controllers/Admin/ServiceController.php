@@ -200,9 +200,15 @@ class ServiceController extends Controller
         $service->iva    = round($totalTax, 2);
 
         $data = [
+            'is_electronic' => $service->isElectronic,
             'company' => $company,
             'service' => $service,
         ];
+
+         if ($service->isElectronic) {
+            $data['range'] = $service->electronicBill->numbering_range;
+            $data['electronic_bill'] = $service->electronicBill->toArray();
+        }
 
 
         return response()->json(['data' => $data]);
