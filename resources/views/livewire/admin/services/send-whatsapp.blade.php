@@ -9,9 +9,7 @@
                         placeholder="Ej: 573144502241"
                         wire:model.defer="phone" />
 
-        <x-wireui.input label="Mensaje adicional (opcional)" 
-                        placeholder="Texto que se agregará al mensaje"
-                        wire:model.defer="message" />
+      
 
         
       </div>

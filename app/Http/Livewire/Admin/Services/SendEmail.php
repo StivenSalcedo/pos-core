@@ -58,7 +58,7 @@ class SendEmail extends Component
                 //http://127.0.0.1:8000/storage/temp/17.pdf
             }
 
-            /* Mail::send('emails.service-notification', [
+             Mail::send('emails.service-notification', [
                 'service' => $this->service,
                 'messageBody' => $this->emailMessage,
             ], function ($message) use ($pdfPath) {
@@ -68,7 +68,7 @@ class SendEmail extends Component
                 if ($this->attachPdf && $pdfPath) {
                     $message->attach($pdfPath);
                 }
-            });*/
+            });
 
             ServiceNotification::create([
                 'service_id' => $this->service->id,
@@ -89,10 +89,72 @@ class SendEmail extends Component
     protected function createPDF(Service $service, $dest)
     {
         $company = session('config');
+        // Variables acumuladas
+        $subtotal = 0;
+        $discount = 0;
+        $totalTax = 0;
+        $totalPaid = 0;
+
+        foreach ($service->products as $item) {
+            $quantity = (float) $item->quantity;
+            $discountValue = (float) ($item->discount ?? 0);
+            $unitPrice = (float) ($item->unit_price - ($discountValue / $quantity));
+            // Valor fijo, no porcentaje
+
+            // Obtener el impuesto principal del producto (si tiene varios, tomamos el primero)
+            $taxData = $item->product->taxRates->first();
+            $taxRateValue = 0;
+            $taxIsPercent = true;
+
+            if ($taxData) {
+                $taxRateValue = (float) $taxData->rate;
+                $taxIsPercent = (bool) $taxData->has_percentage;
+            }
+
+            // Desglose de IVA incluido
+            $baseUnit = $unitPrice;
+            $ivaUnit = 0;
+
+            if ($taxIsPercent && $taxRateValue > 0) {
+                // IVA incluido (ej. 19%)
+                $baseUnit = $unitPrice / (1 + ($taxRateValue / 100));
+                $ivaUnit  = $unitPrice - $baseUnit;
+            } elseif (!$taxIsPercent && $taxRateValue > 0) {
+                // IVA fijo (ej. $800 por unidad)
+                $baseUnit = $unitPrice - $taxRateValue;
+                $ivaUnit  = $taxRateValue;
+            }
+
+            // Totales por línea
+            $lineBase = $baseUnit * $quantity;
+            $lineTax  = $ivaUnit * $quantity;
+            // Acumular totales
+            $subtotal += $lineBase;
+            $discount += $discountValue;
+            $totalTax += $lineTax;
+        }
+
+        // Pagos realizados
+        $totalPaid = $service->payments->sum('amount');
+
+        // Total general
+        $total = $subtotal + $totalTax;
+        $balance = $total - $totalPaid;
+
         $pdf = new Mpdf(['format' => 'A4']);
         $pdf->setFooter('{PAGENO}');
         $pdf->SetHTMLFooter(View::make('pdf.service.footer'));
-        $pdf->WriteHTML(View::make('pdf.service.template-detail', compact('company', 'service')), HTMLParserMode::HTML_BODY);
+        $pdf->WriteHTML(View::make('pdf.service.template-detail', [
+            'company'   => $company,
+            'service'   => $service,
+            'subtotal'  => $subtotal,
+            'discount'  => $discount,
+            'iva'       => $totalTax,
+            'total'     => $total,
+            'pagado'    => $totalPaid,
+            'saldo'     => $balance,
+        ]), HTMLParserMode::HTML_BODY);
+        // $pdf->WriteHTML(View::make('pdf.service.template-detail', compact('company', 'service')), HTMLParserMode::HTML_BODY);
         $pdf->SetTitle('Servicio ' . $service->id);
         return $pdf->Output('Servicio_' . $service->id . '.pdf', $dest);
     }

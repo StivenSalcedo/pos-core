@@ -27,12 +27,12 @@ class ProductSeeder extends Seeder
             'barcode' => 12345,
             'reference' => 12345,
             'category_id' => Category::all()->random()->id,
-            'name' => 'Ibuprofeno',
+            'name' => 'Teclado',
             'cost' => 4000,
             'price' => 5000,
             'stock' => 10,
             'quantity' => 20,
-            'units' => 200,
+            'units' => 0,
             'has_presentations' => '0',
         ]);
 
@@ -60,12 +60,12 @@ class ProductSeeder extends Seeder
             'barcode' => 123456,
             'reference' => 123456,
             'category_id' => Category::all()->random()->id,
-            'name' => 'Aspirina',
+            'name' => 'Cable HDMI',
             'cost' => 3000,
             'price' => 6000,
             'stock' => 20,
             'quantity' => 30,
-            'units' => 600,
+            'units' => 0,
             'has_presentations' => '0',
         ]);
 
