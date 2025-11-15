@@ -57,7 +57,16 @@
                         </x-dropdown-link>
                     </x-slot>
                 </x-dropdown>
+           
+           @if ((App\Services\FactusConfigurationService::isApiEnabled(true)) && !$service->isValidated && count($service->products)>0 && count($service->payments)>0)
+              <td class="text-center">
+                    <button wire:click='validateElectronicBill({{ $service->id }})'>
+                      <x-icons.factus class="h-6 w-6 text-red-500" title="Pendiente por validar" />
+                    </button>
+               
+              </td>
             @endif
+             @endif
         </x-commons.header>
     </div>
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
@@ -93,9 +102,9 @@
                 </button>
 
                 <button wire:click="{{ $service->id ? '$set(\'tab\', \'payments\')' : '' }}"
-                    @if (!$service->id) disabled @endif
+                    @if (!$service->id || count($service->products)==0) disabled @endif
                     class="hidden lg:block px-3 py-2 font-medium text-sm 
-        {{ $tab === 'payments' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
+        {{ $tab === 'payments' ? 'border-b-2 border-primary-500 text-primary-600' : (($service->id || count($service->products)>0) ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
                     Pagos
                 </button>
 

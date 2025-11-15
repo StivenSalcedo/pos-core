@@ -17,8 +17,10 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ServiceAttachment;
 use Illuminate\Support\Str;
 use App\Traits\LivewireTrait;
-
-
+use App\Services\ServiceService;
+use App\Exceptions\CustomException;
+use Illuminate\Validation\ValidationException;
+use App\Services\FactusConfigurationService;
 class Edit extends Component
 {
     use LivewireTrait;
@@ -124,6 +126,7 @@ class Edit extends Component
     public function mount(Service $service)
     {
         $this->service = $service;
+         $this->service->loadMissing(['products', 'payments','payments.paymentMethod','electronicBill']);
        
         if (!$this->service->id) {
             $today = Carbon::now();
@@ -333,7 +336,7 @@ class Edit extends Component
     {
         $this->service->refresh();
         // Asegurar que estén cargados los productos y pagos
-        $this->service->loadMissing(['products', 'payments']);
+       $this->service->loadMissing(['products', 'payments']);
         // Calcular subtotal y descuento
         $this->subtotal = $this->service->products->sum(fn($p) => $p->unit_price * $p->quantity);
         $this->discount = $this->service->products->sum(fn($p) => $p->discount ?? 0);
@@ -390,7 +393,7 @@ class Edit extends Component
 
     public function refreshPaymentDetails()
     {
-        $this->payments = $this->service->payments()->with('payment', 'user')->get();
+        $this->payments = $this->service->payments()->with('paymentMethod', 'user')->get();
         $this->calculateTotals();
     }
 
@@ -470,6 +473,33 @@ class Edit extends Component
         $this->emailMessage = '';
         $this->attachPdf = true;
         $this->openEmailModal = true;
+    }
+
+     public function validateElectronicBill(Service $service)
+    {
+        try {
+            ServiceService::validateElectronicBill($service);
+        } catch (CustomException $ce) {
+            Log::error($ce->getMessage());
+
+            return $this->emit('error', $ce->getMessage());
+        } catch (ValidationException $ce) {
+            $errors = $ce->errors();
+            foreach ($errors as $field => $errorMessages) {
+                foreach ($errorMessages as $errorMessage) {
+                    $this->addError($field, $errorMessage);
+                }
+            }
+
+            return;
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage(), [], $th->getLine());
+
+            return $this->emit('error', 'Ha sucedido un error inesperado. Vuelve a intentarlo');
+        }
+
+       $this->dispatchBrowserEvent('print-ticket', $service->id);
+       $this->mount($this->service);
     }
 
 

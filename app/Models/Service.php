@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,6 +9,22 @@ class Service extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+
+
+     protected function isElectronic(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->electronicBill ? true : false
+        );
+    }
+
+    protected function isValidated(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->electronicBill && $this->electronicBill->is_validated
+        );
+    }
+
     public function customer()
     {
         return $this->belongsTo(\App\Models\Customer::class);
@@ -53,6 +69,13 @@ class Service extends Model
     {
         return $this->belongsTo(User::class, 'tech_assigned_id');
     }
+
+    public function electronicBill()
+    {
+        return $this->hasOne(ElectronicService::class);
+    }
+
+   
 
     protected $casts = [
         'date_entry' => 'datetime:Y-m-d',
