@@ -2,7 +2,7 @@
 
     <x-commons.header >
         <x-wireui.button wire:click="exportCustomers" icon="excel" success text="Exportar a excel" load textLoad="Exportando..." />
-         <x-wireui.button icon="excel" x-on:click="$wire.emitTo('admin.customers.import', 'openImport')"  success text="Importar desde excel" />
+        <x-wireui.button icon="excel" x-on:click="$wire.emitTo('admin.customers.import', 'openImport')"  success text="Importar desde excel" />
         <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.customers.create', 'openCreate')"  text="Crear Cliente" />
     </x-commons.header>
 

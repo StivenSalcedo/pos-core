@@ -1,10 +1,12 @@
-<div class="container pt-8 relative">
-    <x-wireui.card title="Módulos" cardClasses="max-w-6xl mx-auto">
+<div class="container">
+    <x-commons.header>
+        <x-wireui.button icon="check" x-on:click="$wire.emit('enableAllModules')" text="Habilitar todos los módulos" />
+    </x-commons.header>
+    <x-wireui.card title="Módulos" >
 
         <x-slot:header>
             <div x-data class="px-4 py-1 flex justify-between items-center border-b">
                 <h3 class="font-semibold whitespace-normal text-lg">Módulos</h3>
-                <x-wireui.button x-on:click="$wire.emit('enableAllModules')" text="Habilitar todos los módulos" sm />
             </div>
         </x-slot:header>
 
@@ -22,7 +24,7 @@
 
     </x-wireui.card>
 
-    <x-wireui.card title="Funciones" cardClasses="max-w-6xl mx-auto mt-4">
+    <x-wireui.card title="Funciones" cardClasses="mt-4">
 
         <x-slot:header>
             <div class="px-4 py-1 flex justify-between items-center border-b">
