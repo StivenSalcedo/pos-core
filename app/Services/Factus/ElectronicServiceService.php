@@ -20,7 +20,7 @@ class ElectronicServiceService
         $data = self::prepareData($service);
         $response = HttpService::apiHttp()
             ->post('bills/validate', $data);
-
+ Log::debug('Respuesta', ['data' => $response]);
         return $response;
     }
 

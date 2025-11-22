@@ -163,6 +163,8 @@ class Edit extends Component
         $this->refreshPaymentDetails();
         $this->refreshNotifications();
         $this->calculateTotals();
+        
+       
     }
 
 
@@ -354,6 +356,7 @@ class Edit extends Component
 
         $this->tab = 'histories';
         $this->changeTab('histories'); // Reutiliza tu función existente
+
     }
 
     public function changeTab($newTab)
@@ -364,6 +367,8 @@ class Edit extends Component
         if ($newTab === 'histories') {
             $this->refreshHistories();
         }
+        
+       
     }
 
     public function refreshHistories()

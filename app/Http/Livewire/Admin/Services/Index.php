@@ -7,7 +7,11 @@ use Livewire\WithPagination;
 use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use App\Services\ServiceService;
+use App\Exceptions\CustomException;
+use Illuminate\Validation\ValidationException;
+use App\Services\FactusConfigurationService;
+use Illuminate\Support\Facades\Log;
 class Index extends Component
 {
     use WithPagination;
@@ -27,6 +31,7 @@ class Index extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+        
     }
 
     public function confirmDelete($id)
@@ -85,8 +90,39 @@ class Index extends Component
         ])->layoutData(['title' => 'Servicios Tec.']);
     }
 
+    public function printReceipt($id)
+    {
+        $this->dispatchBrowserEvent('print-ticket', $id);
+    }
     public function redirectToEdit($id)
     {
         return redirect()->route('admin.services.edit', $id);
+    }
+
+    public function validateElectronicBill(Service $service)
+    {
+        try {
+            ServiceService::validateElectronicBill($service);
+        } catch (CustomException $ce) {
+            Log::error($ce->getMessage());
+
+            return $this->emit('error', $ce->getMessage());
+        } catch (ValidationException $ce) {
+            $errors = $ce->errors();
+            foreach ($errors as $field => $errorMessages) {
+                foreach ($errorMessages as $errorMessage) {
+                    $this->addError($field, $errorMessage);
+                }
+            }
+
+            return;
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage(), [], $th->getLine());
+
+            return $this->emit('error', 'Ha sucedido un error inesperado. Vuelve a intentarlo');
+        }
+
+       $this->dispatchBrowserEvent('print-ticket', $service->id);
+       $this->render();
     }
 }

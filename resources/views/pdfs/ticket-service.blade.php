@@ -33,7 +33,7 @@
                     <div>Fecha: <span x-text="service.date_entry"></span></div>
                 </li>
                 <li>
-                    <div>Vendedor: <span x-text="service.responsible.name"></span></div>
+                    <div>Vendedor: <span x-text="[service?.responsible?.name].filter(Boolean).join('-')"></span></div>
                 </li>
             </ul>
 
@@ -63,7 +63,11 @@
             <ul class="flex flex-col leading-4">
                 <li>
                     <div>Equipo: <span
-                            x-text="service.equipment_type.name + '-'+ service.brand.name + '-' + service.model"></span>
+                            x-text="[
+        service?.equipment_type?.name,
+        service?.brand?.name,
+        service?.model
+    ].filter(Boolean).join('-')"></span>
                     </div>
                 </li>
                 <li>
@@ -73,7 +77,7 @@
                     <div>Descripción: <span x-text="service.problem_description"></span></div>
                 </li>
                 <li>
-                    <div>Estado: <span x-text="service.state.name"></span></div>
+                    <div>Estado: <span x-text="[service?.state?.name].filter(Boolean).join('-')"></span></div>
                 </li>
                 <li>
                     <div>Fecha estimada de entrega: <span x-text="service.date_due"></span></div>
@@ -145,23 +149,6 @@
             </ul>
 
             <h1 class="border-b-2 border-dotted my-3 border-slate-400"></h1>
-
-
-
-            {{-- resolucion rango de numeracion --}}
-            <template x-if="isElectronic && Object.keys(range).length">
-                <div class="mt-1">
-                    <p class="leading-3 text-center">
-                        Resolución DIAN <span x-text="range.resolution_number"></span>
-                        autorizada el <span x-text="range.start_date"></span>
-                        prefijo <span x-text="range.prefix"></span>
-                        del <span x-text="range.from"></span>
-                        al <span x-text="range.to"></span>
-                        Vig <span x-text="range.months"></span> meses
-                    </p>
-                </div>
-            </template>
-
             <template x-if="isElectronic">
                 <div class="flex justify-center mt-1">
                     <img class="max-w-[140px]" :src="electronic_bill.qr_image">

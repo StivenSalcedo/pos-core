@@ -90,7 +90,7 @@ class HttpService
     {
         $response = self::$http->post($this->formatEnpoint($endpoint), $data);
           //se puso comentario para manejar los errores en cada llamado y no de manera general;
-        //$this->checkResponseErrors($response);
+        $this->checkResponseErrors($response);
 
         return $response;
     }
