@@ -12,7 +12,7 @@
                     <div>Fecha: <span x-text="formatDate(service.date_entry, 'DD/MM/YYYY')"></span></div>
                 </li>
                 <li>
-                    <div>Vendedor: <span x-text="service.responsible.name"></span></div>
+                    <div>Vendedor: <span x-text="[service?.responsible?.name].filter(Boolean).join('-')"></span></div>
                 </li>
             </ul>
 
@@ -41,11 +41,11 @@
 
             <ul class="flex flex-col leading-4">
                 <li>
-                    <div>Equipo: <span x-text="service.equipment_type.name + '-'+ service.brand.name"></span>
+                    <div>Equipo: <span x-text="[service?.equipment_type?.name + '-'+ service?.brand?.name].filter(Boolean).join('-')"></span>
                     </div>
                 </li>
                 <li>
-                    <div>Estado: <span x-text="service.state.name"></span></div>
+                    <div>Estado: <span x-text="[service?.state?.name].filter(Boolean).join('-')"></span></div>
                 </li>
                 <li>
                     <div>Fecha estimada de entrega: <span x-text="service.date_due"></span></div>

@@ -74,6 +74,8 @@
                 @endif
             @endif
         </x-commons.header>
+        <x-loads.panel-fixed text="Validando factura..." class="no-print z-[999]" wire:loading
+        wire:target='validateElectronicBill' />
     </div>
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
 

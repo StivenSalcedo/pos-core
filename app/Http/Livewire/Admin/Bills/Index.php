@@ -76,6 +76,8 @@ class Index extends Component
             ->status($this->status)
             ->terminal($this->terminal_id)
             ->date($this->filterDate, $this->startDate, $this->endDate);
+
+            
     }
 
     public function cancelBill(Bill $bill)

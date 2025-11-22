@@ -1,17 +1,17 @@
 <div class="container">
     <x-commons.header>
-        <x-wireui.button icon="file"  href="{{ route('admin.services.create') }}"  text="Nuevo servicio" />
+        <x-wireui.button icon="file" href="{{ route('admin.services.create') }}" text="Nuevo servicio" />
     </x-commons.header>
     <x-commons.table-responsive>
         <x-slot:top title="Servicios técnicos"></x-slot:top>
         <x-slot:header>
             <input wire:model.debounce.500ms="search" type="text" placeholder="Buscar por modelo o cliente..."
-            class="border-gray-300 rounded-lg w-full md:w-1/3 focus:ring focus:ring-blue-200" />
+                class="border-gray-300 rounded-lg w-full md:w-1/3 focus:ring focus:ring-blue-200" />
             <select wire:model="selectedState" class="border-gray-300 rounded-lg">
                 <option value="">Todos los estados</option>
                 <option value="recibido">Recibido</option>
                 @foreach (\App\Models\ServiceState::orderBy('order')->get() as $state)
-                <option value="{{ $state->id }}">{{ $state->name }}</option>
+                    <option value="{{ $state->id }}">{{ $state->name }}</option>
                 @endforeach
             </select>
             <select wire:model="perPage" class="border-gray-300 rounded-lg">
@@ -51,6 +51,9 @@
                         Estado
                     </th>
                     <th>
+                        Factura
+                    </th>
+                    <th>
                         Acciones
                     </th>
                 </tr>
@@ -77,9 +80,30 @@
                                 {{ $service->state->name ?? 'Recibido' }}
                             </span>
                         </td>
+
+                        @if (App\Services\FactusConfigurationService::isApiEnabled(true)  &&
+                        count($service->products) > 0 &&
+                        count($service->payments) > 0)
+                            <td class="text-center">
+                                <div class="flex justify-center">
+                                    @if ($service->isValidated)
+                                        <x-icons.factus class="h-6 w-6 text-indigo-800" title="Validada" />
+                                    @else
+                                        <button wire:click='validateElectronicBill({{ $service->id }})'>
+                                            <x-icons.factus class="h-6 w-6 text-red-500"
+                                                title="Pendiente por validar" />
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                            @else
+                            <td class="text-center">&nbsp;</td>
+                        @endif
+
                         <td actions>
-                            <x-buttons.edit wire:click="redirectToEdit({{ $service->id }})" title="Editar"/>
-                            <x-buttons.delete wire:click="confirmDelete({{ $service->id }})" title="Eliminar"/>
+                            <x-buttons.download wire:click="printReceipt({{ $service->id }})"   title="Descargar" />
+                            <x-buttons.edit wire:click="redirectToEdit({{ $service->id }})" title="Editar" />
+                            <x-buttons.delete wire:click="confirmDelete({{ $service->id }})" title="Eliminar" />
                         </td>
 
                     </tr>
@@ -92,10 +116,11 @@
         </table>
     </x-commons.table-responsive>
 
+    <x-loads.panel-fixed text="Validando factura..." class="no-print z-[999]" wire:loading wire:target='validateElectronicBill' />
     <div class="mt-4">
         {{ $services->links() }}
     </div>
-
+    @include('pdfs.ticket-service')
     <script>
         document.addEventListener('livewire:load', () => {
             window.addEventListener('confirm-delete', () => {
@@ -128,5 +153,5 @@
             });
         });
     </script>
-   
+
 </div>
