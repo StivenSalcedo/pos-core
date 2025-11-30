@@ -10,7 +10,7 @@
                 <x-wireui.input label="Dirección" wire:model.defer="direction" placeholder="Dirección del proveedor" />
                 <x-wireui.input onlyNumbers label="Celular" wire:model.defer="phone" placeholder="Celular del proveedor" />
                 <x-wireui.native-select optionKeyValue label="Tipo" wire:model.defer="type" class="w-full" optionKeyValue="true" placeholder="Seleccionar el tipo de proveedor" :options="$types" />
-
+                <x-wireui.input label="Email" wire:model.defer="email" />
                 <div class="col-span-full">
                     <x-wireui.textarea label="Descripción" wire:model.defer="description" placeholder="Agregue una descripción del proveedor" />
                 </div>

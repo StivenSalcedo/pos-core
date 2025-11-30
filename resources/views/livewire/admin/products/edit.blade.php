@@ -4,83 +4,93 @@
 
             <x-wireui.errors />
 
-            <div class="">
+            <div>
 
 
-                <div class="grid grid-cols-2 gap-6">
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <x-wireui.native-select label="Sede" placeholder="Selecciona una sede"
+                        wire:model.defer="product.terminal_id" optionKeyValue :options="$terminals" class="min-w-full" />
 
-                    <div class="flex space-x-2 items-end">
-                        <div class="w-full">
-                            <x-wireui.native-select label="Categoría" placeholder="Selecciona una categoría" wire:model.defer="product.category_id" optionKeyValue :options="$categories" class="min-w-full" />
-                        </div>
-                        <button wire:click='$emitTo("admin.categories.index", "openCreate", "{{ $this->getName() }}")' class="h-10 w-10 bg-blue-500 text-white rounded-lg" title="Crear categoría">
-                            <i class="ico icon-add"></i>
+                    {{-- Categoria --}}
+                    <div class="relative">
+                        <x-wireui.native-select class="w-full" label="Categoría" placeholder="Selecciona una categoría"
+                            wire:model.defer="product.category_id" optionKeyValue :options="$categories" />
+                        {{-- Botón para crear nuevo --}}
+                        <button class="absolute top-0 right-0" title="Crear nuevo categoría"
+                            wire:click='$emitTo("admin.categories.index", "openCreate", "{{ $this->getName() }}")'>
+                            <i class="ico icon-add text-blue-600 text-sm"></i>
                         </button>
                     </div>
+                    <x-wireui.input label="Nombre" name="name" wire:model.defer="product.name"
+                        placeholder="Nombre del producto" />
+                    <x-wireui.input label="Proveedor" name="name" wire:model.defer="product.name"
+                        placeholder="Nombre del proveedor" />
+                    <x-wireui.input label="Código de barras" name="barcode" wire:model.defer="product.barcode"
+                        placeholder="Código de barras" />
+                    <x-wireui.input label="Referencia" name="reference" wire:model.defer="product.reference"
+                        placeholder="Referencia del producto" />
+                    <x-wireui.input label="Marca" name="name" wire:model.defer="product.name"
+                        placeholder="Nombre de la marca" />
 
-                    <x-wireui.input label="Nombre" name="name" wire:model.defer="product.name" placeholder="Nombre del producto" />
-                    <x-wireui.native-select label="Sede" placeholder="Selecciona una sede" wire:model.defer="product.terminal_id" optionKeyValue :options="$terminals" class="min-w-full" />
-                </div>
-
-                <div class="grid grid-cols-2 gap-6 mt-6">
-                    <x-wireui.input label="Código de barras" name="barcode" wire:model.defer="product.barcode" placeholder="Código de barras"  />
-                    <x-wireui.input label="Referencia" name="reference" wire:model.defer="product.reference" placeholder="Referencia del producto"  />
-                </div>
-
-                <div class="grid grid-cols-3 gap-6 mt-6">
-                  <div class="flex space-x-2 items-end">
-                    <div class="flex-1">
-                      <x-wireui.input label="Impuestos" :value="$tax_rates->implode('format_rate', ', ')" readonly class="w-full"  />
-                    </div>
-                        <button wire:click='openTaxRates' class="h-10 w-10 bg-blue-500 text-white rounded-lg" title="Agregar impuestos">
-                            <i class="ico icon-add"></i>
+                    {{-- Impuestos --}}
+                    <div class="relative">
+                        <x-wireui.input class="w-full" label="Impuestos" :value="$tax_rates->implode('format_rate', ', ')" readonly />
+                        {{-- Botón para crear nuevo --}}
+                        <button class="absolute top-0 right-0" title="Crear nuevo impuesto" wire:click='openTaxRates'>
+                            <i class="ico icon-add text-blue-600 text-sm"></i>
                         </button>
-                  </div>
-                    <x-wireui.input onlyNumbers label="Costo" name="cost" wire:model.defer="product.cost" placeholder="Costo del producto"  />
-                    <x-wireui.input onlyNumbers label="Precio" name="price" wire:model.defer="product.price" placeholder="Precio del producto"  />
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+
+                    <x-wireui.input onlyNumbers label="Costo" name="cost" wire:model.defer="product.cost"
+                        placeholder="Costo del producto" />
+                    <x-wireui.input onlyNumbers label="Precio" name="price" wire:model.defer="product.price"
+                        placeholder="Precio del producto" />
+                    <x-wireui.input onlyNumbers label="Precio por mayor" name="price" wire:model.defer="product.price"
+                        placeholder="Precio del producto" />
+                    <x-wireui.input onlyNumbers label="Precio emprendedor" name="price"
+                        wire:model.defer="product.price" placeholder="Precio del producto" />
                 </div>
 
                 @if ($is_inventory_enabled)
-                  <div class="grid grid-cols-3 gap-6 mt-6">
+                    @if (!$product->has_inventory)
 
-                      <x-buttons.switch label="Llevar inventario" wire:model="product.has_inventory" active="Sí" inactive="No" />
+                        <div
+                            class="grid {{ $product->has_presentations ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }} md:grid-cols-2 gap-6 mt-6">
 
-                      @if (!$product->has_inventory)
+                            <x-wireui.input onlyNumbers label="Stock" name="stock" wire:model.defer="product.stock"
+                                placeholder="Cantidad de stock" />
 
-                          <x-buttons.switch label="Manejar presentaciones" wire:model="product.has_presentations" active="Sí" inactive="No" />
+                            @if (!$product->has_presentations)
+                                <x-wireui.input onlyNumbers label="Unidades" name="units" wire:model.defer="units"
+                                    placeholder="Unidades" />
 
-                          <div class="grid {{ $product->has_presentations ? 'grid-cols-1' : 'grid-cols-2' }} gap-6">
+                                <x-wireui.input onlyNumbers label="Unidades por producto" name="quantity"
+                                    wire:model.defer="product.quantity" placeholder="Cantidad" />
+                                <div class="flex items-end">
+                                    <x-wireui.button class="inline w-full h-10 text-center" icon="add"
+                                        x-on:click="$wire.emitTo('admin.products.presentations', 'openPresentations', '{{ $this->getName() }}')"
+                                        text="Agregar presentación" icon="add" spinner="update" />
+                                </div>
+                            @endif
 
-                              <x-wireui.input onlyNumbers label="Stock" name="stock" wire:model.defer="product.stock" placeholder="Cantidad de stock"  />
+                        </div>
 
-                              @if (!$product->has_presentations)
+                        <x-buttons.switch class="mt-6" wire:model="product.has_presentations"
+                            active="Manejar presentaciones" inactive="No Manejar presentaciones" />
 
-                                  <x-wireui.input onlyNumbers label="Unidades" name="units" wire:model.defer="units" placeholder="Unidades"  />
-
-                              @endif
-
-                          </div>
-
-                      @endif
-
-                  </div>
+                    @endif
                 @endif
 
             </div>
 
             @if (!$product->has_presentations)
 
-                <div class="mt-4 flex justify-between items-end">
-                    <x-wireui.input onlyNumbers label="Unidades por producto" name="quantity" wire:model.defer="product.quantity" placeholder="Cantidad"  />
-                    <div>
-                        <x-wireui.button x-on:click="$wire.emitTo('admin.products.presentations', 'openPresentations', '{{ $this->getName() }}')"  text="Agregar presentación" />
-                    </div>
-                </div>
-
                 <x-commons.table-responsive class="mt-4 border">
-
                     <table class="table-sm">
-                        <thead >
+                        <thead>
                             <tr>
                                 <th left>
                                     Nombre
@@ -114,7 +124,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <x-commons.table-empty text="No se encontraron presentaciones agregadas"/>
+                                <x-commons.table-empty text="No se encontraron presentaciones agregadas" />
                             @endforelse
                         <tbody>
                     </table>
@@ -122,14 +132,38 @@
 
             @endif
 
-            <x-slot:footer>
-                <div class="flex justify-between items-center">
-                    <div class="flex flex-col space-y-2">
-                        <x-buttons.switch wire:model="product.top" active="destacado" inactive="no destacado"/>
-                        <x-buttons.switch wire:model="product.status" />
-                    </div>
+            <div class="flex justify-center mt-6">
+                <x-wireui.button primary text="Agregar fotografía" icon="add" spinner="update" />
+            </div>
 
-                    <div class="text-right space-x-3">
+            {{-- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div style="width: 200px" class="relative border rounded-lg overflow-hidden group">
+                        <img src="" alt=""
+                            class="object-cover h-40 w-full cursor-pointer">
+
+                        <x-wireui.button sm icon="trash" red 
+                            tooltip="Eliminar foto" />
+
+                    </div>
+                    <div class="col-span-4">
+                        <p class="text-center text-gray-400">No hay imágenes registradas.</p>
+                    </div>
+            </div> --}}
+
+            <div class="grid grid-cols-3 gap-6 border-t pt-6 mt-6">
+                <x-buttons.switch wire:model="product.has_inventory" active="Llevar inventario"
+                    inactive="No llevar inventario" />
+                <div class="flex justify-center">
+                    <x-buttons.switch wire:model="product.top" active="Destacado" inactive="No destacado" />
+                </div>
+                <div class="flex justify-end">
+                    <x-buttons.switch wire:model="product.status" />
+                </div>
+            </div>
+
+            <x-slot:footer>
+                <div class="flex justify-center">
+                    <div class="space-x-3">
                         <x-wireui.button secondary x-on:click="show=false" text="Cerrar" />
                         <x-wireui.button wire:click="update" text="Actualizar" load textLoad="Actualizando.." />
                     </div>

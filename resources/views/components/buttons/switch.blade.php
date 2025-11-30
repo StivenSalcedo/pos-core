@@ -1,4 +1,4 @@
-@props(['label'=>'', 'active' => 'activado', 'inactive' => 'desactivado', 'width' => null])
+@props(['label'=>'', 'active' => 'Activado', 'inactive' => 'Desactivado', 'width' => null])
 <div>
     @if ($label)
         <label class="font-semibold text-sm">{{ $label }}</label>

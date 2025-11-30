@@ -95,6 +95,7 @@
                         </td>
                         <td actions>
                             <x-buttons.edit wire:click="$emitTo('admin.products.edit', 'openEdit', {{ $item->id }})" title="Editar" />
+                            <x-buttons.copy wire:click="$emitTo('admin.products.edit', 'openEdit', {{ $item->id }})" title="Clonar" />
                         </td>
                     </tr>
                 @empty

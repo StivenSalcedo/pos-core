@@ -116,15 +116,15 @@ class Button extends Component {
             EOT,
 
             'secondary' => <<<EOT
-                bg-slate-500 hover:bg-slate-400 hover:ring-slate-500
+                bg-slate-500 hover:bg-slate-600 hover:ring-slate-500
             EOT,
 
             'success' => <<<EOT
-                bg-green-500 hover:bg-green-400 hover:ring-green-500
+                bg-green-500 hover:bg-green-600 hover:ring-green-500
             EOT,
 
             'danger' => <<<EOT
-                bg-red-500 hover:bg-red-400 hover:ring-red-500
+                bg-red-500 hover:bg-red-600 hover:ring-red-500
             EOT,
         ];
     }

@@ -9,10 +9,20 @@
             </div>
         </div>
         <x-wireui.errors class="mb-6" />
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
 
             <x-wireui.input label="Modelo" wire:model.defer="service.model" />
+            {{-- Marca --}}
+            <div class="relative">
+                <x-wireui.native-select class="w-full" label="Marca" placeholder="Seleccione una marca"
+                    :options="$brands" wire:model.defer="service.brand_id" optionKeyValue="true" />
+                {{-- Botón para crear nuevo cliente --}}
+                <button class="absolute top-0 right-0" title="Crear nuevo tipo"
+                    wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
+                    <i class="ico icon-add text-blue-600 text-sm"></i>
+                </button>
+            </div>
             <x-wireui.input label="Usuario" wire:model.defer="service.user" />
             <div x-data="{ show: false }" class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Clave</label>
@@ -43,6 +53,7 @@
                 </button>
             </div>
             <x-wireui.input label="Accesorios" wire:model.defer="service.accessories" />
+            <x-wireui.input label="Serial" wire:model.defer="service.accessories" />
         </div>
 
         <div class="mt-6 grid sm:grid-cols-2 gap-6">

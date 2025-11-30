@@ -43,15 +43,15 @@
                 </button>
             </div>
             {{-- Marca --}}
-            <div class="relative">
-                <x-wireui.native-select class="w-full" label="Marca" placeholder="Seleccione una marca"
+            {{-- <div class="relative">
+                <x-wireui.native-select class="w-full" label="Marcax" placeholder="Seleccione una marca"
                     :options="$brands" wire:model.defer="service.brand_id" optionKeyValue="true" />
-                {{-- Botón para crear nuevo cliente --}}
+                
                 <button class="absolute top-0 right-0" title="Crear nuevo tipo"
                     wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
                     <i class="ico icon-add text-blue-600 text-sm"></i>
                 </button>
-            </div>
+            </div> --}}
             <x-wireui.native-select class="w-full" label="Estado" :options="$states" wire:model.defer="service.state_id"
                 optionKeyValue="true" />
 

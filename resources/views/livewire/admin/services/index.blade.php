@@ -81,9 +81,9 @@
                             </span>
                         </td>
 
-                        @if (App\Services\FactusConfigurationService::isApiEnabled(true)  &&
-                        count($service->products) > 0 &&
-                        count($service->payments) > 0)
+                        @if (App\Services\FactusConfigurationService::isApiEnabled(true) &&
+                                count($service->products) > 0 &&
+                                count($service->payments) > 0)
                             <td class="text-center">
                                 <div class="flex justify-center">
                                     @if ($service->isValidated)
@@ -96,12 +96,12 @@
                                     @endif
                                 </div>
                             </td>
-                            @else
+                        @else
                             <td class="text-center">&nbsp;</td>
                         @endif
 
                         <td actions>
-                            <x-buttons.download wire:click="printReceipt({{ $service->id }})"   title="Descargar" />
+                            <x-buttons.download wire:click="printReceipt({{ $service->id }})" title="Descargar" />
                             <x-buttons.edit wire:click="redirectToEdit({{ $service->id }})" title="Editar" />
                             <x-buttons.delete wire:click="confirmDelete({{ $service->id }})" title="Eliminar" />
                         </td>
@@ -114,9 +114,17 @@
                 @endforelse
             </tbody>
         </table>
-    </x-commons.table-responsive>
 
-    <x-loads.panel-fixed text="Validando factura..." class="no-print z-[999]" wire:loading wire:target='validateElectronicBill' />
+    </x-commons.table-responsive>
+    <div class="flex flex-wrap lg:flex-nowrap">
+        <x-wireui.button secondary class="w-full lg:w-2/5 mt-6" text="Entregado {{ 10 }}" />
+        <x-wireui.button secondary class="w-full lg:w-3/5 ml-0 lg:ml-4 mt-6 " text="Listo para entregar" />
+        <x-wireui.button secondary class="w-full lg:w-2/5 ml-0 lg:ml-4 mt-6" text="En revisión" />
+        <x-wireui.button secondary class="w-full lg:w-3/5 ml-0 lg:ml-4 mt-6" text="Pendiente por parte" />
+    </div>
+
+    <x-loads.panel-fixed text="Validando factura..." class="no-print z-[999]" wire:loading
+        wire:target='validateElectronicBill' />
     <div class="mt-4">
         {{ $services->links() }}
     </div>

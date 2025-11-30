@@ -1,7 +1,7 @@
 <div x-data="createCustomer">
+  
   <x-wireui.modal wire:model.defer="openCreate" max-width="4xl">
     <x-wireui.card title="Crear cliente">
-
       <x-wireui.errors />
 
       <div class="grid sm:grid-cols-2 gap-6">
@@ -29,11 +29,18 @@
 
           <x-wireui.native-select wire:key='tribute' label='Responsabilidad tributaria' wire:model.defer="tribute"
             optionKeyValue="true" :options="$tributes" class="w-full" />
+          
         </div>
 
         <x-wireui.input label="Nombres y apellidos" wire:model.defer="names" />
 
         <x-wireui.input label="Dirección" wire:model.defer="direction" />
+
+        <div x-show="identification_document_id == '6'">
+          <x-wireui.input label="Barrio" wire:model.defer="direction" />
+        </div>
+
+        
 
         <x-wireui.input label="Celular" wire:model.defer="phone" />
 
