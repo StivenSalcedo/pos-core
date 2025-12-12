@@ -14,22 +14,53 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use App\Models\Terminal;
-
+use App\Models\Provider;
+use App\Models\Brand;
+use Livewire\WithFileUploads;
+use App\Models\ProductImage;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 class Edit extends Component
 {
     use LivewireTrait;
+    use WithFileUploads;
 
-    protected $listeners = ['openEdit', 'setPresentation', 'refreshCategories', 'setTaxRates'];
+    protected $listeners = [
+        'openEdit',
+        'setPresentation',
+        'refreshCategories',
+        'setTaxRates',
+        'set-provider' => 'setProviderFromModal',
+        'set-brand' => 'setBrandFromModal',
+        'refreshImages' => '$refresh',
+    ];
 
     public $product, $openEdit = false;
 
-    public $category_id = '',$terminal_id='';
+    public $category_id = '', $terminal_id = '';
 
     public $presentations, $units, $categories, $terminals;
 
     public Collection $tax_rates;
 
     public $is_inventory_enabled = false;
+
+    public $selectedProvider = [];
+
+    public $providers = [];
+
+    public $searchProvider = '';
+
+    public $selectedBrand = [];
+
+    public $brands = [];
+
+    public $searchBrand = '';
+
+    public $clone = false;
+    public $photo;
+    public $openUploadModal = false;
+    public $cameraPhoto;
 
     public function mount()
     {
@@ -52,6 +83,8 @@ class Edit extends Component
             'product.category_id' => 'nullable',
             'product.name' => 'required',
             'product.cost' => 'required',
+            'product.wholesale_price' => 'required',
+            'product.entrepreneur_price' => 'required',
             'product.price' => 'required',
             'product.has_inventory' => 'required',
             'product.stock' => 'required',
@@ -61,7 +94,9 @@ class Edit extends Component
             'product.quantity' => 'nullable',
             'product.has_presentations' => 'required',
             'presentations' => 'nullable',
-            'product.terminal_id'=>'required',
+            'product.terminal_id' => 'required',
+            'product.provider_id' => 'nullable|exists:providers,id',
+            'product.brand_id' => 'nullable|exists:brands,id',
         ];
     }
 
@@ -91,11 +126,13 @@ class Edit extends Component
         $this->tax_rates = collect($taxRates);
     }
 
-    public function openEdit(Product $product)
+    public function openEdit(Product $product, bool $clone = false)
     {
         $this->resetValidation();
         $this->presentations = collect();
         $this->product = $product;
+        
+
         $this->category_id = $product->category_id == null ? '' : $product->category_id;
         $this->terminal_id = $product->terminal_id == null ? '' : $product->terminal_id;
 
@@ -117,7 +154,36 @@ class Edit extends Component
 
         $this->getTaxRates();
         $this->is_inventory_enabled = ModuleService::isEnabled('inventario');
+
+        if ($product->provider) {
+            $this->selectedProvider = [
+                'id' => $product->provider->id,
+                'name' => $product->provider->name,
+                'no_identification' => $product->provider->no_identification,
+            ];
+        } else {
+            $this->selectedProvider = [];
+        }
+
+
+        if ($product->brand) {
+            $this->selectedBrand = [
+                'id' => $product->brand->id,
+                'name' => $product->brand->name,
+            ];
+        } else {
+            $this->selectedBrand = [];
+        }
+
         $this->openEdit = true;
+        if ($clone) {
+            $this->clone = $clone;
+            $this->product->id = null;
+        }
+        else
+        {
+             $this->clone = false;
+        }
     }
 
     public function openTaxRates()
@@ -197,7 +263,7 @@ class Edit extends Component
         $data['category_id'] = $data['category_id'] === '' ? null : $data['category_id'];
         $data['presentations'] = $data['presentations']->toArray();
 
-        $data['tax_rates'] = $this->tax_rates->map(fn ($item) => collect($item)->only('id', 'value'))->toArray();
+        $data['tax_rates'] = $this->tax_rates->map(fn($item) => collect($item)->only('id', 'value'))->toArray();
 
         return $data;
     }
@@ -213,6 +279,8 @@ class Edit extends Component
             'name' => 'required|string|min:3|max:250',
             'cost' => 'required|integer|max:99999999',
             'price' => 'required|integer|max:99999999',
+            'entrepreneur_price' => 'nullable|integer|max:99999999',
+            'wholesale_price' => 'nullable|integer|max:99999999',
             'has_inventory' => 'required|min:0|max:1',
             'stock' => 'required|integer|min:0|max:9999999',
             'units' => 'required|integer|min:0|max:9999999',
@@ -225,6 +293,8 @@ class Edit extends Component
             'tax_rates.*.id' => 'required|integer|exists:tax_rates,id',
             'tax_rates.*.value' => 'required|integer|min:0|max:999999999',
             'terminal_id' => 'required|exists:terminals,id',
+            'provider_id' => 'nullable|exists:providers,id',
+            'brand_id' => 'nullable|exists:brands,id',
         ];
 
         $attributes = [
@@ -233,7 +303,9 @@ class Edit extends Component
             'quantity' => 'unidades x producto',
             'presentations' => 'presentaciones',
             'tax_rates' => 'impuestos',
-            'terminal_id'=>'sede'
+            'terminal_id' => 'sede',
+            'provider_id' => 'proveedor',
+            'brand_id' => 'marca',
         ];
 
         $messages = [
@@ -260,7 +332,7 @@ class Edit extends Component
 
             $this->product->save();
 
-            $this->product->taxRates()->sync($this->tax_rates->mapWithKeys(fn ($item) => [$item['id'] => ['value' => $item['value']]]));
+            $this->product->taxRates()->sync($this->tax_rates->mapWithKeys(fn($item) => [$item['id'] => ['value' => $item['value']]]));
 
             $this->product->presentations()->delete();
 
@@ -280,7 +352,7 @@ class Edit extends Component
             return $this->emit('error', 'Ha ocurrido un error inesperado al actualizar el producto. Vuelve a intentarlo');
         }
 
-        $this->resetExcept('tax_rates', 'categories','terminals');
+        $this->resetExcept('tax_rates', 'categories', 'terminals');
         $this->tax_rates = collect();
         $this->resetValidation();
         $this->presentations = collect();
@@ -288,5 +360,161 @@ class Edit extends Component
 
         $this->emit('success', 'Producto actualizado con éxito');
         $this->emitTo('admin.products.index', 'render');
+    }
+
+    public function clearProvider()
+    {
+        $this->selectedProvider = null;
+        $this->product->provider_id = null;
+        $this->searchProvider = '';
+    }
+
+    public function setProviderFromModal($provider)
+    {
+        $this->selectProvider($provider['id']);
+    }
+
+    public function updatedSearchProvider()
+    {
+        if (strlen($this->searchProvider) > 1) {
+            $this->providers = Provider::where('name', 'like', "%{$this->searchProvider}%")
+                ->orWhere('no_identification', 'like', "%{$this->searchProvider}%")
+                ->limit(10)->get();
+        } else {
+            $this->providers = [];
+        }
+    }
+
+    public function selectProvider($id)
+    {
+        $provider = Provider::find($id);
+        if ($provider) {
+            $this->selectedProvider = $provider->only(['id', 'name', 'no_identification']);
+            $this->product->provider_id = $provider->id;
+            $this->providers = [];
+            $this->searchProvider = $provider->name;
+        }
+    }
+
+
+    public function clearBrand()
+    {
+        $this->selectedBrand = null;
+        $this->product->brand_id = null;
+        $this->searchBrand = '';
+    }
+
+    public function setBrandFromModal($provider)
+    {
+        $this->selectBrand($provider['id']);
+    }
+
+    public function updatedSearchBrand()
+    {
+        if (strlen($this->searchBrand) > 1) {
+            $this->brands = Brand::where('name', 'like', "%{$this->searchBrand}%")
+                ->limit(10)->get();
+        } else {
+            $this->brands = [];
+        }
+    }
+
+    public function selectBrand($id)
+    {
+        $brand = Brand::find($id);
+        if ($brand) {
+            $this->selectedBrand = $brand->only(['id', 'name']);
+            $this->product->brand_id = $brand->id;
+            $this->brands = [];
+            $this->searchBrand = $brand->name;
+        }
+    }
+
+     public function openPhotoUpload()
+    {
+        $this->reset('photo');
+        $this->resetValidation();
+        $this->openUploadModal = true;
+    }
+
+    public function saveCameraPhoto($base64Image)
+    {
+        try {
+            if (!$base64Image) {
+                $this->emit('error', 'No se pudo obtener la imagen de la cámara.');
+
+                return;
+            }
+
+            // Quitar encabezado "data:image/png;base64,..."
+            $imageData = explode(',', $base64Image)[1] ?? null;
+            if (!$imageData) throw new \Exception("Formato inválido de imagen");
+
+            $binary = base64_decode($imageData);
+
+            // Crear nombre y ruta
+            $filename = 'camera_' . Str::random(8) . '.jpg';
+            $path = 'services/' . $this->service->id . '/' . $filename;
+
+            Storage::disk('public')->put($path, $binary);
+
+            // Guardar registro
+            ProductImage::create([
+                'product_id' => $this->service->id,
+                'path'       => $path,
+                'filename'   => $filename,
+            ]);
+
+
+            $this->emit('success', 'La imagen capturada se subió correctamente.');
+
+
+            $this->emitSelf('refreshImages');
+        } catch (\Exception $e) {
+            $this->emit('error', 'Error al guardar:' + $e->getMessage());
+        }
+    }
+
+    public function savePhoto()
+    {
+        $this->validatePhoto();
+        $path = $this->photo->storeAs('images/products', $this->product->id . '_' . $this->photo->getClientOriginalName(), 'public');
+        //$path = $this->photo->store('services/' . $this->service->id, 'public');
+
+        ProductImage::create([
+            'product_id' => $this->product->id,
+            'path' => $path,
+            'filename' => $this->photo->getClientOriginalName(),
+        ]);
+
+        $this->emit('success', 'La imagen se guardó correctamente.');
+
+
+        $this->reset('photo');
+        $this->openUploadModal = false;
+        $this->emitSelf('refreshImages');
+    }
+
+    public function removePhoto($id)
+    {
+        $attachment = ProductImage::findOrFail($id);
+
+        // Eliminar archivo del disco
+        if (Storage::disk('public')->exists($attachment->path)) {
+            Storage::disk('public')->delete($attachment->path);
+        }
+
+        $attachment->delete();
+
+        $this->emit('success', 'La imagen fue eliminada correctamente.');
+
+
+        $this->emitSelf('refreshImages');
+    }
+     public function validatePhoto()
+    {
+        $this->validate([
+            'photo' => 'required|image|max:4096',
+        ]);
     }
 }

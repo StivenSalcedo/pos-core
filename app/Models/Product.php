@@ -93,4 +93,19 @@ class Product extends Model
             return $query->where('terminal_id', $terminal_id);
         }
     }
+
+     public function provider()
+    {
+        return $this->belongsTo(Provider::class);
+    }
+
+     public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(\App\Models\ProductImage::class);
+    }
 }

@@ -41,6 +41,7 @@ class Edit extends Component
             'customer.phone' => ['nullable', 'string', new Phone],
             'customer.email' => 'nullable|string|email|max:250',
             'customer.top' => 'required|integer|min:0|max:1',
+            'customer.neighborhood' => 'nullable|string|max:100',
             'customer.status' => 'required|integer|min:0|max:1',
         ];
     }

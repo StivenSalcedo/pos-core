@@ -12,17 +12,18 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Maatwebsite\Excel\Concerns\WithTitle;
-
-class ProductsSheet implements FromQuery, WithMapping, WithHeadings, WithColumnFormatting, WithMultipleSheets, WithTitle {
+use Maatwebsite\Excel\Concerns\FromCollection;
+class ProductsSheet implements FromCollection, WithMapping, WithHeadings, WithColumnFormatting, WithTitle {
 
     use Exportable;
-
+    public function __construct(public $products) {}
     public function title(): string {
         return 'Productos';
     }
 
-    public function query() {
-        return Product::query();
+     public function collection()
+    {
+        return $this->products;
     }
 
     public function headings(): array {
@@ -71,11 +72,5 @@ class ProductsSheet implements FromQuery, WithMapping, WithHeadings, WithColumnF
         ];
     }
 
-    public function sheets(): array {
-        $sheets = [];
-
-        $sheets[] = new ProductsDetailSheet();
-
-        return $sheets;
-    }
+    
 }

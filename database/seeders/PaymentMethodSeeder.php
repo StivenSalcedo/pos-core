@@ -28,8 +28,43 @@ class PaymentMethodSeeder extends Seeder {
             'status' => PaymentMethod::ACTIVE,
         ]);
 
-        PaymentMethod::create([
+        /*PaymentMethod::create([
             'name' => 'Transferencia',
+            'code' => '47',
+            'status' => PaymentMethod::ACTIVE,
+        ]);*/
+        PaymentMethod::create([
+            'name' => 'Nequi',
+            'code' => '47',
+            'status' => PaymentMethod::ACTIVE,
+        ]);
+        PaymentMethod::create([
+            'name' => 'Daviplata',
+            'code' => '47',
+            'status' => PaymentMethod::ACTIVE,
+        ]);
+        PaymentMethod::create([
+            'name' => 'Movii',
+            'code' => '47',
+            'status' => PaymentMethod::ACTIVE,
+        ]);
+        PaymentMethod::create([
+            'name' => 'Bancolombia',
+            'code' => '47',
+            'status' => PaymentMethod::ACTIVE,
+        ]);
+         PaymentMethod::create([
+            'name' => 'Davivienda',
+            'code' => '47',
+            'status' => PaymentMethod::ACTIVE,
+        ]);
+        PaymentMethod::create([
+            'name' => 'Banco de Bogotá',
+            'code' => '47',
+            'status' => PaymentMethod::ACTIVE,
+        ]);
+         PaymentMethod::create([
+            'name' => 'BBVA',
             'code' => '47',
             'status' => PaymentMethod::ACTIVE,
         ]);

@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Http\Livewire\Admin\Brands;
-
+namespace App\Http\Livewire\Admin\Components;
+use App\Models\Component as HardwareComponent;
 use Livewire\Component;
-use App\Models\Brand;
 use App\Traits\LivewireTrait;
 use Livewire\WithPagination;
 
 class Create extends Component
 {
-    use WithPagination;
+     use WithPagination;
     use LivewireTrait;
 
     public $openCreate = false;
     public $name;
-    public $brand_id;
+    public $component_id;
     public $update = false;
     protected $listeners = ['openCreate'];
 
@@ -27,35 +26,34 @@ class Create extends Component
 
     public function render()
     {
-         $brands = Brand::latest()->paginate(10);
-        return view('livewire.admin.brands.create',compact('brands'));
+         $components = HardwareComponent::latest()->paginate(10);
+     
+        return view('livewire.admin.components.create',compact('components'));
     }
     public function store()
     {
         $this->validate([
-            'name' => 'required|string|max:255|unique:brands,name',
+            'name' => 'required|string|max:255|unique:components,name',
         ]);
 
-        $brand = Brand::create([
-            'name' => $this->name,
+        $component = HardwareComponent::create([
+            'name' => $this->name
         ]);
 
         // Emitir al editor de servicios o donde lo necesites
-        $this->emitTo('admin.services.edit', 'refreshBrands', $brand->id);
-        $this->emitTo('admin.services.add-component', 'refreshBrands', $brand->id);
-        $this->emitTo('admin.products.edit', 'set-brand', $brand);
-        $this->emitTo('admin.products.create', 'set-brand', $brand);
-        $this->emit('success', 'La Marca fue registrada correctamente');
+        $this->emitTo('admin.services.edit', 'refreshComponents', $component->id);
+        $this->emitTo('admin.services.add-component', 'refreshComponents', $component->id);
+        $this->emit('success', 'El componente fue registrado correctamente');
       
 
         $this->resetForm();
         $this->openCreate = false;
     }
 
-    public function edit(Brand $brand_type)
+    public function edit(HardwareComponent $component_type)
     {
-        $this->brand_id = $brand_type->id;
-        $this->name = $brand_type->name;
+        $this->component_id = $component_type->id;
+        $this->name = $component_type->name;
         $this->update = true;
     }
 
@@ -68,7 +66,7 @@ class Create extends Component
 
         $this->validate($rules);
 
-        $brand_type = Brand::find($this->brand_id);
+        $brand_type = HardwareComponent::find($this->brand_id);
         $brand_type->name = $this->name;
         $brand_type->save();
 
@@ -81,7 +79,7 @@ class Create extends Component
 
     protected function resetForm()
     {
-        $this->reset('name', 'update', 'brand_id');
+        $this->reset('name', 'update', 'component_id');
         $this->resetValidation();
     }
 
@@ -89,4 +87,5 @@ class Create extends Component
     {
         $this->resetForm();
     }
+    
 }

@@ -3,7 +3,7 @@
         <h3 class="font-medium whitespace-normal text-lg">Componentes del servicio</h3>
         <div class="text-right">
             <x-wireui.button primary
-                x-on:click="$wire.emitTo('admin.services.add-component', 'openAddComponent', {{ $service->id }})"
+                x-on:click="$wire.emitTo('admin.services.add-component', 'openAddComponent', {{ $service->id }},0)"
                 text="Agregar componente" icon="add" spinner="update" />
         </div>
     </div>
@@ -33,7 +33,7 @@
                         <td class="px-3 py-2">{{ $detail['capacity'] ?? 'N/A' }}</td>
                         <td class="px-3 py-2 text-right">{{ $detail['quantity'] ?? 1 }}</td>
                         <td class="px-3 py-2 text-center">
-                            <x-buttons.edit wire:click="deleteDetail({{ $detail['id'] }})" title="Editar" />
+                            <x-buttons.edit x-on:click="$wire.emitTo('admin.services.add-component', 'openAddComponent', {{ $service->id }},{{  $detail['id'] }})" title="Editar" />
                             <x-buttons.delete wire:click="deleteDetail({{ $detail['id'] }})" title="Eliminar" />                            
                         </td>
                     </tr>

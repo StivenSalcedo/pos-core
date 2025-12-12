@@ -13,17 +13,28 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use App\Models\Terminal;
+use App\Models\Provider;
+use App\Models\Brand;
 
 class Create extends Component
 {
 
     use LivewireTrait;
 
-    protected $listeners = ['openCreate', 'setPresentation', 'refreshCategories', 'setTaxRates'];
+    protected $listeners = [
+        'openCreate',
+        'setPresentation',
+        'refreshCategories',
+        'setTaxRates',
+        'set-provider' => 'setProviderFromModal',
+        'set-brand' => 'setBrandFromModal'
+    ];
 
     public $openCreate = false;
 
-    public $barcode, $reference, $category_id = "", $name, $cost, $price, $has_inventory = '1', $stock, $units = 0, $quantity,$terminal_id = "";
+    public $barcode, $reference, $category_id = "", $name, $cost, $price, $has_inventory = '1', $stock, $units = 0, $quantity, $terminal_id = "";
+
+    public  $entrepreneur_price=0, $wholesale_price=0, $provider_id = '', $brand_id = '';
 
     public $has_presentations = '1';
 
@@ -32,6 +43,18 @@ class Create extends Component
     public $categories, $presentations, $terminals;
 
     public $is_inventory_enabled = false;
+
+    public $selectedProvider = [];
+
+    public $providers = [];
+
+    public $searchProvider = '';
+
+    public $selectedBrand = [];
+
+    public $brands = [];
+
+    public $searchBrand = '';
 
     public function mount()
     {
@@ -110,7 +133,7 @@ class Create extends Component
 
     protected function formatData()
     {
-        $arrayProperties = ['barcode', 'reference', 'category_id', 'name', 'cost', 'price', 'has_inventory', 'stock', 'units', 'quantity', 'has_presentations', 'presentations', 'terminal_id'];
+        $arrayProperties = ['barcode', 'reference', 'category_id', 'name', 'cost', 'wholesale_price', 'entrepreneur_price', 'price', 'has_inventory', 'stock', 'units', 'quantity', 'has_presentations', 'presentations', 'terminal_id', 'brand_id', 'provider_id'];
 
         $this->applyTrim($arrayProperties);
 
@@ -133,7 +156,7 @@ class Create extends Component
         $data['category_id'] = $data['category_id'] === '' ? null : $data['category_id'];
         $data['presentations'] = $data['presentations']->toArray();
 
-        $data['tax_rates'] = $this->tax_rates->map(fn ($item) => collect($item)->only('id', 'value'))->toArray();
+        $data['tax_rates'] = $this->tax_rates->map(fn($item) => collect($item)->only('id', 'value'))->toArray();
 
         return $data;
     }
@@ -148,6 +171,8 @@ class Create extends Component
             'category_id' => 'nullable|exists:categories,id',
             'name' => 'required|string|min:3|max:250',
             'cost' => 'required|integer|min:0|max:99999999',
+            'entrepreneur_price' => 'required|integer|min:0|max:99999999',
+            'wholesale_price' => 'required|integer|min:0|max:99999999',
             'price' => 'required|integer|min:0|max:99999999',
             'has_inventory' => 'required|min:0|max:1',
             'stock' => 'required|integer|min:0|max:99999999',
@@ -158,7 +183,7 @@ class Create extends Component
             'tax_rates' => 'array|min:0',
             'tax_rates.*.id' => 'required|integer|exists:tax_rates,id',
             'tax_rates.*.value' => 'required|integer|min:0|max:999999999',
-            'terminal_id'=>'required|exists:terminals,id',
+            'terminal_id' => 'required|exists:terminals,id',
         ];
 
         $attributes = [
@@ -167,6 +192,8 @@ class Create extends Component
             'presentations' => 'presentaciones',
             'tax_rates' => 'impuestos',
             'terminal_id' => 'sede',
+            'provider_id' => 'proveedor',
+            'brand_id' => 'marca',
         ];
 
         $messages = [
@@ -196,7 +223,7 @@ class Create extends Component
 
             $product = Product::create($data);
 
-            $product->taxRates()->attach($this->tax_rates->mapWithKeys(fn ($item) => [$item['id'] => ['value' => $item['value']]]));
+            $product->taxRates()->attach($this->tax_rates->mapWithKeys(fn($item) => [$item['id'] => ['value' => $item['value']]]));
 
             if (!intval($this->has_presentations)) {
                 foreach ($this->presentations as  $item) {
@@ -211,12 +238,80 @@ class Create extends Component
             Log::error($th->getMessage(), ['product' => $data, 'presentation' => $this->presentations]);
         }
 
-        $this->resetExcept('tax_rates', 'categories');
+        $this->resetExcept('tax_rates', 'categories','terminals');
         $this->tax_rates = collect();
         $this->resetValidation();
         $this->presentations = collect();
 
         $this->emitTo('admin.products.index', 'render');
         $this->emit('success', 'Producto creado con éxito');
+    }
+
+    public function clearProvider()
+    {
+        $this->selectedProvider = null;
+        $this->provider_id = null;
+        $this->searchProvider = '';
+    }
+
+    public function setProviderFromModal($provider)
+    {
+        $this->selectProvider($provider['id']);
+    }
+
+    public function updatedSearchProvider()
+    {
+        if (strlen($this->searchProvider) > 1) {
+            $this->providers = Provider::where('name', 'like', "%{$this->searchProvider}%")
+                ->orWhere('no_identification', 'like', "%{$this->searchProvider}%")
+                ->limit(10)->get();
+        } else {
+            $this->providers = [];
+        }
+    }
+
+    public function selectProvider($id)
+    {
+        $provider = Provider::find($id);
+        if ($provider) {
+            $this->selectedProvider = $provider->only(['id', 'name', 'no_identification']);
+            $this->provider_id = $provider->id;
+            $this->providers = [];
+            $this->searchProvider = $provider->name;
+        }
+    }
+
+
+    public function clearBrand()
+    {
+        $this->selectedBrand = null;
+        $this->brand_id = null;
+        $this->searchBrand = '';
+    }
+
+    public function setBrandFromModal($provider)
+    {
+        $this->selectBrand($provider['id']);
+    }
+
+    public function updatedSearchBrand()
+    {
+        if (strlen($this->searchBrand) > 1) {
+            $this->brands = Brand::where('name', 'like', "%{$this->searchBrand}%")
+                ->limit(10)->get();
+        } else {
+            $this->brands = [];
+        }
+    }
+
+    public function selectBrand($id)
+    {
+        $brand = Brand::find($id);
+        if ($brand) {
+            $this->selectedBrand = $brand->only(['id', 'name']);
+            $this->brand_id = $brand->id;
+            $this->brands = [];
+            $this->searchBrand = $brand->name;
+        }
     }
 }

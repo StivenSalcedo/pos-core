@@ -16,6 +16,7 @@
             <x-wireui.search placeholder="Buscar..." />
             <x-wireui.native-select wire:model.defer="filter" label="Por:" optionKeyValue="true" :options="$filters" />
             <x-wireui.native-select optionKeyValue label="Sede" wire:model="terminal_id" :options="$terminals" placeholder="Todas" width="8" />
+             <x-wireui.native-select optionKeyValue label="Estado" wire:model="state_id" :options="$status" placeholder="Todas" width="8" />
         </x-slot:header>
 
         <table class="table-sm">
@@ -95,7 +96,7 @@
                         </td>
                         <td actions>
                             <x-buttons.edit wire:click="$emitTo('admin.products.edit', 'openEdit', {{ $item->id }})" title="Editar" />
-                            <x-buttons.copy wire:click="$emitTo('admin.products.edit', 'openEdit', {{ $item->id }})" title="Clonar" />
+                            <x-buttons.copy wire:click="$emitTo('admin.products.edit', 'openEdit', {{ $item->id }},true)" title="Clonar" />
                         </td>
                     </tr>
                 @empty

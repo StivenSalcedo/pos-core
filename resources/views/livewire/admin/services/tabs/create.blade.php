@@ -42,16 +42,7 @@
                     <i class="ico icon-add text-blue-600 text-sm"></i>
                 </button>
             </div>
-            {{-- Marca --}}
-            {{-- <div class="relative">
-                <x-wireui.native-select class="w-full" label="Marcax" placeholder="Seleccione una marca"
-                    :options="$brands" wire:model.defer="service.brand_id" optionKeyValue="true" />
-                
-                <button class="absolute top-0 right-0" title="Crear nuevo tipo"
-                    wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
-                    <i class="ico icon-add text-blue-600 text-sm"></i>
-                </button>
-            </div> --}}
+           
             <x-wireui.native-select class="w-full" label="Estado" :options="$states" wire:model.defer="service.state_id"
                 optionKeyValue="true" />
 
@@ -107,7 +98,7 @@
     </div>
     <livewire:admin.customers.create />
     <livewire:admin.equipment-types.create />
-    <livewire:admin.brands.create />
+  
 </div>
 @push('js')
     <script>

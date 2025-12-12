@@ -84,6 +84,7 @@ class Edit extends Component
         'service.accessories' => 'nullable|string|max:255',
         'service.user' => 'nullable|string|max:255',
         'service.brand_id' => 'required|exists:brands,id',
+        'service.serial' => 'nullable|string|max:150',
 
 
     ];
@@ -96,7 +97,8 @@ class Edit extends Component
         'service.customer_id'      => 'required|exists:customers,id',
         'service.equipment_type_id' => 'required|exists:equipment_types,id',
         'service.state_id'          => 'required|exists:service_states,id',
-        'service.brand_id' => 'required|exists:brands,id',
+      
+      
     ];
 
 
@@ -108,6 +110,8 @@ class Edit extends Component
         'service.customer_id' => 'Cliente',
         'service.equipment_type_id' => 'Tipo de Equipo',
         'service.brand_id' => 'Marca',
+        'service.serial' => 'Serial'
+
     ];
 
     public function validatePhoto()
@@ -186,7 +190,7 @@ class Edit extends Component
                 'state_id'        =>  $data['service']['state_id'],
                 'model'            => 'N/A',
                 'equipment_type_id' => $data['service']['equipment_type_id'],
-                'brand_id' => $data['service']['brand_id'],
+                'brand_id' => null,
             ]);
             // ✅ Obtener el tipo de equipo con sus componentes por defecto
             $equipmentType = \App\Models\EquipmentType::with('components')->find($this->service->equipment_type_id);
@@ -319,6 +323,8 @@ class Edit extends Component
         }
     }
 
+    
+
     public function refreshServiceDetails()
     {
         $this->details = $this->service->details()->with('component', 'brand')->get()->toArray();
@@ -335,6 +341,7 @@ class Edit extends Component
         $this->products = $this->service->products()->with('product')->get()->toArray();
         $this->calculateTotals();
     }
+    
     public function calculateTotals()
     {
         $this->service->refresh();

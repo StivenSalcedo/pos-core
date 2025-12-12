@@ -53,7 +53,7 @@
                 </button>
             </div>
             <x-wireui.input label="Accesorios" wire:model.defer="service.accessories" />
-            <x-wireui.input label="Serial" wire:model.defer="service.accessories" />
+            <x-wireui.input label="Serial" wire:model.defer="service.serial" />
         </div>
 
         <div class="mt-6 grid sm:grid-cols-2 gap-6">
@@ -62,4 +62,5 @@
             <x-wireui.textarea label="Diagnóstico" wire:model.defer="service.diagnosis" rows="4" />
         </div>
     </div>
+      <livewire:admin.brands.create />
 </div>

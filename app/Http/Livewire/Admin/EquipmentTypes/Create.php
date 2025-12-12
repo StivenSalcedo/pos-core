@@ -47,7 +47,7 @@ class Create extends Component
         ]);
 
         $componentIds = \App\Models\Component::orderBy('id')
-        ->take(2)
+        ->take(3)
         ->pluck('id')
         ->toArray();
 

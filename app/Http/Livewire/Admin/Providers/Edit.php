@@ -37,6 +37,7 @@ class Edit extends Component {
             'provider.type' => ['nullable', 'string', Rule::in(TypesProviders::getCases())],
             'provider.description' => 'nullable|string|max:250',
             'provider.status' => 'required|integer|min:0|max:1',
+            'provider.email' => 'nullable|string|email|max:250',
         ];
     }
 

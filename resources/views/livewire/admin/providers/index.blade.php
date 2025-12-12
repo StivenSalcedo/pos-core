@@ -34,6 +34,9 @@
                         Tipo
                     </th>
                     <th>
+                        Email
+                    </th>
+                    <th>
                         Estado
                     </th>
                     <th>
@@ -60,6 +63,9 @@
                             @if ($item->type)
                             {{$item->type->name}}
                             @endif
+                        </td>
+                        <td left>
+                            {{ $item->email }}
                         </td>
                         <td>
                             <x-commons.status :status="$item->status" />

@@ -7,13 +7,12 @@
         <x-slot:header>
             <input wire:model.debounce.500ms="search" type="text" placeholder="Buscar por modelo o cliente..."
                 class="border-gray-300 rounded-lg w-full md:w-1/3 focus:ring focus:ring-blue-200" />
-            <select wire:model="selectedState" class="border-gray-300 rounded-lg">
+            <!--<select wire:model="selectedState" class="border-gray-300 rounded-lg">
                 <option value="">Todos los estados</option>
-                <option value="recibido">Recibido</option>
                 @foreach (\App\Models\ServiceState::orderBy('order')->get() as $state)
-                    <option value="{{ $state->id }}">{{ $state->name }}</option>
-                @endforeach
-            </select>
+<option value="{{ $state->id }}">{{ $state->name }}</option>
+@endforeach
+            </select>-->
             <select wire:model="perPage" class="border-gray-300 rounded-lg">
                 <option value="10">10 por página</option>
                 <option value="25">25 por página</option>
@@ -103,7 +102,7 @@
                         <td actions>
                             <x-buttons.download wire:click="printReceipt({{ $service->id }})" title="Descargar" />
                             <x-buttons.edit wire:click="redirectToEdit({{ $service->id }})" title="Editar" />
-                            <x-buttons.delete wire:click="confirmDelete({{ $service->id }})" title="Eliminar" />
+                            <!--  <x-buttons.delete wire:click="confirmDelete({{ $service->id }})" title="Eliminar" />-->
                         </td>
 
                     </tr>
@@ -117,10 +116,10 @@
 
     </x-commons.table-responsive>
     <div class="flex flex-wrap lg:flex-nowrap">
-        <x-wireui.button secondary class="w-full lg:w-2/5 mt-6" text="Entregado {{ 10 }}" />
-        <x-wireui.button secondary class="w-full lg:w-3/5 ml-0 lg:ml-4 mt-6 " text="Listo para entregar" />
-        <x-wireui.button secondary class="w-full lg:w-2/5 ml-0 lg:ml-4 mt-6" text="En revisión" />
-        <x-wireui.button secondary class="w-full lg:w-3/5 ml-0 lg:ml-4 mt-6" text="Pendiente por parte" />
+         @foreach (\App\Models\ServiceState::orderBy('order')->get() as $state)
+            <x-wireui.button wire:click="updateData({{ $state->id }})" secondary class="w-full lg:w-2/5 ml-0 lg:ml-4 mt-6"
+                text="{{ $state->name }} : {{ $servicesGrouped->get($state->id)?->count() ?? 0 }}" />
+        @endforeach
     </div>
 
     <x-loads.panel-fixed text="Validando factura..." class="no-print z-[999]" wire:loading

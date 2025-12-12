@@ -7,18 +7,17 @@ use App\Exports\Sheets\ProductsSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ProductsExport implements WithMultipleSheets {
-    
+class ProductsExport implements WithMultipleSheets
+{
     use Exportable;
 
-    public function sheets(): array {
-        
-        $sheets = [];
+    public function __construct(public $products) {}
 
-        $sheets[] = new ProductsSheet();
-        $sheets[] = new ProductsDetailSheet();
-
-        return $sheets;
+    public function sheets(): array
+    {
+        return [
+            new ProductsSheet($this->products)
+          
+        ];
     }
-    
 }

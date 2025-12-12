@@ -46,6 +46,8 @@ class Create extends Component
 
     public $email;
 
+    public $neighborhood;
+
     public function mount()
     {
         $this->identificationDocuments = IdentificationDocument::enabled()->get()->pluck('name', 'id');
@@ -78,6 +80,7 @@ class Create extends Component
             'direction' => 'nullable|string|max:250',
             'phone' => ['nullable', 'string', new Phone],
             'email' => 'nullable|string|email|max:250',
+            'neighborhood' => 'nullable|string|max:100',
         ];
 
         $messages = [
