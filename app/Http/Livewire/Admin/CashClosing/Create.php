@@ -79,7 +79,7 @@ class Create extends Component
             $this->cash         = $this->bills->where('payment_method_id', PaymentMethod::CASH)->sum('total');
             $this->credit_card  = $this->bills->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('total') + $this->bills->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('tip');
             $this->debit_card   = $this->bills->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('total') + $this->bills->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('tip');
-            $this->transfer     = $this->bills->where('payment_method_id', PaymentMethod::TRANSFER)->sum('total') + $this->bills->where('payment_method_id', PaymentMethod::TRANSFER)->sum('tip');
+            $this->transfer     = $this->bills->where('payment_method_id','>=', PaymentMethod::TRANSFER)->sum('total') + $this->bills->where('payment_method_id','>=', PaymentMethod::TRANSFER)->sum('tip');
             $this->tip          = $this->bills->sum('tip');
         }
     }
@@ -100,7 +100,7 @@ class Create extends Component
         $this->cash         = $this->cash + $finances->where('payment_method_id', PaymentMethod::CASH)->sum('value');
         $this->credit_card  = $this->credit_card + $finances->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('value');
         $this->debit_card   = $this->debit_card + $finances->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('value');
-        $this->transfer     = $this->transfer + $finances->where('payment_method_id', PaymentMethod::TRANSFER)->sum('value');
+        $this->transfer     = $this->transfer + $finances->where('payment_method_id', '>=',PaymentMethod::TRANSFER)->sum('value');
 
         $this->total_sales = $this->cash + $this->credit_card + $this->debit_card + $this->transfer;
     }

@@ -107,9 +107,9 @@ class ServiceModuleSeeder extends Seeder
 
         // Components pool
         $components = [
-            'ssd',
-            'memoria RAM',
-            'disco duro',
+            'Disco Duro',
+            'Memoria Ram',
+            'Procesador',
             'placa madre',
             'fuente',
             'tarjeta grafica',
@@ -159,13 +159,13 @@ class ServiceModuleSeeder extends Seeder
         // Service states (usando tu lista)
         $states = [
             ['key' => 'en_revision', 'name' => 'En revisión', 'order' => 1],
-            ['key' => 'listo', 'name' => 'Listo', 'order' => 2],
-            ['key' => 'abandonado', 'name' => 'Abandonado', 'order' => 3],
-            ['key' => 'devolucion', 'name' => 'Devolución', 'order' => 4],
-            ['key' => 'entregado', 'name' => 'Entregado', 'order' => 5],
-            ['key' => 'listo_para_entregar', 'name' => 'Listo para entregar', 'order' => 6],
+            ['key' => 'listo_para_entregar', 'name' => 'Listo para Entregar', 'order' => 2],
+            ['key' => 'entregado', 'name' => 'Entregado', 'order' => 3],
+            ['key' => 'pendiente_parte', 'name' => 'Pendiente por parte', 'order' => 4],
+            ['key' => 'abandonado', 'name' => 'Abandonado', 'order' => 5],
+            ['key' => 'devolucion', 'name' => 'Devolución', 'order' => 6],
             ['key' => 'pendiente_autorizar', 'name' => 'Pendiente por autorizar', 'order' => 7],
-            ['key' => 'pendiente_parte', 'name' => 'Pendiente por parte', 'order' => 8],
+           
         ];
 
         // Insert equipment types

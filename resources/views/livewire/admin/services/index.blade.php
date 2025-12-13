@@ -7,12 +7,12 @@
         <x-slot:header>
             <input wire:model.debounce.500ms="search" type="text" placeholder="Buscar por modelo o cliente..."
                 class="border-gray-300 rounded-lg w-full md:w-1/3 focus:ring focus:ring-blue-200" />
-            <!--<select wire:model="selectedState" class="border-gray-300 rounded-lg">
+      <select wire:model="selectedState" class="border-gray-300 rounded-lg">
                 <option value="">Todos los estados</option>
                 @foreach (\App\Models\ServiceState::orderBy('order')->get() as $state)
 <option value="{{ $state->id }}">{{ $state->name }}</option>
 @endforeach
-            </select>-->
+            </select>
             <select wire:model="perPage" class="border-gray-300 rounded-lg">
                 <option value="10">10 por página</option>
                 <option value="25">25 por página</option>
@@ -116,8 +116,8 @@
 
     </x-commons.table-responsive>
     <div class="flex flex-wrap lg:flex-nowrap">
-         @foreach (\App\Models\ServiceState::orderBy('order')->get() as $state)
-            <x-wireui.button wire:click="updateData({{ $state->id }})" secondary class="w-full lg:w-2/5 ml-0 lg:ml-4 mt-6"
+         @foreach (\App\Models\ServiceState::orderBy('order')->limit(4)->get() as $state)
+            <x-wireui.button wire:click="updateData({{ $state->id }})" secondary class="w-full lg:w-3/5 ml-0 lg:ml-4 mt-6 {{($this->selectedState==$state->id)?'bg-green-600':'bg-slate-600'}}"
                 text="{{ $state->name }} : {{ $servicesGrouped->get($state->id)?->count() ?? 0 }}" />
         @endforeach
     </div>
