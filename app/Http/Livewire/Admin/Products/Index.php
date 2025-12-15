@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Admin\Products;
 
 use App\Exports\ProductsExport;
 use App\Http\Controllers\Log;
+use App\Models\Category;
 use App\Models\Product;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -41,11 +42,16 @@ class Index extends Component
         2 => 'Nombre'
     ];
 
+    public $categories;
+
+    public $category_id='';
+
 
 
     public function mount()
     {
         $this->terminals = Terminal::all()->pluck('name', 'id');
+         $this->categories = Category::all()->pluck('name', 'id');
         $this->getTotalCost();
     }
 
@@ -64,9 +70,12 @@ class Index extends Component
     {
         $filter = [1 => 'reference',  2 => 'name'][$this->filter];
 
-        return Product::with('taxRates', 'taxRates.tribute', 'terminal', 'provider', 'brand')
+        return Product::with('taxRates', 'taxRates.tribute', 'terminal', 'provider', 'brand','category')
             ->where($filter, 'LIKE', '%' . $this->search . '%')
             ->terminal($this->terminal_id)
+            ->when($this->category_id,
+            fn($q) =>
+                $q->where('category_id', $this->category_id))
             ->when(
                 $this->state_id == 1,
                 fn($q) =>
