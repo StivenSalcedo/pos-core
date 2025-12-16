@@ -9,16 +9,19 @@ use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SalesReportExport;
+use App\Exports\PaymentMethodSummaryExport;
+use App\Exports\EmployeeSummaryExport;
 class Index extends Component
 {
 
     use WithPagination;
 
-    public $search, $filterDate = '8', $startDate, $endDate, $productsArray, $productsSelected = [], $useBarcode;
+    public $search, $filterDate = '1', $startDate, $endDate, $productsArray, $productsSelected = [], $useBarcode;
 
     public $total = 0;
-
+    public $orderUnits = null; // asc | desc | null
     public function mount()
     {
 
@@ -42,127 +45,72 @@ class Index extends Component
 
     public function render()
     {
+        [$from, $to] = $this->resolveDates();
 
-        /* $products = Sale::with('product')
-            ->whereHas('product', function ($query) {
-                $query
-                    ->where('name', 'LIKE', "%{$this->search}%")
-                    ->orWhere('reference', 'LIKE', "%{$this->search}%");
+        /*
+    |--------------------------------------------------------------------------
+    | 1. BASE QUERY (sales)
+    |--------------------------------------------------------------------------
+    */
+        $baseReportQuery = Sale::query()
+            ->join('products', 'products.id', '=', 'sales.product_id')
+            ->selectRaw('
+            sales.product_id,
+            products.reference,
+            products.name,
+            SUM(sales.quantity) as quantity,
+            SUM(sales.units) as units,
+            SUM(sales.total) as total
+        ')
+            ->when($from && $to, function ($q) use ($from, $to) {
+                $q->whereBetween('sales.created_at', [$from, $to]);
             })
-            ->selectRaw('MAX(product_id) AS product_id, SUM(quantity) AS quantity, SUM(units) AS units, SUM(total) AS total')
-            ->date($this->filterDate, $this->startDate, $this->endDate)
-            ->searchByIds($this->productsSelected)
-            ->groupBy('product_id')
+            ->when($this->search, function ($q) {
+                $q->where(function ($q) {
+                    $q->where('products.name', 'LIKE', "%{$this->search}%")
+                        ->orWhere('products.reference', 'LIKE', "%{$this->search}%");
+                });
+            })
+            ->when($this->productsSelected, function ($q) {
+                $q->whereIn('sales.product_id', $this->normalizeProductIds());
+            })
+            ->groupBy(
+                'sales.product_id',
+                'products.reference',
+                'products.name'
+            );
+
+        /*
+    |--------------------------------------------------------------------------
+    | 2. PAGINADO
+    |--------------------------------------------------------------------------
+    */
+        $products = (clone $baseReportQuery)
+            ->when($this->orderUnits, function ($q) {
+                $q->orderBy('quantity', $this->orderUnits);
+            })
             ->paginate(10);
 
-        $this->total = Sale::date($this->filterDate, $this->startDate, $this->endDate)
-            ->whereHas('product', function ($query) {
-                $query
-                    ->where('name', 'LIKE', "%{$this->search}%")
-                    ->orWhere('reference', 'LIKE', "%{$this->search}%");
-                })
-            ->sum('total');*/
-
-
-
         /*
     |--------------------------------------------------------------------------
-    | 1. Servicios PAGADOS y filtrados por fecha (services)
+    | 3. TOTAL GENERAL
     |--------------------------------------------------------------------------
     */
-        $paidServices = DB::table('services')
-            ->select('services.id')
-            ->whereBetween('services.created_at', [
-                $this->startDate . ' 00:00:00',
-                $this->endDate . ' 23:59:59'
-            ])
-            ->whereRaw('
-            (
-                SELECT COALESCE(SUM(sp.total),0)
-                FROM service_products sp
-                WHERE sp.service_id = services.id
-            ) = (
-                SELECT COALESCE(SUM(pay.amount),0)
-                FROM service_payments pay
-                WHERE pay.service_id = services.id
-            )
-        ');
-
-        /*
-    |--------------------------------------------------------------------------
-    | 2. Ventas normales (sales)
-    |--------------------------------------------------------------------------
-    */
-        $salesQuery = Sale::query()
-            ->selectRaw('
-            product_id,
-            SUM(quantity) as quantity,
-            SUM(units) as units,
-            SUM(total) as total
-        ')
-            ->whereHas('product', function ($query) {
-                $query->where('name', 'LIKE', "%{$this->search}%")
-                    ->orWhere('reference', 'LIKE', "%{$this->search}%");
+        $this->total = Sale::query()
+            ->when($from && $to, function ($q) use ($from, $to) {
+                $q->whereBetween('created_at', [$from, $to]);
             })
-            ->date($this->filterDate, $this->startDate, $this->endDate)
-            ->searchByIds($this->productsSelected)
-            ->groupBy('product_id');
-
-        /*
-    |--------------------------------------------------------------------------
-    | 3. Productos de SERVICIOS PAGADOS
-    |--------------------------------------------------------------------------
-    */
-        $serviceQuery = DB::table('service_products')
-            ->selectRaw('
-            product_id,
-            SUM(quantity) as quantity,
-            0 as units,
-            SUM(total) as total
-        ')
-            ->whereIn('service_id', $paidServices)
+            ->when($this->search, function ($q) {
+                $q->whereHas('product', function ($q) {
+                    $q->where('name', 'LIKE', "%{$this->search}%")
+                        ->orWhere('reference', 'LIKE', "%{$this->search}%");
+                });
+            })
             ->when($this->productsSelected, function ($q) {
-                $q->whereIn('product_id', $this->productsSelected);
+                $q->whereIn('product_id', $this->normalizeProductIds());
             })
-            ->groupBy('product_id');
-
-        /*
-    |--------------------------------------------------------------------------
-    | 4. UNION FINAL
-    |--------------------------------------------------------------------------
-    */
-       $products = DB::query()
-    ->fromSub(
-        $salesQuery->unionAll($serviceQuery),
-        'report'
-    )
-    ->join('products', 'products.id', '=', 'report.product_id')
-    ->selectRaw('
-        report.product_id,
-        products.reference,
-        products.name,
-        SUM(report.quantity) as quantity,
-        SUM(report.units) as units,
-        SUM(report.total) as total
-    ')
-    ->groupBy(
-        'report.product_id',
-        'products.reference',
-        'products.name'
-    )
-    ->paginate(10);
-
-        /*
-    |--------------------------------------------------------------------------
-    | 5. TOTAL GENERAL
-    |--------------------------------------------------------------------------
-    */
-        $this->total = DB::query()
-            ->fromSub(
-                $salesQuery->unionAll($serviceQuery),
-                'totals'
-            )
             ->sum('total');
+
         return view('livewire.admin.sales.index', compact('products'));
     }
 
@@ -191,8 +139,147 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function getToday()
+    public function refreshData()
     {
-        Artisan::call('sales:update --today');
+
+
+        Artisan::call('sales:update', [
+            '--filter' => $this->filterDate,
+            '--from'   => $this->startDate,
+            '--to'     => $this->endDate,
+        ]);
+
+        $this->resetPage();
+    }
+
+    private function resolveDates()
+    {
+        switch ((int) $this->filterDate) {
+            case 1: // Hoy
+                return [now()->startOfDay(), now()->endOfDay()];
+
+            case 2: // Esta semana
+                return [now()->startOfWeek(), now()->endOfWeek()];
+
+            case 3: // Últimos 7 días
+                return [now()->subDays(6)->startOfDay(), now()->endOfDay()];
+
+            case 4: // Semana pasada
+                return [
+                    now()->subWeek()->startOfWeek(),
+                    now()->subWeek()->endOfWeek()
+                ];
+
+            case 5: // Hace 15 días
+                return [now()->subDays(14)->startOfDay(), now()->endOfDay()];
+
+            case 6: // Este mes
+                return [now()->startOfMonth(), now()->endOfMonth()];
+
+            case 7: // Mes pasado
+                return [
+                    now()->subMonth()->startOfMonth(),
+                    now()->subMonth()->endOfMonth()
+                ];
+
+            case 8: // Rango manual
+                return [
+                    \Carbon\Carbon::parse($this->startDate)->startOfDay(),
+                    \Carbon\Carbon::parse($this->endDate)->endOfDay()
+                ];
+
+            default: // 0 => Todos
+                return [null, null];
+        }
+    }
+
+    private function normalizeProductIds()
+    {
+        return collect($this->productsSelected)
+            ->flatten()
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
+    public function toggleOrderUnits()
+    {
+        $this->orderUnits = match ($this->orderUnits) {
+            'asc'  => 'desc',
+            'desc' => null,
+            default => 'asc',
+        };
+
+        $this->resetPage();
+    }
+
+    public function exportExcel()
+    {
+        [$from, $to] = $this->resolveDates();
+        $filename = 'reporte_productos';
+         if($from && $to)
+         {
+            $filename.='_' . $from . '_a_' . $to . '.xlsx';
+         }
+         else
+         {
+            $filename.= '.xlsx';
+         }
+        return Excel::download(
+            new SalesReportExport(
+                $this->search,
+                $this->normalizeProductIds(),
+                $from,
+                $to,
+                $this->orderUnits
+            ),
+            $filename
+        );
+    }
+
+
+
+    public function exportExcelPaymentMethodSummary()
+    {
+         [$from, $to] = $this->resolveDates();
+         $filename = 'resumen_metodos_pago';
+         if($from && $to)
+         {
+            $filename.='_' . $from . '_a_' . $to . '.xlsx';
+         }
+         else
+         {
+            $filename.= '.xlsx';
+         }
+       
+        return Excel::download(
+            new PaymentMethodSummaryExport(
+                $from,
+                $to
+            ),
+            $filename
+        );
+    }
+
+    public function exportExcelEmployeeSummarySummary()
+    {
+         [$from, $to] = $this->resolveDates();
+         $filename = 'resumen_empleado';
+         if($from && $to)
+         {
+            $filename.='_' . $from . '_a_' . $to . '.xlsx';
+         }
+         else
+         {
+            $filename.= '.xlsx';
+         }
+       
+        return Excel::download(
+            new EmployeeSummaryExport(
+                $from,
+                $to
+            ),
+            $filename
+        );
     }
 }

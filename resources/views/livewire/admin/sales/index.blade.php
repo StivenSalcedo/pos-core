@@ -2,22 +2,26 @@
 
     <x-commons.header>
         <x-wireui.range-date wire:model="filterDate" :options="[
-                0 => 'Todos',
-                1 => 'Hoy',
-                2 => 'Esta semana',
-                3 => 'Ultimos 7 días',
-                4 => 'La semana pasada',
-                5 => 'Hace 15 días',
-                6 => 'Este mes',
-                7 => 'El mes pasado',
-                8 => 'Rango de fechas']" />
+            0 => 'Todos',
+            1 => 'Hoy',
+            2 => 'Esta semana',
+            3 => 'Ultimos 7 días',
+            4 => 'La semana pasada',
+            5 => 'Hace 15 días',
+            6 => 'Este mes',
+            7 => 'El mes pasado',
+            8 => 'Rango de fechas',
+        ]" />
+        <x-wireui.button wire:click="exportExcel" icon="download" text="Exportar Productos vendidos" />
+        <x-wireui.button wire:click="exportExcelPaymentMethodSummary" icon="download" text="Exportar Resumen pagos" />
+          <x-wireui.button wire:click="exportExcelEmployeeSummarySummary" icon="download" text="Exportar por empleado" />
     </x-commons.header>
 
     <div>
         @include('livewire.admin.sales.products')
     </div>
 
-    <x-loads.panel-fixed text="Cargando..." class="z-40" wire:loading/>
+    <x-loads.panel-fixed text="Cargando..." class="z-40" wire:loading />
 
     <x-commons.table-responsive>
 
@@ -35,8 +39,11 @@
                 </div>
 
                 <div class="flex items-end space-x-3">
-                    <x-wireui.input label="Total" :value="formatToCop($total)" readonly class="text-right"/>
-                    <x-wireui.button wire:click="getToday()" text="Actualizar datos" load textLoad="Actualizando" />
+                   
+                    <x-wireui.input label="Total" :value="formatToCop($total)" readonly class="text-right" />
+                    <x-wireui.button wire:click="refreshData()" text="Actualizar datos" load textLoad="Actualizando" />
+                    
+                    
                 </div>
 
             </div>
@@ -51,8 +58,13 @@
                     <th left>
                         Nombres
                     </th>
-                    <th>
+                    <th class="cursor-pointer select-none" wire:click="toggleOrderUnits">
                         Cantidad
+                        @if ($orderUnits === 'asc')
+                            ↑
+                        @elseif ($orderUnits === 'desc')
+                            ↓
+                        @endif
                     </th>
                     <th right>
                         Total
@@ -69,7 +81,7 @@
                             {{ $item->name }}
                         </td>
                         <td>
-                            {{ $item->quantity }} - {{ $item->units }}
+                            {{ $item->quantity }}
                         </td>
                         <td right>
                             @formatToCop($item->total)

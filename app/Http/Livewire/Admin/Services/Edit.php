@@ -83,7 +83,7 @@ class Edit extends Component
         'service.password' => 'nullable|string|max:255',
         'service.accessories' => 'nullable|string|max:255',
         'service.user' => 'nullable|string|max:255',
-        'service.brand_id' => 'required|exists:brands,id',
+        'service.brand_id' => 'nullable|exists:brands,id',
         'service.serial' => 'nullable|string|max:150',
 
 
@@ -191,6 +191,7 @@ class Edit extends Component
                 'model'            => 'N/A',
                 'equipment_type_id' => $data['service']['equipment_type_id'],
                 'brand_id' => null,
+                'user_id' => auth()->user()->id,
             ]);
             // ✅ Obtener el tipo de equipo con sus componentes por defecto
             $equipmentType = \App\Models\EquipmentType::with('components')->find($this->service->equipment_type_id);

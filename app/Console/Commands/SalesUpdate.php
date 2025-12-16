@@ -6,86 +6,198 @@ use App\Models\Bill;
 use App\Models\DetailBill;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as SupportCollection;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-class SalesUpdate extends Command {
-    
-    protected $signature = 'sales:update {--today}';
+class SalesUpdate extends Command
+{
+   protected $signature = '
+    sales:update
+    {--filter= : Tipo de filtro de fecha (0–8)}
+    {--from= : Fecha inicio Y-m-d (solo filtro 8)}
+    {--to= : Fecha fin Y-m-d (solo filtro 8)}
+';
 
-    protected $description = 'Calcula las ventas del dia anterior';
+    protected $description = 'Actualiza la tabla sales a partir de facturas y servicios';
 
-    public function handle() {
+    public function handle()
+    {
+        [$from, $to] = $this->resolveDateRange();
 
-        $date = $this->option('today') ? now() : now()->subDay();
+        $this->info("Procesando sales desde {$from->toDateString()} hasta {$to->toDateString()}");
 
-        Sale::whereDate('created_at', $date)->delete();
+        DB::beginTransaction();
 
-        $collection = DetailBill::whereDate('created_at', $date)->whereRelation('bill', 'status', Bill::ACTIVA)->get();
+        try {
 
-        $collect = $this->calcTotales($collection);
+            /* ======================================================
+             | 1. LIMPIAR SALES DEL RANGO
+             ====================================================== */
+            Sale::whereBetween('created_at', [$from, $to])->delete();
 
-        if ($collect->count()) {
+            /* ======================================================
+             | 2. FACTURAS → SALES
+             ====================================================== */
+            $details = DetailBill::with(['bill'])
+                ->whereBetween('created_at', [$from, $to])
+                ->whereRelation('bill', 'status', Bill::ACTIVA)
+                ->get();
 
-            foreach ($collect as $key => $item) {
-                
-                $quantity = $item->sum('amount');
-                $units = 0;
-                $product = Product::find($key);
-
-                if (!intval($product->has_presentations)) {
-                    $units = $item->sum('units') - (intval($item->sum('units') / $product->quantity) * $product->quantity );
-                    $quantity = $quantity + intval($item->sum('units') / $product->quantity);
-                }
+            foreach ($details as $item) {
 
                 Sale::create([
-                    'quantity' => $quantity,
-                    'units' => $units,
-                    'total' => $item->sum('total'),
-                    'product_id' => $key,
-                    'created_at' => $date,
+                    'product_id'        => $item->product_id,
+                    'quantity'          => $item->amount,
+                    'units'             => $item->units ?? 0,
+                    'total'             => $item->total,
+
+                    'payment_method_id' => $item->bill->payment_method_id,
+                    'user_id'           => $item->bill->user_id,
+                    'bill_id'           => $item->bill_id,
+                    'service_id'        => null,
+                    'source'            => 'bill',
+
+                    'created_at'        => $item->created_at,
+                    'updated_at'        => now(),
                 ]);
-
             }
 
-        }
+            /* ======================================================
+             | 3. SERVICIOS → SALES (SOLO PAGADOS COMPLETOS)
+             ====================================================== */
+            $services = Service::with(['products', 'payments'])
+                ->whereBetween('created_at', [$from, $to])
+                ->get();
 
-        Storage::disk('root')->append('logs/tareas.log', '[' . now()->format('d-m-Y h:i:s a') . '] Se actualizo la tabla sales con éxito');
+            foreach ($services as $service) {
 
-    }
+                $totalProducts = $service->products->sum('total');
+                $totalPayments = $service->payments->sum('amount');
 
-    protected function calcTotales(Collection $collection) : SupportCollection{
+                // ❌ servicio no completamente pagado
+                if ($totalProducts != $totalPayments) {
+                    continue;
+                }
 
-        $collect = collect();
+                foreach ($service->products as $product) {
 
-        foreach ($collection as $item) {
+                    Sale::create([
+                        'product_id'        => $product->product_id,
+                        'quantity'          => $product->quantity,
+                        'units'             => $product->units ?? 0,
+                        'total'             => $product->total,
 
-            $array = [];
+                        // ⚠️ toma el método de pago del primer pago
+                        'payment_method_id' => $service->payments->first()->payment_method_id,
+                        'user_id'           => $service->user_id,
+                        'bill_id'           => null,
+                        'service_id'        => $service->id,
+                        'source'            => 'service',
 
-            $array['product_id'] = $item->product_id;
-
-            if ($item->presentation) {
-
-                $array['units'] = $item->presentation->quantity * $item->amount;
-                $array['amount'] = 0;
-
-            }else{
-
-                $array['units'] = 0;
-                $array['amount'] = $item->amount;
-
+                        'created_at'        => $service->created_at,
+                        'updated_at'        => now(),
+                    ]);
+                }
             }
 
-            $array['total'] = $item->total;
+            DB::commit();
 
-            $collect->push($array);
+            $this->info('Sales actualizadas correctamente');
 
-            
+            Log::info('SalesUpdate ejecutado', [
+                'from' => $from->toDateString(),
+                'to'   => $to->toDateString(),
+            ]);
+
+            return Command::SUCCESS;
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            Log::error('Error en SalesUpdate', [
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->error('Error al actualizar sales');
+            $this->error($e->getMessage());
+
+            return Command::FAILURE;
         }
-
-        return $collect->groupBy('product_id');
-
     }
+
+    /* ======================================================
+     | RESOLVER RANGO DE FECHAS
+     ====================================================== */
+   private function resolveDateRange(): array
+{
+    $filter = (int) $this->option('filter');
+
+    return match ($filter) {
+
+        // 0 → Todos (⚠️ solo si quieres permitirlo)
+        0 => [
+            now()->subYears(10)->startOfDay(),
+            now()->endOfDay()
+        ],
+
+        // 1 → Hoy
+        1 => [
+            now()->startOfDay(),
+            now()->endOfDay()
+        ],
+
+        // 2 → Esta semana
+        2 => [
+            now()->startOfWeek(),
+            now()->endOfWeek()
+        ],
+
+        // 3 → Últimos 7 días
+        3 => [
+            now()->subDays(6)->startOfDay(),
+            now()->endOfDay()
+        ],
+
+        // 4 → Semana pasada
+        4 => [
+            now()->subWeek()->startOfWeek(),
+            now()->subWeek()->endOfWeek()
+        ],
+
+        // 5 → Hace 15 días
+        5 => [
+            now()->subDays(14)->startOfDay(),
+            now()->endOfDay()
+        ],
+
+        // 6 → Este mes
+        6 => [
+            now()->startOfMonth(),
+            now()->endOfMonth()
+        ],
+
+        // 7 → Mes pasado
+        7 => [
+            now()->subMonth()->startOfMonth(),
+            now()->subMonth()->endOfMonth()
+        ],
+
+        // 8 → Rango manual
+        8 => [
+            \Carbon\Carbon::parse($this->option('from'))->startOfDay(),
+            \Carbon\Carbon::parse($this->option('to'))->endOfDay()
+        ],
+
+        // Default → ayer
+        default => [
+            now()->subDay()->startOfDay(),
+            now()->subDay()->endOfDay()
+        ],
+    };
+}
+
 }
