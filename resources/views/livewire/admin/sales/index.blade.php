@@ -63,10 +63,10 @@
                 @forelse ($products as $key => $item)
                     <tr wire:key="sale-{{ $key }}">
                         <td left>
-                            {{ $item->product->reference }}
+                            {{ $item->reference }}
                         </td>
                         <td left>
-                            {{ $item->product->name }}
+                            {{ $item->name }}
                         </td>
                         <td>
                             {{ $item->quantity }} - {{ $item->units }}

@@ -184,6 +184,8 @@ class Create extends Component
             'tax_rates.*.id' => 'required|integer|exists:tax_rates,id',
             'tax_rates.*.value' => 'required|integer|min:0|max:999999999',
             'terminal_id' => 'required|exists:terminals,id',
+            'provider_id' => 'nullable|exists:providers,id',
+            'brand_id'=> 'nullable|exists:brands,id',
         ];
 
         $attributes = [
@@ -194,6 +196,7 @@ class Create extends Component
             'terminal_id' => 'sede',
             'provider_id' => 'proveedor',
             'brand_id' => 'marca',
+            'category_id'=> 'categoria',
         ];
 
         $messages = [

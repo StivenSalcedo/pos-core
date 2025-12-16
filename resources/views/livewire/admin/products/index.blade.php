@@ -16,7 +16,8 @@
             <x-wireui.search placeholder="Buscar..." />
             <x-wireui.native-select wire:model.defer="filter" label="Por:" optionKeyValue="true" :options="$filters" />
             <x-wireui.native-select optionKeyValue label="Sede" wire:model="terminal_id" :options="$terminals" placeholder="Todas" width="8" />
-             <x-wireui.native-select optionKeyValue label="Estado" wire:model="state_id" :options="$status" placeholder="Todas" width="8" />
+            <x-wireui.native-select optionKeyValue label="Estado" wire:model="state_id" :options="$status" placeholder="Todas" width="8" />
+            <x-wireui.native-select optionKeyValue label="Categoria" wire:model="category_id" :options="$categories" placeholder="Todas" width="8" />
         </x-slot:header>
 
         <table class="table-sm">
@@ -26,10 +27,10 @@
                         Código barras
                     </th>
                     <th left>
-                        Referencia
+                        Nombre
                     </th>
                     <th left>
-                        Nombre
+                        Categoria
                     </th>
                     <th left>
                         Sede
@@ -60,11 +61,11 @@
                         <td left class="{{ !$item->top ? 'text-green-500 font-bold' : ''  }}">
                             {{ $item->barcode }}
                         </td>
-                        <td left class="{{ !$item->top ? 'text-green-500 font-bold' : ''  }}">
-                            {{ $item->reference }}
-                        </td>
                         <td left>
                             {{ $item->name }}
+                        </td>
+                         <td left class="{{ !$item->top ? 'text-green-500 font-bold' : ''  }}">
+                            {{ $item->category?->name ?? 'Sin categoria' }}
                         </td>
                         <td left>
                         {{ $item->terminal?->name ?? 'Sin sede' }}
