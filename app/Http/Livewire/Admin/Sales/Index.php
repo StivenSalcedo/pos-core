@@ -8,11 +8,12 @@ use App\Models\Sale;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
+
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SalesReportExport;
 use App\Exports\PaymentMethodSummaryExport;
 use App\Exports\EmployeeSummaryExport;
+use App\Exports\CashRegisterDailyExport;
 class Index extends Component
 {
 
@@ -276,6 +277,28 @@ class Index extends Component
        
         return Excel::download(
             new EmployeeSummaryExport(
+                $from,
+                $to
+            ),
+            $filename
+        );
+    }
+
+    public function exportExcelCashRegisterDailySummary()
+    {
+         [$from, $to] = $this->resolveDates();
+         $filename = 'arqueo_caja';
+         if($from && $to)
+         {
+            $filename.='_' . $from . '_a_' . $to . '.xlsx';
+         }
+         else
+         {
+            $filename.= '.xlsx';
+         }
+       
+        return Excel::download(
+            new CashRegisterDailyExport(
                 $from,
                 $to
             ),

@@ -192,6 +192,7 @@ class Edit extends Component
                 'equipment_type_id' => $data['service']['equipment_type_id'],
                 'brand_id' => null,
                 'user_id' => auth()->user()->id,
+                'terminal_id' => getTerminal()->id,
             ]);
             // ✅ Obtener el tipo de equipo con sus componentes por defecto
             $equipmentType = \App\Models\EquipmentType::with('components')->find($this->service->equipment_type_id);

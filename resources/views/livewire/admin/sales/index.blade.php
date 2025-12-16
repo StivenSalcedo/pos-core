@@ -14,7 +14,9 @@
         ]" />
         <x-wireui.button wire:click="exportExcel" icon="download" text="Exportar Productos vendidos" />
         <x-wireui.button wire:click="exportExcelPaymentMethodSummary" icon="download" text="Exportar Resumen pagos" />
-          <x-wireui.button wire:click="exportExcelEmployeeSummarySummary" icon="download" text="Exportar por empleado" />
+        <x-wireui.button wire:click="exportExcelEmployeeSummarySummary" icon="download" text="Exportar por empleado" />
+        <x-wireui.button wire:click="exportExcelCashRegisterDailySummary" icon="download" text="Exportar Arqueo de caja" />
+
     </x-commons.header>
 
     <div>
@@ -39,11 +41,11 @@
                 </div>
 
                 <div class="flex items-end space-x-3">
-                   
+
                     <x-wireui.input label="Total" :value="formatToCop($total)" readonly class="text-right" />
                     <x-wireui.button wire:click="refreshData()" text="Actualizar datos" load textLoad="Actualizando" />
-                    
-                    
+
+
                 </div>
 
             </div>

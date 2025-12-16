@@ -11,6 +11,7 @@ use App\Models\PaymentMethod;
 use App\Models\Terminal;
 use App\Traits\LivewireTrait;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class Create extends Component
 {
@@ -51,6 +52,7 @@ class Create extends Component
     {
         $this->lastRecord = CashClosing::latest('id')->where('terminal_id', $this->terminal->id)->first();
         $this->getBills();
+        $this->getPaidServices();
         $this->getFinances();
         $this->getOutputs();
         $this->getCashRegister();
@@ -79,7 +81,7 @@ class Create extends Component
             $this->cash         = $this->bills->where('payment_method_id', PaymentMethod::CASH)->sum('total');
             $this->credit_card  = $this->bills->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('total') + $this->bills->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('tip');
             $this->debit_card   = $this->bills->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('total') + $this->bills->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('tip');
-            $this->transfer     = $this->bills->where('payment_method_id','>=', PaymentMethod::TRANSFER)->sum('total') + $this->bills->where('payment_method_id','>=', PaymentMethod::TRANSFER)->sum('tip');
+            $this->transfer     = $this->bills->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('total') + $this->bills->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('tip');
             $this->tip          = $this->bills->sum('tip');
         }
     }
@@ -100,7 +102,7 @@ class Create extends Component
         $this->cash         = $this->cash + $finances->where('payment_method_id', PaymentMethod::CASH)->sum('value');
         $this->credit_card  = $this->credit_card + $finances->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('value');
         $this->debit_card   = $this->debit_card + $finances->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('value');
-        $this->transfer     = $this->transfer + $finances->where('payment_method_id', '>=',PaymentMethod::TRANSFER)->sum('value');
+        $this->transfer     = $this->transfer + $finances->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('value');
 
         $this->total_sales = $this->cash + $this->credit_card + $this->debit_card + $this->transfer;
     }
@@ -173,5 +175,43 @@ class Create extends Component
         $this->terminal = new Terminal();
         $this->emitTo('admin.cash-closing.index', 'render');
         $this->emit('success', 'Cierre de caja realizado con éxito');
+    }
+
+    private function getPaidServices()
+    {
+        $paidServiceIds = DB::query()
+            ->from('services')
+            ->select('services.id')
+            ->where('services.terminal_id', $this->terminal->id)
+            ->when(
+                $this->lastRecord,
+                fn($q) =>
+                $q->where('services.created_at', '>', $this->lastRecord->created_at)
+            )
+            ->whereRaw('
+            (
+                SELECT COALESCE(SUM(sp.total),0)
+                FROM service_products sp
+                WHERE sp.service_id = services.id
+            ) = (
+                SELECT COALESCE(SUM(pay.amount),0)
+                FROM service_payments pay
+                WHERE pay.service_id = services.id
+            )
+        ');
+
+        $services = DB::table('service_payments')
+            ->selectRaw('
+            payment_method_id,
+            SUM(amount) as total
+        ')
+            ->whereIn('service_id', $paidServiceIds)
+            ->groupBy('payment_method_id')
+            ->get();
+
+        $this->cash        += $services->where('payment_method_id', PaymentMethod::CASH)->sum('total');
+        $this->credit_card += $services->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('total');
+        $this->debit_card  += $services->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('total');
+        $this->transfer    += $services->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('total');
     }
 }

@@ -27,7 +27,7 @@ class ServiceService
             'observation' => $observation,
             'terminal_id' => getTerminal()->id,
             'customer_id' => $customer_id,
-            'user_id' => auth()->user()->id,
+            'user_id' => auth()->user()->id
         ]);
 
         return $service;
