@@ -6,7 +6,6 @@
 
             <div>
 
-
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <x-wireui.native-select label="Sede" placeholder="Selecciona una sede"
                         wire:model.defer="product.terminal_id" optionKeyValue :options="$terminals" class="min-w-full" />
@@ -40,7 +39,7 @@
                     </div>
 
                     {{-- Proveedor (buscador) --}}
-                    <div class="mt-6">
+                    <div class="relative">
                         <div class="flex justify-between">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
                             {{-- Botón para crear nuevo proveedor --}}
@@ -54,7 +53,8 @@
 
                         {{-- Resultados búsqueda --}}
                         @if ($providers && count($providers) > 0)
-                            <div class="border mt-2 rounded-md shadow bg-white max-h-40 overflow-y-auto">
+                            <div
+                                class="absolute w-full border mt-2 rounded-md shadow bg-white max-h-40 overflow-y-auto z-50">
                                 @foreach ($providers as $provider)
                                     <div wire:click="selectProvider({{ $provider->id }})"
                                         class="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm">
@@ -102,7 +102,8 @@
 
                         {{-- Resultados búsqueda --}}
                         @if ($brands && count($brands) > 0)
-                            <div class="border mt-2 rounded-md shadow bg-white max-h-40 overflow-y-auto">
+                            <div
+                                class="absolute w-full border mt-2 rounded-md shadow bg-white max-h-40 overflow-y-auto z-50">
                                 @foreach ($brands as $brand)
                                     <div wire:click="selectBrand({{ $brand->id }})"
                                         class="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm">
@@ -224,28 +225,28 @@
             @endif
 
             @if (!$clone)
-               
+
                 <div class="flex justify-center mt-6">
                     <x-wireui.button primary text="Agregar fotografía" icon="add" wire:click="openPhotoUpload"
                         spinner="update" />
                 </div>
-                
-                @forelse($product->images as $photoShow)
-                    <div style="width: 200px" class="relative border rounded-lg overflow-hidden group">
-                        <img src="{{ asset('storage/' . $photoShow->path) }}" alt="{{ $photoShow->filename }}"
-                            class="object-cover h-40 w-full cursor-pointer"
-                            x-on:click="$dispatch('open-photo-preview', { src: '{{ asset('storage/' . $photoShow->path) }}' })">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                    @forelse($product->images as $photoShow)
+                        <div class="relative w-52 border rounded-lg overflow-hidden group">
+                            <img src="{{ asset('storage/' . $photoShow->path) }}" alt="{{ $photoShow->filename }}"
+                                class="object-cover h-40 w-full cursor-pointer"
+                                x-on:click="$dispatch('open-photo-preview', { src: '{{ asset('storage/' . $photoShow->path) }}' })">
 
-                        <x-wireui.button sm icon="trash" red wire:click="removePhoto({{ $photoShow->id }})"
-                            tooltip="Eliminar foto" />
+                            <x-wireui.button sm icon="trash" red wire:click="removePhoto({{ $photoShow->id }})"
+                                tooltip="Eliminar foto" />
+                        </div>
 
-                    </div>
-                @empty
-                    <div class="col-span-4">
-                        <p class="text-center text-gray-400">No hay imágen registradas.</p>
-                    </div>
-                @endforelse
-
+                    @empty
+                        <div class="col-span-4 text-center">
+                            <small class="text-gray-400">No hay imágen registradas.</small>
+                        </div>
+                    @endforelse
+                </div>
             @endif
 
             <div class="grid grid-cols-3 gap-6 border-t pt-6 mt-6">
@@ -277,7 +278,6 @@
 
             <div class="space-y-4">
                 <x-wireui.input type="file" label="Seleccionar imagen" wire:model="photo" accept="image/*" />
-
                 @if ($photo)
                     <div class="text-center"> <img src="{{ $photo->temporaryUrl() }}"
                             class="mx-auto h-40 rounded-lg shadow"> </div>
@@ -286,7 +286,7 @@
 
             <x-slot:footer>
                 <div class="flex justify-end space-x-3">
-                    <x-wireui.button flat text="Cancelar" x-on:click="$wire.openUploadModal = false" />
+                    <x-wireui.button secondary text="Cancelar" x-on:click="$wire.openUploadModal = false" />
                     <x-wireui.button primary text="Guardar" wire:click="savePhoto" />
                 </div>
             </x-slot:footer>

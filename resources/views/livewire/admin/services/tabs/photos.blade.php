@@ -17,7 +17,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         @forelse($service->attachments as $photoShow)
-            <div style="width: 200px" class="relative border rounded-lg overflow-hidden group">
+            <div class="relative w-52 border rounded-lg overflow-hidden group">
                 <img src="{{ asset('storage/' . $photoShow->path) }}" alt="{{ $photoShow->filename }}"
                     class="object-cover h-40 w-full cursor-pointer"
                     x-on:click="$dispatch('open-photo-preview', { src: '{{ asset('storage/' . $photoShow->path) }}' })">
@@ -27,8 +27,8 @@
 
             </div>
         @empty
-            <div class="col-span-4">
-                <p class="text-center text-gray-400">No hay imágenes registradas.</p>
+            <div class="col-span-4 text-center">
+                <small class="text-gray-400">No hay imágenes registradas.</small>
             </div>
             
         @endforelse
@@ -50,7 +50,7 @@
 
             <x-slot:footer>
                 <div class="flex justify-end space-x-3">
-                    <x-wireui.button flat text="Cancelar" x-on:click="$wire.openUploadModal = false" />
+                    <x-wireui.button secondary text="Cancelar" x-on:click="$wire.openUploadModal = false" />
                     <x-wireui.button primary text="Guardar" wire:click="savePhoto" />
                 </div>
             </x-slot:footer>
