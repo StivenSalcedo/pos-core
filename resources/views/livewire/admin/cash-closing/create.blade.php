@@ -47,7 +47,7 @@
 
             <li class="flex justify-between py-1.5">
               <span>
-                Transferencia
+                Transferencia (Bancos)
               </span>
               <span class="text-right">
                 @formatToCop($transfer)
