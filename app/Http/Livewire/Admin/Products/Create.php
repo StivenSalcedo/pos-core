@@ -34,7 +34,7 @@ class Create extends Component
 
     public $barcode, $reference, $category_id = "", $name, $cost, $price, $has_inventory = '1', $stock, $units = 0, $quantity, $terminal_id = "";
 
-    public  $entrepreneur_price=0, $wholesale_price=0, $provider_id = '', $brand_id = '';
+    public  $entrepreneur_price = 0, $wholesale_price = 0, $provider_id = '', $brand_id = '';
 
     public $has_presentations = '1';
 
@@ -127,7 +127,9 @@ class Create extends Component
     public function openCreate()
     {
         $this->resetValidation();
-        $this->is_inventory_enabled = ModuleService::isEnabled('inventario');
+        $this->resetErrorBag();
+        $this->setDefaults();
+       
         $this->openCreate = true;
     }
 
@@ -185,7 +187,7 @@ class Create extends Component
             'tax_rates.*.value' => 'required|integer|min:0|max:999999999',
             'terminal_id' => 'required|exists:terminals,id',
             'provider_id' => 'nullable|exists:providers,id',
-            'brand_id'=> 'nullable|exists:brands,id',
+            'brand_id' => 'nullable|exists:brands,id',
         ];
 
         $attributes = [
@@ -196,7 +198,7 @@ class Create extends Component
             'terminal_id' => 'sede',
             'provider_id' => 'proveedor',
             'brand_id' => 'marca',
-            'category_id'=> 'categoria',
+            'category_id' => 'categoria',
         ];
 
         $messages = [
@@ -241,7 +243,7 @@ class Create extends Component
             Log::error($th->getMessage(), ['product' => $data, 'presentation' => $this->presentations]);
         }
 
-        $this->resetExcept('tax_rates', 'categories','terminals');
+        $this->resetExcept('tax_rates', 'categories', 'terminals');
         $this->tax_rates = collect();
         $this->resetValidation();
         $this->presentations = collect();
@@ -316,5 +318,38 @@ class Create extends Component
             $this->brands = [];
             $this->searchBrand = $brand->name;
         }
+    }
+
+    protected function setDefaults()
+    {
+        $this->barcode = null;
+        $this->reference = null;
+        $this->category_id = '';
+        $this->name = null;
+        $this->cost = null;
+        $this->price = null;
+        $this->entrepreneur_price = 0;
+        $this->wholesale_price = 0;
+
+        $this->has_inventory = '1';
+        $this->has_presentations = '1';
+
+        $this->stock = 0;
+        $this->units = 0;
+        $this->quantity = null;
+
+        $this->terminal_id = '';
+        $this->provider_id = null;
+        $this->brand_id = null;
+
+        $this->presentations = collect();
+        $this->tax_rates = collect();
+
+        $this->selectedProvider = [];
+        $this->selectedBrand = [];
+        $this->searchProvider = '';
+        $this->searchBrand = '';
+
+        $this->is_inventory_enabled = ModuleService::isEnabled('inventario');
     }
 }

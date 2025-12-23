@@ -61,7 +61,7 @@ class Create extends Component
         $this->emitTo('admin.providers.index', 'render');
        
 
-        $this->reset();
+        $this->resetExcept('types');
 
         $this->openCreate = false;
     }
