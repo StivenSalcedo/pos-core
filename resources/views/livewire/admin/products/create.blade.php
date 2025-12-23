@@ -144,32 +144,13 @@
 
                 @if ($is_inventory_enabled)
                     @if (!$has_inventory)
-
                         <div
                             class="grid {{ $has_presentations ? 'lg:grid-cols-1' : 'lg:grid-cols-4' }} md:grid-cols-2 gap-6 mt-6">
 
                             <x-wireui.input onlyNumbers label="Stock" name="stock" wire:model.defer="stock"
                                 placeholder="Cantidad de stock" />
-<!--
-                            @if (!$has_presentations)
-                                <x-wireui.input onlyNumbers label="Unidades" name="units" wire:model.defer="units"
-                                    placeholder="Unidades" />
-
-                                <x-wireui.input onlyNumbers label="Unidades por producto" name="quantity"
-                                    wire:model.defer="product.quantity" placeholder="Cantidad" />
-                                <div class="flex items-end">
-                                    <x-wireui.button class="inline w-full h-10 text-center" icon="add"
-                                        x-on:click="$wire.emitTo('admin.products.presentations', 'openPresentations', '{{ $this->getName() }}')"
-                                        text="Agregar presentación" icon="add" spinner="update" />
-                                </div>
-                            @endif
 
                         </div>
-
-                        <x-buttons.switch class="mt-6" wire:model="has_presentations"
-                            active="Manejar presentaciones" inactive="No Manejar presentaciones" />
--->
-            </div>
                     @endif
                 @endif
 
