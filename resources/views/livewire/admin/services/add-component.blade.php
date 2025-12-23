@@ -4,19 +4,20 @@
             <x-wireui.errors />
 
             <div class="grid sm:grid-cols-2 gap-4">
-                 <div class="relative">
-                <x-wireui.native-select label="Componente" placeholder="Seleccione un componente" :options="$components"
-                    wire:model.defer="form.component_id" optionKeyValue="true" />
- <button class="absolute top-0 right-0" title="Crear nuevo tipo"
+                {{-- Componente --}}
+                <div class="relative">
+                    <x-wireui.native-select class="w-full" label="Componente" placeholder="Seleccione un componente" :options="$components"
+                        wire:model.defer="form.component_id" optionKeyValue="true" />
+                    <button class="absolute top-0 right-0" title="Crear nuevo componente"
                         wire:click='$emitTo("admin.components.create", "openCreate", "{{ $this->getName() }}")'>
                         <i class="ico icon-add text-blue-600 text-sm"></i>
                     </button>
-                 </div>
-
+                </div>
+                {{-- Marca --}}
                 <div class="relative">
-                    <x-wireui.native-select label="Marca" placeholder="Seleccione una marca (opcional)"
+                    <x-wireui.native-select class="w-full" label="Marca" placeholder="Seleccione una marca (opcional)"
                         :options="$brands" wire:model.defer="form.brand_id" optionKeyValue="true" />
-                    <button class="absolute top-0 right-0" title="Crear nuevo tipo"
+                    <button class="absolute top-0 right-0" title="Crear nueva marca"
                         wire:click='$emitTo("admin.brands.create", "openCreate", "{{ $this->getName() }}")'>
                         <i class="ico icon-add text-blue-600 text-sm"></i>
                     </button>
