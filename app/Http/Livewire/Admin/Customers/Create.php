@@ -65,6 +65,11 @@ class Create extends Component
     public function openCreate()
     {
         $this->resetValidation();
+        $this->resetErrorBag();
+        $this->legal_organization = LegalOrganization::NATURAL_PERSON->value;
+        $this->tribute = CustomerTributes::NOT_RESPONSIBLE->value;
+        $this->identification_document_id = IdentificationDocument::CEDULA;
+        $this->dv = null;
         $this->openCreate = true;
     }
 
@@ -75,7 +80,7 @@ class Create extends Component
             'legal_organization' => ['required', Rule::in(LegalOrganization::getCases())],
             'tribute' => ['required', Rule::in(CustomerTributes::getCases())],
             'no_identification' => ['required', 'string', new Identification, 'unique:customers'],
-            'dv' => 'required_if:identification_document_id,6|min:0|max:9',
+            'dv' => 'required_if:identification_document_id,6|min:0|max:1',
             'names' => 'required|string|min:5|max:250',
             'direction' => 'nullable|string|max:250',
             'phone' => ['nullable', 'string', new Phone],
@@ -109,12 +114,10 @@ class Create extends Component
         $customer = Customer::create($data);
         $payload = $customer->only(['id', 'names', 'no_identification', 'phone']);
         //$this->dispatchBrowserEvent('set-customer', $customer->only(['id', 'no_identification', 'names', 'phone']));
-       
+
         $this->emitTo('admin.services.edit',  'set-customer', $payload);
         $this->emit('success', 'Cliente creado con éxito');
         $this->emitTo('admin.customers.index', 'render');
         $this->resetExcept('identificationDocuments', 'tributes', 'legalOrganizations');
     }
-
-   
 }

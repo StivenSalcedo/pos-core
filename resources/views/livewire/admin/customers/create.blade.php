@@ -17,7 +17,7 @@
 
                     <template x-if="identification_document_id === '6'">
                         <div class="w-20">
-                            <x-wireui.input label="DV" x-model="dv" name='dv'
+                            <x-wireui.input maxlength="1" label="DV" x-model="dv" name='dv'
                                 x-on:keypress="onlyNumbers($event)" />
                         </div>
                     </template>
