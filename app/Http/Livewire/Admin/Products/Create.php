@@ -182,7 +182,7 @@ class Create extends Component
             'has_presentations' => 'required|integer|min:0|max:1',
             'quantity' => 'nullable|exclude_if:has_presentations,1|integer|min:1|max:99999999',
             'presentations' => 'nullable|exclude_if:has_presentations,1|array|min:1',
-            'tax_rates' => 'array|min:0',
+            'tax_rates' => 'array|min:1',
             'tax_rates.*.id' => 'required|integer|exists:tax_rates,id',
             'tax_rates.*.value' => 'required|integer|min:0|max:999999999',
             'terminal_id' => 'required|exists:terminals,id',

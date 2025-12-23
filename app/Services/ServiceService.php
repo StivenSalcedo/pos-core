@@ -96,14 +96,14 @@ class ServiceService
                 throw new CustomException("No se encontro el producto $value[name] en la base de datos");
             }
 
-            if (! intval($product['has_presentations'])) {
+           /* if (! intval($product['has_presentations'])) {
                 $presentation = $product->presentations->find($value['presentation']['id']);
                 $units = $presentation->quantity * $value['amount'];
                 $costForUnit = bcdiv($product->cost, $product->quantity, 2);
                 $value['cost'] = bcdiv($costForUnit * $units, '1');
-            } else {
+            } else {*/
                 $value['cost'] = $product->cost * $value['amount'];
-            }
+           // }
 
             $products[$key] = $value;
         }

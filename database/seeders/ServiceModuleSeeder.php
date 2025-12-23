@@ -213,7 +213,7 @@ class ServiceModuleSeeder extends Seeder
         // Obtener los dos primeros componentes
         $firstTwoComponents = DB::table('components')
             ->orderBy('id')
-            ->limit(2)
+            ->limit(3)
             ->pluck('id')
             ->toArray();
 

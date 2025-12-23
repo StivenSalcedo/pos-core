@@ -154,7 +154,7 @@
 
                             <x-wireui.input onlyNumbers label="Stock" name="stock" wire:model.defer="product.stock"
                                 placeholder="Cantidad de stock" />
-
+<!--
                             @if (!$product->has_presentations)
                                 <x-wireui.input onlyNumbers label="Unidades" name="units" wire:model.defer="units"
                                     placeholder="Unidades" />
@@ -168,10 +168,11 @@
                                 </div>
                             @endif
 
-                        </div>
+                        
 
                         <x-buttons.switch class="mt-6" wire:model="product.has_presentations"
-                            active="Manejar presentaciones" inactive="No Manejar presentaciones" />
+                            active="Manejar presentaciones" inactive="No Manejar presentaciones" />-->
+                            </div>
 
                     @endif
                 @endif
