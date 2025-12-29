@@ -87,4 +87,5 @@ php artisan migrate:fresh --seed
 php artisan storage:link
 cp htaccess .htaccess
 chmod 775 -R storage/app/public
+mklink /D "public\storage" "..\storage\app\public"
 ```

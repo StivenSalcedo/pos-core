@@ -35,7 +35,6 @@ class Edit extends Component {
     protected function rules(){
         return [
             'output.reason' => 'required|string|min:5|max:250',
-            'output.from' => ['required', Rule::in(CashRegisters::getCases())],
             'date' => 'required|date',
             'output.price' => 'nullable|integer|max:99999999',
             'output.description' => 'nullable|string|max:250',

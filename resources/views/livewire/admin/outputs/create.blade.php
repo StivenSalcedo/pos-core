@@ -6,7 +6,6 @@
 
             <div class="space-y-6">
                 <x-wireui.input label="Fecha" onkeydown="return false" wire:model.defer="date" type="date"  />
-                <x-wireui.native-select label="De donde quieres sacar el dinero" wire:model.defer="from"  optionKeyValue="true" placeholder="Selecciona una opción" :options="$cashRegisters"  class="w-full" />
                 <x-wireui.input label="Motivo" wire:model.defer="reason" />
                 <x-wireui.input onlyNumbers label="Valor" wire:model.defer="price" />
                 <x-wireui.textarea label="Descripción" wire:model.defer="description" />

@@ -26,7 +26,7 @@ class SendWhatsapp extends Component
     public function openModalWindow($serviceId)
     {
         $this->resetValidation();
-        $this->service = Service::with('customer')->findOrFail($serviceId);
+        $this->service = Service::with('customer','equipmentType', 'brand', 'state')->findOrFail($serviceId);
         $this->phone = '57' . $this->service->customer->phone ?? '';
         $this->openModal = true;
     }

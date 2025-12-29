@@ -45,9 +45,7 @@
                         Fecha
                     </th>
 
-                    <th left>
-                        Fuente
-                    </th>
+                    
 
                     <th left>
                         Responsable
@@ -77,9 +75,7 @@
                             {{ $item->date->format('d-m-Y') }}
                         </td>
 
-                        <td left>
-                            {{ $item->from->getLabel() }}
-                        </td>
+                        
 
                         <td left class="leading-none">
                             {{ $item->user->name }} <br>

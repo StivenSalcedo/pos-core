@@ -1,5 +1,4 @@
 <div class="container">
-  @can('ver totales de venta')
     <x-commons.header>
       <x-wireui.range-date wire:model="filterDate" :options="[
           0 => 'Todos',
@@ -18,7 +17,6 @@
       <x-wireui.button icon="quote" href="{{ route('admin.bills.create') }}" text="Crear factura" />
 
     </x-commons.header>
-  @endcan
   <x-commons.table-responsive>
 
     <x-slot:top title="Facturas">

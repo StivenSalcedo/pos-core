@@ -37,7 +37,6 @@ class Create extends Component {
     public function store(){
         $rules = [
             'reason' => 'required|string|min:5|max:250',
-            'from' => ['required', Rule::in(CashRegisters::getCases())],
             'date' => 'required|date',
             'price' => 'nullable|integer|max:99999999',
             'description' => 'nullable|string|max:250',
