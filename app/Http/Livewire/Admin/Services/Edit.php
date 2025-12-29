@@ -130,7 +130,7 @@ class Edit extends Component
     public function mount(Service $service)
     {
         $this->service = $service;
-         $this->service->loadMissing(['products', 'payments','payments.paymentMethod','electronicBill']);
+         $this->service->loadMissing(['products', 'payments','payments.paymentMethod','electronicBill', 'equipmentType', 'brand', 'state']);
        
         if (!$this->service->id) {
             $today = Carbon::now();

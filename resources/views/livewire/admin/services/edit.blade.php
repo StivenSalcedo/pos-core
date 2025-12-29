@@ -50,7 +50,7 @@
                         </button>
                     </x-slot>
                     <x-slot name="content">
-                        <x-dropdown-link class="flex items-center" :href="route('admin.service-detail.pdf', $service->id)" target="_blank">
+                        <x-dropdown-link class="flex items-center" :href="route('admin.service-detail.pdf', $service)" target="_blank">
                             Imprimir entrada
                         </x-dropdown-link>
                         <x-dropdown-link class="flex items-center cursor-pointer"

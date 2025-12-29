@@ -6,10 +6,10 @@
 
         <table width="100%">
             <tr>
-                <td width="50%">
+                <td width="25%">
                     <img class="h-28" src="{{ getUrlLogo() }}">
                 </td>
-                <td class="text-right" width="50%">
+                <td class="text-right" width="75%">
                     <table class="">
                         <tr>
                             <td class="text-right font-bold">
@@ -95,7 +95,7 @@
                     DETALLE DEL EQUIPO
                 </td>
                 <td class="font-bold" width="50%" align="right">
-                    {{ $service->equipmentType->name }} - {{ $service->brand->name }} - {{ $service->model ?? 'N/A' }}
+                    {{ $service->equipmenttype->name ?? 'Tipo de equipo no definido'}} - {{ $service->brand->name ?? 'Sin Marca' }} - {{ $service->model ?? 'N/A' }}
                 </td>
             </tr>
         </table>

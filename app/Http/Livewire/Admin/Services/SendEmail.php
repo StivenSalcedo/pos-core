@@ -33,7 +33,7 @@ class SendEmail extends Component
     public function openModal($serviceId)
     {
         $this->serviceId = $serviceId;
-        $this->service = Service::with('customer')->findOrFail($serviceId);
+        $this->service = Service::with('customer', 'equipmentType', 'brand', 'state')->findOrFail($serviceId);
 
         $this->emailTo = $this->service->customer?->email ?? '';
         $this->emailMessage = '';
@@ -61,12 +61,12 @@ class SendEmail extends Component
              Mail::send('emails.service-notification', [
                 'service' => $this->service,
                 'messageBody' => $this->emailMessage,
-            ], function ($message) use ($pdfPath) {
+            ], function ($message) use ($pdfUrl) {
                 $message->to($this->emailTo)
                         ->subject('Detalle del servicio #' . $this->service->id);
 
-                if ($this->attachPdf && $pdfPath) {
-                    $message->attach($pdfPath);
+                if ($this->attachPdf && $pdfUrl) {
+                    $message->attach($pdfUrl);
                 }
             });
 
