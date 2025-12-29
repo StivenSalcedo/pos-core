@@ -47,6 +47,7 @@ class SendEmail extends Component
 
         try {
             $pdfPath = null;
+            $pdfUrl = null;
             if ($this->attachPdf) {
                 $pdf = $this->createPDF($this->service, 'S');
                 $filename = $this->service->id . '.pdf';

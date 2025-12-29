@@ -112,7 +112,7 @@ class Index extends Component
             })
             ->sum('total');
 
-        return view('livewire.admin.sales.index', compact('products'));
+        return view('livewire.admin.sales.index', compact('products'))->layoutData(['title' => 'Productos vendidos']);
     }
 
     public function updatedSearch()
