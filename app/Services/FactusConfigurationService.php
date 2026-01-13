@@ -22,12 +22,16 @@ class FactusConfigurationService
 
     public static function isApiEnabled(bool $useCache = false)
     {
-        if ($useCache && Cache::has('is_api_enabled')) {
-            return (bool) Cache::get('is_api_enabled');
+       if (FactusConfiguration::first()->is_api_enabled && AccessToken::exists()) {
+            $apiEnabled = 1;
+        }
+        else
+        {
+            $apiEnabled = 0;
         }
 
-        $apiEnabled = FactusConfiguration::first()->is_api_enabled;
-        $apiEnabled =AccessToken::exists();
+        //$apiEnabled = FactusConfiguration::first()->is_api_enabled;
+        //$apiEnabled =AccessToken::exists();
         if ($useCache) {
         Cache::forever('is_api_enabled', $apiEnabled);
         }

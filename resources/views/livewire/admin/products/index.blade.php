@@ -13,7 +13,7 @@
         </x-slot:top>
 
         <x-slot:header>
-            <x-wireui.search placeholder="Buscar..." />
+            <x-wireui.search placeholder="Buscar..." autofocus/>
             <x-wireui.native-select wire:model.defer="filter" label="Por:" optionKeyValue="true" :options="$filters" />
             <x-wireui.native-select optionKeyValue label="Sede" wire:model="terminal_id" :options="$terminals" placeholder="Todas" width="8" />
             <x-wireui.native-select optionKeyValue label="Estado" wire:model="state_id" :options="$status" placeholder="Todas" width="8" />

@@ -86,7 +86,7 @@ class Connection extends Component
 
         try {
             $factusConfiguration = FactusConfiguration::first();
-            $factusConfiguration->is_api_enabled = ! $factusConfiguration->is_api_enabled;
+            $factusConfiguration->is_api_enabled = !$this->isApiEnabled;
             $factusConfiguration->save();
             Cache::forget('is_api_enabled');
         } catch (\Throwable $th) {

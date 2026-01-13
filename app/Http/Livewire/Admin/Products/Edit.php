@@ -20,6 +20,8 @@ use Livewire\WithFileUploads;
 use App\Models\ProductImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\FactusConfigurationService;
+
 class Edit extends Component
 {
     use LivewireTrait;
@@ -307,6 +309,10 @@ class Edit extends Component
             'provider_id' => 'proveedor',
             'brand_id' => 'marca',
         ];
+
+         if (!FactusConfigurationService::isApiEnabled()) {
+            unset($rules['tax_rates']); // se excluye totalmente
+        }
 
         $messages = [
             'presentations.min' => 'Agrega una o más presentaciones',

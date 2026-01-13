@@ -15,6 +15,7 @@ use Livewire\Component;
 use App\Models\Terminal;
 use App\Models\Provider;
 use App\Models\Brand;
+use App\Services\FactusConfigurationService;
 
 class Create extends Component
 {
@@ -129,7 +130,7 @@ class Create extends Component
         $this->resetValidation();
         $this->resetErrorBag();
         $this->setDefaults();
-       
+
         $this->openCreate = true;
     }
 
@@ -200,6 +201,10 @@ class Create extends Component
             'brand_id' => 'marca',
             'category_id' => 'categoria',
         ];
+
+        if (!FactusConfigurationService::isApiEnabled()) {
+            unset($rules['tax_rates']); // se excluye totalmente
+        }
 
         $messages = [
             'presentations.min' => 'Debes agregar una o mas presentaciones',
