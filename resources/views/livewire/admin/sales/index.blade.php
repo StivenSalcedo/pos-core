@@ -40,6 +40,33 @@
                     @endif
                 </div>
 
+                <table class="table">
+            <thead>
+                <tr>
+                    <th left>
+                        Forma de Pago
+                    </th>
+                    <th left>
+                       Valor
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($reportPayments as $item)
+                    <tr wire:key="payment-{{ $item->payment_method_id }}">
+                        <td left>
+                            {{ $item->name }}
+                        </td>
+                        <td left>
+                           $ {{ $item->total }}
+                        </td>
+                    </tr>
+                @empty
+                    <x-commons.table-empty />
+                @endforelse
+            <tbody>
+        </table>
+
                 <div class="flex items-end space-x-3">
 
                     <x-wireui.input label="Total" :value="formatToCop($total)" readonly class="text-right" />

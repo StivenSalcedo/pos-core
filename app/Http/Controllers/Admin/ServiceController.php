@@ -80,7 +80,7 @@ class ServiceController extends Controller
             'iva'       => $totalTax,
             'total'     => $total,
             'pagado'    => $totalPaid,
-            'saldo'     => $balance,
+            'saldo'     => $balance
         ]), HTMLParserMode::HTML_BODY);
         $pdf->SetTitle('Servicio ' . $service->id);
         return $pdf->Output('Servicio ' . $service->id . '.pdf', $dest);
@@ -138,7 +138,8 @@ class ServiceController extends Controller
             'responsible',
             'equipmentType',
             'brand',
-            'state'
+            'state',
+            'payments.paymentMethod',
         ]);
         $company = CompanyService::companyData();
 
@@ -147,6 +148,7 @@ class ServiceController extends Controller
         $discount = 0;
         $totalTax = 0;
         $totalPaid = 0;
+        $paymentsTotal=0;
 
         foreach ($service->products as $item) {
             $quantity = (float) $item->quantity;
@@ -187,6 +189,10 @@ class ServiceController extends Controller
             $totalTax += $lineTax;
         }
 
+         foreach ($service->payments as $item) {
+             $paymentsTotal += $item->amount;
+         }
+
        
 
         // Total general
@@ -198,7 +204,7 @@ class ServiceController extends Controller
         $service->discount = round($discount, 2);
         $service->total    = round($total, 2);
         $service->iva    = round($totalTax, 2);
-
+        $service->paymentsTotal= round($paymentsTotal,2);
         $data = [
             'is_electronic' => $service->isElectronic,
             'company' => $company,

@@ -14,6 +14,7 @@ use App\Exports\SalesReportExport;
 use App\Exports\PaymentMethodSummaryExport;
 use App\Exports\EmployeeSummaryExport;
 use App\Exports\CashRegisterDailyExport;
+
 class Index extends Component
 {
 
@@ -22,7 +23,10 @@ class Index extends Component
     public $search, $filterDate = '1', $startDate, $endDate, $productsArray, $productsSelected = [], $useBarcode;
 
     public $total = 0;
+    public $ReportPayments = null;
     public $orderUnits = null; // asc | desc | null
+
+
     public function mount()
     {
 
@@ -112,7 +116,34 @@ class Index extends Component
             })
             ->sum('total');
 
-        return view('livewire.admin.sales.index', compact('products'))->layoutData(['title' => 'Productos vendidos']);
+
+        //resumen pagos
+        $reportPayments = Sale::query()
+            ->join('payment_methods', 'payment_methods.id', '=', 'sales.payment_method_id')
+            ->join('products', 'products.id', '=', 'sales.product_id')
+            ->selectRaw('
+            sales.payment_method_id as payment_method_id,
+            payment_methods.name as name,
+            SUM(sales.total) as total
+        ')
+            ->when($from && $to, function ($q) use ($from, $to) {
+                $q->whereBetween('sales.created_at', [$from, $to]);
+            })
+            ->when($this->search, function ($q) {
+                $q->where(function ($q) {
+                    $q->where('products.name', 'LIKE', "%{$this->search}%")
+                        ->orWhere('products.reference', 'LIKE', "%{$this->search}%");
+                });
+            })
+            ->when($this->productsSelected, function ($q) {
+                $q->whereIn('sales.product_id', $this->normalizeProductIds());
+            })
+            ->groupBy(
+                'sales.payment_method_id',
+                'payment_methods.name'
+            )->get();
+
+        return view('livewire.admin.sales.index', compact('products', 'reportPayments'))->layoutData(['title' => 'Productos vendidos']);
     }
 
     public function updatedSearch()
@@ -218,14 +249,11 @@ class Index extends Component
     {
         [$from, $to] = $this->resolveDates();
         $filename = 'reporte_productos';
-         if($from && $to)
-         {
-            $filename.='_' . $from . '_a_' . $to . '.xlsx';
-         }
-         else
-         {
-            $filename.= '.xlsx';
-         }
+        if ($from && $to) {
+            $filename .= '_' . $from . '_a_' . $to . '.xlsx';
+        } else {
+            $filename .= '.xlsx';
+        }
         return Excel::download(
             new SalesReportExport(
                 $this->search,
@@ -242,17 +270,14 @@ class Index extends Component
 
     public function exportExcelPaymentMethodSummary()
     {
-         [$from, $to] = $this->resolveDates();
-         $filename = 'resumen_metodos_pago';
-         if($from && $to)
-         {
-            $filename.='_' . $from . '_a_' . $to . '.xlsx';
-         }
-         else
-         {
-            $filename.= '.xlsx';
-         }
-       
+        [$from, $to] = $this->resolveDates();
+        $filename = 'resumen_metodos_pago';
+        if ($from && $to) {
+            $filename .= '_' . $from . '_a_' . $to . '.xlsx';
+        } else {
+            $filename .= '.xlsx';
+        }
+
         return Excel::download(
             new PaymentMethodSummaryExport(
                 $from,
@@ -264,17 +289,14 @@ class Index extends Component
 
     public function exportExcelEmployeeSummarySummary()
     {
-         [$from, $to] = $this->resolveDates();
-         $filename = 'resumen_empleado';
-         if($from && $to)
-         {
-            $filename.='_' . $from . '_a_' . $to . '.xlsx';
-         }
-         else
-         {
-            $filename.= '.xlsx';
-         }
-       
+        [$from, $to] = $this->resolveDates();
+        $filename = 'resumen_empleado';
+        if ($from && $to) {
+            $filename .= '_' . $from . '_a_' . $to . '.xlsx';
+        } else {
+            $filename .= '.xlsx';
+        }
+
         return Excel::download(
             new EmployeeSummaryExport(
                 $from,
@@ -286,17 +308,14 @@ class Index extends Component
 
     public function exportExcelCashRegisterDailySummary()
     {
-         [$from, $to] = $this->resolveDates();
-         $filename = 'arqueo_caja';
-         if($from && $to)
-         {
-            $filename.='_' . $from . '_a_' . $to . '.xlsx';
-         }
-         else
-         {
-            $filename.= '.xlsx';
-         }
-       
+        [$from, $to] = $this->resolveDates();
+        $filename = 'arqueo_caja';
+        if ($from && $to) {
+            $filename .= '_' . $from . '_a_' . $to . '.xlsx';
+        } else {
+            $filename .= '.xlsx';
+        }
+
         return Excel::download(
             new CashRegisterDailyExport(
                 $from,

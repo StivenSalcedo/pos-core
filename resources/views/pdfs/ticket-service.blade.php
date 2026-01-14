@@ -126,6 +126,49 @@
 
             <h1 class="border-b-2 border-dotted my-3 border-slate-400"></h1>
 
+            {{-- Abonos --}}
+            <template x-if="!isElectronic && service.payments.length>0">
+                <div class="uppercase font-bold mb-3">Abonos</div>
+            </template>
+            <template x-if="!isElectronic && service.payments.length>0">
+                <table class="w-full leading-3">
+                    <thead>
+                        <tr>
+                            <th width="40%" class="text-left font-medium">
+                                Fecha
+                            </th>
+                            <th width="40%" class="text-center font-medium">
+                                Forma de Pago
+                            </th>
+
+                            <th width="20%" class="text-right font-medium">
+                                Valor
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="item in service.payments">
+                            <tr>
+                                <td class="text-left">
+                                    <span x-text="formatDate(item.created_at, 'DD/MM/YYYY HH:mm')"></span>
+                                </td>
+
+                                <td class="text-center">
+                                    <span x-text="strLimit(item.payment_method.name,30)"></span>
+                                </td>
+
+                                <td class="text-right">
+                                    <span x-text="formatToCop(item.amount)"></span>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+            <template x-if="!isElectronic && service.payments.length>0">
+                <h1 class="border-b-2 border-dotted my-3 border-slate-400"></h1>
+            </template>
+
             {{-- Totales --}}
             <ul class="flex flex-col items-end leading-4">
                 <li class="">
@@ -137,13 +180,29 @@
                     <span>Descuento:</span>
                     <span class="font-medium w-24" x-text="formatToCop(service.discount)"></span>
                 </li>
-                <li x-if="service.iva>0" class="">
-                    <span>IVA:</span>
-                    <span class="font-medium w-24" x-text="formatToCop(service.iva)"></span>
-                </li>
+
+                <template x-if="service.iva>0">
+                    <li class="">
+                        <span>IVA:</span>
+                        <span class="font-medium w-24" x-text="formatToCop(service.iva)"></span>
+                    </li>
+                </template>
+                <template x-if="!isElectronic">
+                    <li class="">
+                        <span>Abonos:</span>
+                        <span class="font-medium w-24" x-text="formatToCop(service.paymentsTotal)"></span>
+                    </li>
+                </template>
                 <li class="">
                     <span class="uppercase font-bold">Total a pagar:</span>
-                    <span class="font-medium w-24" x-text="formatToCop(service.total)"></span>
+                    <template x-if="!isElectronic">
+                        <span class="font-medium w-24" x-text="formatToCop(service.total-service.paymentsTotal)"></span>
+                    </template>
+                    <template x-if="isElectronic">
+                        <span class="font-medium w-24" x-text="formatToCop(service.total)"></span>
+                    </template>
+
+
                 </li>
 
             </ul>

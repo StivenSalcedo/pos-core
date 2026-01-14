@@ -149,6 +149,7 @@ class Edit extends Component
 
         $this->brands = Brand::pluck('name', 'id');
        $this->service->load(['details.component', 'details.brand']);
+        $this->service->payments = $this->service->payments()->with('paymentMethod', 'user')->get();
 
         if ($service->customer) {
             $this->selectedCustomer = [

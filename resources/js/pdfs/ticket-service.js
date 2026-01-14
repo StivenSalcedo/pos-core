@@ -65,5 +65,21 @@ export default () => ({
     const width = this.$store.config.widthTicket
 
     style.innerHTML = `@page { size: ${width}mm ${height}mm; margin: 0cm;}`
-  }
+  },
+  formatDate(date, format = 'DD/MM/YYYY') {
+        const d = new Date(date);
+        const pad = n => String(n).padStart(2, '0');
+        const map = {
+            YYYY: d.getFullYear(),
+            MM: pad(d.getMonth() + 1),
+            DD: pad(d.getDate()),
+            HH: pad(d.getHours()),
+            mm: pad(d.getMinutes()),
+            ss: pad(d.getSeconds()),
+            MMM: d.toLocaleString('es-ES', { month: 'short' }),
+            MMMM: d.toLocaleString('es-ES', { month: 'long' }),
+        };
+
+        return format.replace(/YYYY|MM|DD|HH|mm|ss|MMM|MMMM/g, matched => map[matched]);
+      }
 })
