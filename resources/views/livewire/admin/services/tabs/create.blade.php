@@ -12,6 +12,53 @@
         </div>
 
         <x-wireui.errors class="mb-6" />
+        {{-- 🔹 Cliente (buscador) --}}
+        <div class="mt-6">
+            <div class="flex justify-between">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                {{-- Botón para crear nuevo cliente --}}
+                <button title="Crear nuevo cliente"
+                    x-on:click="setTimeout(() => {Livewire.emitTo('admin.customers.create', 'openCreate');}, 300);">
+                    <i class="ico icon-add-user text-blue-600 text-xl"></i>
+                </button>
+            </div>
+            <x-wireui.input class="w-full" wire:model.debounce.500ms="searchCustomer"
+                placeholder="Buscar cliente por nombre o documento..." />
+
+            {{-- Resultados búsqueda --}}
+            @if ($customers && count($customers) > 0)
+                <div class="border mt-2 rounded-md shadow bg-white max-h-40 overflow-y-auto">
+                    @foreach ($customers as $customer)
+                        <div wire:click="selectCustomer({{ $customer->id }})"
+                            class="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm">
+                            {{ $customer->names }}
+                            <span class="text-gray-500 text-xs">({{ $customer->no_identification }})</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- Cliente seleccionado --}}
+            @if ($selectedCustomer)
+                <div
+                    class="bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 flex items-center justify-between my-4">
+                    <div>
+                        <strong>{{ $selectedCustomer['names'] ?? '' }}</strong>
+                        <span class="text-gray-500 text-xs">
+                            {{ $selectedCustomer['no_identification'] ?? '' }} | {{$selectedCustomer['direction'] ?? ''}} | {{$selectedCustomer['phone'] ?? ''}} | {{$selectedCustomer['email'] ?? ''}}
+                        </span>
+                    </div>
+                    <x-buttons.delete wire:click="clearCustomer" title="Eliminar" />
+                    <x-buttons.edit wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $selectedCustomer['id'] }})" title="Editar"/>
+
+                    {{-- <x-wireui.button flat sm icon="trash"  class="ml-2" /> --}}
+
+                </div>
+            @endif
+            @error('service.customer_id')
+                <span class="text-red-500 text-xs">{{ $message }}</span>
+            @enderror
+        </div>
         <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {{-- Fecha de ingreso --}}
             <x-wireui.input class="w-full" label="Fecha de ingreso" wire:model.defer="service.date_entry" type="date"
@@ -49,55 +96,11 @@
 
         </div>
 
-        {{-- 🔹 Cliente (buscador) --}}
-        <div class="mt-6">
-            <div class="flex justify-between">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
-                {{-- Botón para crear nuevo cliente --}}
-                <button title="Crear nuevo cliente"
-                    x-on:click="setTimeout(() => {Livewire.emitTo('admin.customers.create', 'openCreate');}, 300);">
-                    <i class="ico icon-add-user text-blue-600 text-xl"></i>
-                </button>
-            </div>
-            <x-wireui.input class="w-full" wire:model.debounce.500ms="searchCustomer"
-                placeholder="Buscar cliente por nombre o documento..." />
-
-            {{-- Resultados búsqueda --}}
-            @if ($customers && count($customers) > 0)
-                <div class="border mt-2 rounded-md shadow bg-white max-h-40 overflow-y-auto">
-                    @foreach ($customers as $customer)
-                        <div wire:click="selectCustomer({{ $customer->id }})"
-                            class="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm">
-                            {{ $customer->names }}
-                            <span class="text-gray-500 text-xs">({{ $customer->no_identification }})</span>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-
-            {{-- Cliente seleccionado --}}
-            @if ($selectedCustomer)
-                <div
-                    class="bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 flex items-center justify-between my-4">
-                    <div>
-                        <strong>{{ $selectedCustomer['names'] ?? '' }}</strong>
-                        <span class="text-gray-500 text-xs">
-                            ({{ $selectedCustomer['no_identification'] ?? '' }})
-                        </span>
-                    </div>
-                    <x-buttons.delete wire:click="clearCustomer" title="Eliminar" />
-
-                    {{-- <x-wireui.button flat sm icon="trash"  class="ml-2" /> --}}
-
-                </div>
-            @endif
-            @error('service.customer_id')
-                <span class="text-red-500 text-xs">{{ $message }}</span>
-            @enderror
-        </div>
+        
     </div>
     <livewire:admin.customers.create />
     <livewire:admin.equipment-types.create />
+    <livewire:admin.customers.edit>
   
 </div>
 @push('js')

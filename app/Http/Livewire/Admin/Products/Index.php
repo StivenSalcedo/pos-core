@@ -46,7 +46,7 @@ class Index extends Component
 
     public $category_id='';
 
-
+    public $orderStock = null; // asc | desc | null
 
     public function mount()
     {
@@ -91,11 +91,25 @@ class Index extends Component
                 fn($q) =>
                 $q->where('status', '1')
             )
-            ->filterBarcode($filter, $this->search);
+            ->filterBarcode($filter, $this->search)
+            ->when($this->orderStock, function ($q) {
+                $q->orderBy('stock', $this->orderStock);
+            });
     }
 
     public function updatedSearch()
     {
+        $this->resetPage();
+    }
+
+     public function toggleOrderStock()
+    {
+        $this->orderStock = match ($this->orderStock) {
+            'asc'  => 'desc',
+            'desc' => null,
+            default => 'asc',
+        };
+
         $this->resetPage();
     }
 

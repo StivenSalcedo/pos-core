@@ -44,8 +44,13 @@
                     <th left>
                         Precio
                     </th>
-                    <th>
+                    <th class="cursor-pointer select-none" wire:click="toggleOrderStock">
                         Stock
+                         @if ($orderStock === 'asc')
+                            ↑
+                        @elseif ($orderStock === 'desc')
+                            ↓
+                        @endif
                     </th>
                     <th>
                         Estado

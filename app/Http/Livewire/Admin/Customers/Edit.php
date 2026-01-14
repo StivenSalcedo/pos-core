@@ -100,11 +100,13 @@ class Edit extends Component
 
         $this->validate($rules, $this->messages());
         $this->customer->save();
+        $this->emitTo('admin.services.edit', 'set-customer',$this->customer);
         $this->customer = new Customer();
 
         $this->openEdit = false;
 
         $this->emitTo('admin.customers.index', 'render');
+      
         $this->emit('success', 'Cliente actualizado con éxito');
     }
 }

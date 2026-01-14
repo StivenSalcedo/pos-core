@@ -110,9 +110,10 @@ class AddComponent extends Component
 
     public function refreshComponents($newComponentId = null)
     {
+        // $this->components =null;
         $this->components = ComponentModel::orderBy('id', 'desc')->pluck('name', 'id')->toArray();
         // Si se envió un ID válido, seleccionarlo automáticamente
-        if ($newComponentId && isset($this->components[$newComponentId])) {
+       if ($newComponentId && isset($this->components[$newComponentId])) {
            $this->form['component_id'] = $newComponentId;
         }
     }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Livewire\Admin\Components;
+
 use App\Models\Component as HardwareComponent;
 use Livewire\Component;
 use App\Traits\LivewireTrait;
@@ -8,7 +9,7 @@ use Livewire\WithPagination;
 
 class Create extends Component
 {
-     use WithPagination;
+    use WithPagination;
     use LivewireTrait;
 
     public $openCreate = false;
@@ -26,9 +27,9 @@ class Create extends Component
 
     public function render()
     {
-         $components = HardwareComponent::latest()->paginate(10);
-     
-        return view('livewire.admin.components.create',compact('components'));
+        $components = HardwareComponent::latest()->paginate(10);
+
+        return view('livewire.admin.components.create', compact('components'));
     }
     public function store()
     {
@@ -44,7 +45,7 @@ class Create extends Component
         $this->emitTo('admin.services.edit', 'refreshComponents', $component->id);
         $this->emitTo('admin.services.add-component', 'refreshComponents', $component->id);
         $this->emit('success', 'El componente fue registrado correctamente');
-      
+
 
         $this->resetForm();
         $this->openCreate = false;
@@ -61,18 +62,18 @@ class Create extends Component
     {
 
         $rules = [
-            'name' => 'required|string|max:250|unique:brands,name,' . $this->brand_id,
+            'name' => 'required|string|max:250|unique:brands,name,' . $this->component_id,
         ];
 
         $this->validate($rules);
 
-        $brand_type = HardwareComponent::find($this->brand_id);
+        $brand_type = HardwareComponent::find($this->component_id);
         $brand_type->name = $this->name;
         $brand_type->save();
 
         $this->emit('success', 'Marca actualizada con éxito');
-
-        $this->emitTo('admin.services.edit', 'refreshBrands', $brand_type->id);
+        $this->emitTo('admin.services.add-component', 'refreshComponents', $brand_type->id);
+        $this->emitTo('admin.services.edit', 'refreshComponents', $brand_type->id);
 
         $this->resetForm();
     }
@@ -87,5 +88,4 @@ class Create extends Component
     {
         $this->resetForm();
     }
-    
 }

@@ -155,6 +155,10 @@ class Edit extends Component
                 'id' => $service->customer->id,
                 'names' => $service->customer->names,
                 'no_identification' => $service->customer->no_identification,
+                'direction'=> $service->customer->direction,
+                'phone'=> $service->customer->phone,
+                'email'=> $service->customer->email,
+
             ];
         }
 
@@ -441,7 +445,7 @@ class Edit extends Component
     {
         $customer = Customer::find($id);
         if ($customer) {
-            $this->selectedCustomer = $customer->only(['id', 'names', 'no_identification']);
+            $this->selectedCustomer = $customer->only(['id', 'names', 'no_identification','direction','phone','email']);
             $this->service->customer_id = $customer->id;
             $this->customers = [];
             $this->searchCustomer = $customer->names;
