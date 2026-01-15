@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Service extends Model
 {
@@ -11,17 +13,17 @@ class Service extends Model
     protected $guarded = ['id'];
 
 
-     protected function isElectronic(): Attribute
+    protected function isElectronic(): Attribute
     {
         return new Attribute(
-            get: fn () => $this->electronicBill ? true : false
+            get: fn() => $this->electronicBill ? true : false
         );
     }
 
     protected function isValidated(): Attribute
     {
         return new Attribute(
-            get: fn () => $this->electronicBill && $this->electronicBill->is_validated
+            get: fn() => $this->electronicBill && $this->electronicBill->is_validated
         );
     }
 
@@ -75,9 +77,40 @@ class Service extends Model
         return $this->hasOne(ElectronicService::class);
     }
 
-   
+    public function terminal()
+    {
+        return $this->belongsTo(Terminal::class);
+    }
+
+
 
     protected $casts = [
         'date_entry' => 'datetime:Y-m-d',
     ];
+
+    public function scopeFilterByTerminalPermission(
+        Builder $query,
+        $user,
+        $terminalId = null
+    ) {
+        // ❌ Usuario SIN permiso → solo su sede actual
+        if (! $user->can('ver todas las sedes')) {
+            $currentTerminalId = optional($user->terminals->first())->id;
+
+            if ($currentTerminalId) {
+                $query->where('terminal_id', $currentTerminalId);
+            }
+
+            return $query;
+        }
+
+        // ✅ Usuario CON permiso
+        // 👉 si selecciona una sede, filtra
+        // 👉 si selecciona "todas", NO filtra
+        if (! empty($terminalId)) {
+            $query->where('terminal_id', $terminalId);
+        }
+
+        return $query;
+    }
 }

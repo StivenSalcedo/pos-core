@@ -68,16 +68,32 @@ class Index extends Component
 
     protected function getQuery()
     {
-        $filter = [1 => 'id',  2 => 'names', 3 => 'name'][$this->filter];
+        $filter = [1 => 'id', 2 => 'names', 3 => 'name'][$this->filter];
 
-        $this->query = Bill::query()
-            ->with('electronicBill', 'user', 'terminal', 'customer', 'paymentMethod', 'finance', 'electronicCreditNote')
+        $user = auth()->user();
+
+        $query = Bill::query()
+            ->with(
+                'electronicBill',
+                'user',
+                'terminal',
+                'customer',
+                'paymentMethod',
+                'finance',
+                'electronicCreditNote'
+            )
             ->search($filter, $this->search)
             ->status($this->status)
-            ->terminal($this->terminal_id)
             ->date($this->filterDate, $this->startDate, $this->endDate);
 
-            
+        // 🔐 VALIDACIÓN DE PERMISO
+        if (!$user->can('ver todas las sedes')) {
+            $query->terminal($user->terminals->first()->id);
+        } else {
+            $query->terminal($this->terminal_id);
+        }
+
+        $this->query = $query;
     }
 
     public function cancelBill(Bill $bill)

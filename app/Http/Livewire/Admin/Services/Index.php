@@ -12,6 +12,7 @@ use App\Exceptions\CustomException;
 use Illuminate\Validation\ValidationException;
 use App\Services\FactusConfigurationService;
 use Illuminate\Support\Facades\Log;
+use App\Models\Terminal;
 
 class Index extends Component
 {
@@ -24,6 +25,8 @@ class Index extends Component
     public $serviceIdToDelete = null;
     public $servicesGrouped = null;
     protected $paginationTheme = 'tailwind';
+    public $terminals;
+    public $terminal_id = '';
 
     protected $listeners = [
         'confirmDelete',
@@ -66,16 +69,28 @@ class Index extends Component
         }
     }
 
+    public function mount()
+    {
+
+        $this->terminals = Terminal::all()->pluck('name', 'id');
+       
+    }
+
     public function render()
     {
+
+        $user = auth()->user();
         $query = Service::query()
             ->with(['customer', 'equipmentType', 'brand', 'state'])
             ->when(
                 $this->search,
                 fn($q) =>
                 $q->where('model', 'like', "%{$this->search}%")
-                    ->orWhereHas('customer', fn($c) =>
-                    $c->where('names', 'like', "%{$this->search}%"))
+                    ->orWhereHas(
+                        'customer',
+                        fn($c) =>
+                        $c->where('names', 'like', "%{$this->search}%")
+                    )
             )
             ->when($this->selectedState !== null && $this->selectedState !== '', function ($q) {
                 if ($this->selectedState === 'recibido') {
@@ -84,28 +99,37 @@ class Index extends Component
                     $q->where('state_id', $this->selectedState);
                 }
             })
+            // 🔐 VALIDACIÓN DE PERMISO (LISTADO)
+            ->filterByTerminalPermission(auth()->user(), $this->terminal_id)
             ->latest();
 
-            $queryForTotals = Service::query()
-        ->with(['state'])
-        ->when(
-            $this->search,
-            fn($q) =>
-            $q->where('model', 'like', "%{$this->search}%")
-                ->orWhereHas('customer', fn($c) =>
-                $c->where('names', 'like', "%{$this->search}%"))
-        );
+        // 🔹 MISMA LÓGICA PARA TOTALES
+        $queryForTotals = Service::query()
+            ->with(['state'])
+            ->when(
+                $this->search,
+                fn($q) =>
+                $q->where('model', 'like', "%{$this->search}%")
+                    ->orWhereHas(
+                        'customer',
+                        fn($c) =>
+                        $c->where('names', 'like', "%{$this->search}%")
+                    )
+            )
+            ->filterByTerminalPermission(auth()->user(), $this->terminal_id);
 
         $services = $queryForTotals->get()->groupBy('state_id');
-        $this->servicesGrouped = $services->map(function ($group) {
-            return $group->map(fn($item) => $item);
-        });
 
+        $this->servicesGrouped = $services->map(
+            fn($group) =>
+            $group->map(fn($item) => $item)
+        );
 
         return view('livewire.admin.services.index', [
             'services' => $query->paginate($this->perPage),
         ])->layoutData(['title' => 'Servicios Tec.']);
     }
+
 
     public function updateData($id)
     {
@@ -147,4 +171,6 @@ class Index extends Component
         $this->dispatchBrowserEvent('print-ticket', $service->id);
         $this->render();
     }
+
+    
 }
