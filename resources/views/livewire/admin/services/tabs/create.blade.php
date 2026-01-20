@@ -40,16 +40,39 @@
 
             {{-- Cliente seleccionado --}}
             @if ($selectedCustomer)
-                <div
-                    class="bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 flex items-center justify-between my-4">
+                <div class="flex justify-between mt-4">
+                    <label
+                        class="block text-sm font-medium text-gray-700 mb-1"><strong>{{ $selectedCustomer['names'] ?? '' }}</strong></label>
+                    {{-- Botón para crear nuevo cliente --}}
                     <div>
-                        <strong>{{ $selectedCustomer['names'] ?? '' }}</strong>
-                        <span class="text-gray-500 text-xs">
-                            {{ $selectedCustomer['no_identification'] ?? '' }} | {{$selectedCustomer['direction'] ?? ''}} | {{$selectedCustomer['phone'] ?? ''}} | {{$selectedCustomer['email'] ?? ''}}
-                        </span>
+                        <x-buttons.delete class="mr-2" wire:click="clearCustomer" title="Eliminar" />
+                        <x-buttons.edit
+                            wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $selectedCustomer['id'] }})"
+                            title="Editar" />
                     </div>
-                    <x-buttons.delete wire:click="clearCustomer" title="Eliminar" />
-                    <x-buttons.edit wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $selectedCustomer['id'] }})" title="Editar"/>
+
+                </div>
+                <div
+                    class="flex flex-col sm:flex-row justify-between bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 mb-4">
+                    {{-- <div>
+                        <strong>{{ $selectedCustomer['names'] ?? '' }}</strong>
+                    </div> --}}
+                    <div class="text-gray-500 text-xs">
+                        NIT o CC: {{ $selectedCustomer['no_identification'] ?? '' }}
+                    </div>
+                    <div class="text-gray-500 text-xs">
+                        Teléfono: {{ $selectedCustomer['phone'] ?? '' }}
+                    </div>
+                    <div class="text-gray-500 text-xs">
+                        Dirección: {{ $selectedCustomer['direction'] ?? '' }}
+                    </div>
+                    <div class="text-gray-500 text-xs">
+                        Email: {{ $selectedCustomer['email'] ?? '' }}
+                    </div>
+                    {{-- <x-buttons.delete wire:click="clearCustomer" title="Eliminar" />
+                    <x-buttons.edit
+                        wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $selectedCustomer['id'] }})"
+                        title="Editar" /> --}}
 
                     {{-- <x-wireui.button flat sm icon="trash"  class="ml-2" /> --}}
 
@@ -59,7 +82,7 @@
                 <span class="text-red-500 text-xs">{{ $message }}</span>
             @enderror
         </div>
-        <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {{-- Fecha de ingreso --}}
             <x-wireui.input class="w-full" label="Fecha de ingreso" wire:model.defer="service.date_entry" type="date"
                 disabled />
@@ -89,19 +112,19 @@
                     <i class="ico icon-add text-blue-600 text-sm"></i>
                 </button>
             </div>
-           
+
             <x-wireui.native-select class="w-full" label="Estado" :options="$states" wire:model.defer="service.state_id"
                 optionKeyValue="true" />
 
 
         </div>
 
-        
+
     </div>
     <livewire:admin.customers.create />
     <livewire:admin.equipment-types.create />
     <livewire:admin.customers.edit>
-  
+
 </div>
 @push('js')
     <script>
