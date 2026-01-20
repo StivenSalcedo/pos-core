@@ -121,7 +121,7 @@ class Create extends Component
 
         $this->resetExcept('ranges');
 
-        $this->emit('success', 'Terminal creado con éxito');
+        $this->emit('success', 'Sede creada con éxito');
         $this->emitTo('admin.terminals.index', 'render');
         $this->emitTo('admin.menu', 'render');
 

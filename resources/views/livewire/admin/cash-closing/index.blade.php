@@ -180,7 +180,7 @@
 
         <x-wireui.card title="Sedes">
           <div x-on:open-modal.window="show=true">
-            <p class="font-semibold">Selecciona la terminal</p>
+            <p class="font-semibold">Selecciona la sede</p>
             <ul class="mt-2 divide-y-2 rounded border shadow">
               @foreach ($terminals as $item)
                 <li wire:key='terminal-{{ $item }}'

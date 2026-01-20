@@ -14,7 +14,7 @@
         <x-wireui.input label="Contacto" wire:model.defer="phone" />
         <x-wireui.input label="Email" wire:model.defer="email" />
             <div x-data="mainTerminalsCreate()" class="mt-6">
-                <x-wireui.label label="Selecciona los usuarios que usaran esta terminal" />
+                <x-wireui.label label="Selecciona los usuarios que usaran esta sede" />
                 <ul class="mt-3 pl-4">
                     <template x-for="(item, index) in users ">
                         <ul x-on:click="selected(index)" class="hover:font-semibold cursor-pointer">

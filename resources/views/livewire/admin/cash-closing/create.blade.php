@@ -6,7 +6,7 @@
       <x-wireui.errors />
 
       <div class="flex items-end justify-end">
-        <span class="mr-1 font-semibold">Terminal: </span>
+        <span class="mr-1 font-semibold">Sede: </span>
         <span class="text-sm font-semibold">{{ $terminal->name }}</span>
       </div>
 

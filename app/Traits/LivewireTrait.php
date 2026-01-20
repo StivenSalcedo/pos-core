@@ -135,11 +135,11 @@ trait LivewireTrait {
     }
 
     /**
-     * Valida si el usuario tiene asignada una terminal, si no cuenta con una terminal emite una alerta
+     * Valida si el usuario tiene asignada una sede, si no cuenta con una sede emite una alerta
      */
     protected function validateTerminal(){
         if (!hasTerminal()) {
-            $this->emit('error', 'El usuario no tiene una terminal asignada');
+            $this->emit('error', 'El usuario no tiene una sede asignada');
             throw ValidationException::withMessages([]);
         }
     }
