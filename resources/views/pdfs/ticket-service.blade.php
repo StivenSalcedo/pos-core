@@ -127,10 +127,10 @@
             <h1 class="border-b-2 border-dotted my-3 border-slate-400"></h1>
 
             {{-- Abonos --}}
-            <template x-if="!isElectronic && service.payments.length>0">
+            <template x-if="!isElectronic && service?.payments?.length>0">
                 <div class="uppercase font-bold mb-3">Abonos</div>
             </template>
-            <template x-if="!isElectronic && service.payments.length>0">
+            <template x-if="!isElectronic && service?.payments?.length>0">
                 <table class="w-full leading-3">
                     <thead>
                         <tr>
@@ -165,7 +165,7 @@
                     </tbody>
                 </table>
             </template>
-            <template x-if="!isElectronic && service.payments.length>0">
+            <template x-if="!isElectronic && service?.payments?.length>0">
                 <h1 class="border-b-2 border-dotted my-3 border-slate-400"></h1>
             </template>
 

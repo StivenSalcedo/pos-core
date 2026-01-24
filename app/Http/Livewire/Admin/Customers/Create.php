@@ -73,6 +73,14 @@ class Create extends Component
         $this->openCreate = true;
     }
 
+    /*public function updatedNoIdentification()
+    {
+        if ($this->identification_document_id == '6') {
+            $this->dv = calculateCheckDigit($this->no_identification);
+        }
+    }*/
+
+
     public function store()
     {
         $rules = [

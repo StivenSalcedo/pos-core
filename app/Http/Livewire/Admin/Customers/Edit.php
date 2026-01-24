@@ -77,6 +77,7 @@ class Edit extends Component
     {
         $this->customer = $customer;
         $this->resetValidation();
+         $this->resetErrorBag();
         $this->openEdit = true;
     }
 

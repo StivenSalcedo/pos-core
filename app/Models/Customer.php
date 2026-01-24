@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Traits\Auditable;
+use App\Models\Audit;
 
 class Customer extends Model
 {
     use HasFactory;
-
+    use Auditable;
     protected $guarded = ['id'];
 
     protected $attributes = [
@@ -63,6 +65,22 @@ class Customer extends Model
     public function scopeDefault($query)
     {
         return $query->select(['id', 'no_identification', 'names', 'phone'])->find(1);
+    }
+
+     public function getAuditParentId()
+    {
+        return $this->id;
+    }
+
+    public function getAuditParentType()
+    {
+        return self::class;
+    }
+
+    public function audits()
+    {
+        return $this->morphMany(Audit::class, 'parent')
+            ->orderByDesc('created_at');
     }
 
 }

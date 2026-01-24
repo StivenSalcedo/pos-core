@@ -68,14 +68,16 @@
                         !$service->isValidated &&
                         count($service->products) > 0 &&
                         count($service->payments) > 0)
-                    <button wire:click='validateElectronicBill({{ $service->id }})' class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-red-500 hover:bg-red-600 hover:ring-red-500 disabled:opacity-60">
-                        <x-icons.factus class="h-6 w-6 text-white-500" title="Pendiente por validar" /> <span class="ml-2">Factura electrónica</span>
+                    <button wire:click='validateElectronicBill({{ $service->id }})'
+                        class="inline-flex items-center border border-transparent leading-6 font-medium rounded-md text-white transition ease-in-out duration-150 text-xs sm:text-sm px-4 py-1 sm:py-1.5 bg-red-500 hover:bg-red-600 hover:ring-red-500 disabled:opacity-60">
+                        <x-icons.factus class="h-6 w-6 text-white-500" title="Pendiente por validar" /> <span
+                            class="ml-2">Factura electrónica</span>
                     </button>
                 @endif
             @endif
         </x-commons.header>
         <x-loads.panel-fixed text="Validando factura..." class="no-print z-[999]" wire:loading
-        wire:target='validateElectronicBill' />
+            wire:target='validateElectronicBill' />
     </div>
     <x-wireui.card title="{{ $service->id ? 'Editar servicio: ' : 'Crear Servicio ' }} {{ $service->id }}" separator>
 
@@ -134,6 +136,12 @@
         {{ $tab === 'histories' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
                     Historial cliente
                 </button>
+                <button wire:click="{{ $service->id ? '$set(\'tab\', \'audits\')' : '' }}"
+                    @if (!$service->id) disabled @endif
+                    class="hidden xl:block px-3 py-2 font-medium text-sm 
+        {{ $tab === 'audits' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
+                    Auditorias
+                </button>
 
                 {{-- dropdown menu services --}}
                 <div class="block xl:hidden">
@@ -149,6 +157,9 @@
                             </button>
                         </x-slot>
                         <x-slot name="content">
+                            <x-dropdown-link wire:click="{{ $service->id ? '$set(\'tab\', \'audits\')' : '' }}">
+                                Auditorias
+                            </x-dropdown-link>
                             <x-dropdown-link wire:click="goToHistoriesTab">
                                 Historial cliente
                             </x-dropdown-link>
@@ -199,6 +210,8 @@
                 @include('livewire.admin.services.tabs.notifications')
             @elseif ($tab === 'histories')
                 @include('livewire.admin.services.tabs.histories')
+            @elseif ($tab === 'audits')
+                @include('livewire.admin.services.tabs.audits')
             @endif
         </div>
         @include('pdfs.ticket-service')
@@ -234,6 +247,70 @@
         </div>
     @endif
 </div>
+<!-- Modal de cámara -->
+<div x-data="cameraHandler()" x-on:openCameraCapture.window="openCamera()" x-on:closeCamera.window="stopCamera()">
+    <x-wireui.modal wire:model.defer="cameraPhoto" name="cameraModal" max-width="2xl">
+        <x-wireui.card title="Capturar foto con cámara">
+
+            <div class="flex justify-center">
+                <video id="camera-stream" autoplay playsinline class="rounded-md border w-full max-w-md"></video>
+            </div>
+
+            <canvas id="camera-canvas" class="hidden"></canvas>
+
+            <x-slot:footer>
+                <div class="flex justify-center space-x-3">
+                    <x-wireui.button flat label="Cerrar" x-on:click="stopCamera()" />
+                    <x-wireui.button primary label="Capturar y guardar" x-on:click="capturePhoto()" />
+                </div>
+            </x-slot:footer>
+
+        </x-wireui.card>
+    </x-wireui.modal>
+</div>
+
+<script>
+    function cameraHandler() {
+        return {
+            stream: null,
+            openCamera() {
+                Livewire.emit('refreshAttachments');
+                let modal = new bootstrap.Modal(document.querySelector('[wire\\:model\\.defer="cameraPhoto"]'));
+                modal.show();
+                navigator.mediaDevices.getUserMedia({
+                        video: true
+                    })
+                    .then(s => {
+                        this.stream = s;
+                        document.getElementById('camera-stream').srcObject = s;
+                    })
+                    .catch(err => alert('No se pudo acceder a la cámara: ' + err.message));
+            },
+            stopCamera() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                }
+                this.stream = null;
+            },
+            capturePhoto() {
+                let video = document.getElementById('camera-stream');
+                let canvas = document.getElementById('camera-canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                let dataUrl = canvas.toDataURL('image/jpeg');
+                Livewire.emit('uploadCameraPhoto', dataUrl);
+                this.stopCamera();
+
+                // Cierra el modal de cámara
+                document.querySelector('[wire\\:model\\.defer="cameraPhoto"]').dispatchEvent(new CustomEvent('close'));
+            }
+        }
+    }
+</script>
+
 @push('js')
     <script>
         window.addEventListener('open-new-tab', event => {

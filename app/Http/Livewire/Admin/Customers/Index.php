@@ -23,6 +23,10 @@ class Index extends Component
         2 => 'Nombres',
     ];
 
+    public function mount()
+    {
+       
+    }
     public function render()
     {
 

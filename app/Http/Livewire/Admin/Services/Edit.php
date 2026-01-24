@@ -21,6 +21,8 @@ use App\Services\ServiceService;
 use App\Exceptions\CustomException;
 use Illuminate\Validation\ValidationException;
 use App\Services\FactusConfigurationService;
+use App\Services\Audit\AuditMessageService;
+
 class Edit extends Component
 {
     use LivewireTrait;
@@ -36,7 +38,7 @@ class Edit extends Component
     public $products = [];
     public $payments = [];
     public $histories = [];
-    public $notifications=[];
+    public $notifications = [];
     public $searchCustomer = '';
     public $photo;
     public $openUploadModal = false;
@@ -97,8 +99,8 @@ class Edit extends Component
         'service.customer_id'      => 'required|exists:customers,id',
         'service.equipment_type_id' => 'required|exists:equipment_types,id',
         'service.state_id'          => 'required|exists:service_states,id',
-      
-      
+
+
     ];
 
 
@@ -129,16 +131,19 @@ class Edit extends Component
 
     public function mount(Service $service)
     {
-        $this->service = $service;
-         $this->service->loadMissing(['products', 'payments','payments.paymentMethod','electronicBill', 'equipmentType', 'brand', 'state']);
-       
+        
+    $this->service = $service;
+    
+
+        $this->service->loadMissing(['products', 'payments', 'payments.paymentMethod', 'electronicBill', 'equipmentType', 'brand', 'state', 'audits.user']);
+
         if (!$this->service->id) {
             $today = Carbon::now();
             $this->service->date_entry = $today->format('Y-m-d');
             $this->service->date_due = $today->copy()->addDays(3)->format('Y-m-d');
+           
         } else {
             $this->date_entry_time = $this->service->date_entry;
-  
         }
 
         Log::debug('Llegó a setCustomerFromModal', ['data' => $service]);
@@ -148,17 +153,18 @@ class Edit extends Component
         $this->equipmentTypes = EquipmentType::pluck('name', 'id');
 
         $this->brands = Brand::pluck('name', 'id');
-       $this->service->load(['details.component', 'details.brand']);
+        $this->service->load(['details.component', 'details.brand']);
         $this->service->payments = $this->service->payments()->with('paymentMethod', 'user')->get();
+
 
         if ($service->customer) {
             $this->selectedCustomer = [
                 'id' => $service->customer->id,
                 'names' => $service->customer->names,
                 'no_identification' => $service->customer->no_identification,
-                'direction'=> $service->customer->direction,
-                'phone'=> $service->customer->phone,
-                'email'=> $service->customer->email,
+                'direction' => $service->customer->direction,
+                'phone' => $service->customer->phone,
+                'email' => $service->customer->email,
 
             ];
         }
@@ -172,8 +178,20 @@ class Edit extends Component
         $this->refreshPaymentDetails();
         $this->refreshNotifications();
         $this->calculateTotals();
-        
        
+    }
+
+    public function getAuditsProperty()
+    {
+        if (!$this->service->exists) {
+            return collect();
+        }
+
+        return $this->service
+            ->audits()
+            ->with('user')
+            ->latest()
+            ->get();
     }
 
 
@@ -215,7 +233,7 @@ class Edit extends Component
 
             // Emitir evento para el componente index
             $this->emit('success', 'Servicio creado con éxito');
-           //  $this->dispatchBrowserEvent('print-label', $service->id);
+            //  $this->dispatchBrowserEvent('print-label', $service->id);
             $this->dispatchBrowserEvent('redirect-after-success', [
                 'url' => route('admin.services.edit', $service->id)
             ]);
@@ -330,17 +348,17 @@ class Edit extends Component
         }
     }
 
-    
+
 
     public function refreshServiceDetails()
     {
         $this->details = $this->service->details()->with('component', 'brand')->get()->toArray();
     }
 
-     public function refreshNotifications()
+    public function refreshNotifications()
     {
-        $notifications= $this->service->notifications()->get()->toArray();
-         $this->notifications=$notifications;
+        $notifications = $this->service->notifications()->get()->toArray();
+        $this->notifications = $notifications;
     }
 
     public function refreshProductDetails()
@@ -348,12 +366,12 @@ class Edit extends Component
         $this->products = $this->service->products()->with('product')->get()->toArray();
         $this->calculateTotals();
     }
-    
+
     public function calculateTotals()
     {
         $this->service->refresh();
         // Asegurar que estén cargados los productos y pagos
-       $this->service->loadMissing(['products', 'payments']);
+        $this->service->loadMissing(['products', 'payments']);
         // Calcular subtotal y descuento
         $this->subtotal = $this->service->products->sum(fn($p) => $p->unit_price * $p->quantity);
         $this->discount = $this->service->products->sum(fn($p) => $p->discount ?? 0);
@@ -381,8 +399,6 @@ class Edit extends Component
         if ($newTab === 'histories') {
             $this->refreshHistories();
         }
-        
-       
     }
 
     public function refreshHistories()
@@ -446,7 +462,7 @@ class Edit extends Component
     {
         $customer = Customer::find($id);
         if ($customer) {
-            $this->selectedCustomer = $customer->only(['id', 'names', 'no_identification','direction','phone','email']);
+            $this->selectedCustomer = $customer->only(['id', 'names', 'no_identification', 'direction', 'phone', 'email']);
             $this->service->customer_id = $customer->id;
             $this->customers = [];
             $this->searchCustomer = $customer->names;
@@ -495,7 +511,7 @@ class Edit extends Component
         $this->openEmailModal = true;
     }
 
-     public function validateElectronicBill(Service $service)
+    public function validateElectronicBill(Service $service)
     {
         try {
             ServiceService::validateElectronicBill($service);
@@ -518,8 +534,8 @@ class Edit extends Component
             return $this->emit('error', 'Ha sucedido un error inesperado. Vuelve a intentarlo');
         }
 
-       $this->dispatchBrowserEvent('print-ticket', $service->id);
-       $this->mount($this->service);
+        $this->dispatchBrowserEvent('print-ticket', $service->id);
+        $this->mount($this->service);
     }
 
 

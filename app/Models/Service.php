@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use App\Traits\Auditable;
+use App\Models\Audit;
 
 class Service extends Model
 {
     use HasFactory;
+    use Auditable;
+
     protected $guarded = ['id'];
 
 
@@ -82,6 +86,12 @@ class Service extends Model
         return $this->belongsTo(Terminal::class);
     }
 
+    public function audits()
+    {
+        return $this->morphMany(Audit::class, 'parent')
+            ->orderByDesc('created_at');
+    }
+
 
 
     protected $casts = [
@@ -112,5 +122,15 @@ class Service extends Model
         }
 
         return $query;
+    }
+
+    public function getAuditParentId()
+    {
+        return $this->id;
+    }
+
+    public function getAuditParentType()
+    {
+        return self::class;
     }
 }

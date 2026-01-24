@@ -1,9 +1,12 @@
 <div class="container">
 
-    <x-commons.header >
-        <x-wireui.button wire:click="exportCustomers" icon="excel" success text="Exportar a excel" load textLoad="Exportando..." />
-        <x-wireui.button icon="excel" x-on:click="$wire.emitTo('admin.customers.import', 'openImport')"  success text="Importar desde excel" />
-        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.customers.create', 'openCreate')"  text="Crear Cliente" />
+    <x-commons.header>
+        <x-wireui.button wire:click="exportCustomers" icon="excel" success text="Exportar a excel" load
+            textLoad="Exportando..." />
+        <x-wireui.button icon="excel" x-on:click="$wire.emitTo('admin.customers.import', 'openImport')" success
+            text="Importar desde excel" />
+        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.customers.create', 'openCreate')"
+            text="Crear Cliente" />
     </x-commons.header>
 
     <x-commons.table-responsive>
@@ -42,11 +45,12 @@
             <tbody>
                 @forelse ($customers as $item)
                     <tr wire:key="customer-{{ $item->id }}">
-                        <td left class="{{ !$item->top ? 'text-green-500 leading-none' : 'leading-none'  }}">
-                            <span class="text-xs font-bold leading-none">{{ $item->identificationDocument->name}}</span>
+                        <td left class="{{ !$item->top ? 'text-green-500 leading-none' : 'leading-none' }}">
+                            <span
+                                class="text-xs font-bold leading-none">{{ $item->identificationDocument->name }}</span>
                             <br>
                             <span class="leading-none">
-                              {{$item->format_no_identification}}
+                                {{ $item->format_no_identification }}
                             </span>
                         </td>
                         <td left>
@@ -62,7 +66,19 @@
                             <x-commons.status :status="$item->status" />
                         </td>
                         <td actions>
-                            <x-buttons.edit wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $item->id }})" title="Editar"/>
+                            @can('editar informacion del cliente')
+                                <x-buttons.edit
+                                    wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $item->id }})"
+                                    title="Editar" />
+                            @endcan
+
+
+
+
+                            <x-buttons.icon primary
+                                wire:click="$emitTo('admin.customers.customer-audit-modal', 'open1', {{ $item->id }})"
+                                icon="clock" spinner="update" />
+
                         </td>
                     </tr>
                 @empty
@@ -79,9 +95,8 @@
     @endif
 
     <livewire:admin.customers.create>
-
-    <livewire:admin.customers.edit>
-
-    <livewire:admin.customers.import>
+        <livewire:admin.customers.edit>
+            <livewire:admin.customers.import>
+                <livewire:admin.customers.customer-audit-modal>
 
 </div>
