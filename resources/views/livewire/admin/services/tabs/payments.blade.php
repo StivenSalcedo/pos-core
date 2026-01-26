@@ -26,7 +26,7 @@
                         <td class="px-3 py-2">{{ $p['paymentMethod']['name'] ?? 'N/A' }}</td>
                         <td class="px-3 py-2">{{ $p['user']['name'] ?? 'N/A' }}</td>
                         <td class="px-3 py-2 text-center">
-                            @if (!$service->isValidated)
+                            @if (!$service->isValidated && auth()->user()->can('borrar pago en servicio'))
                                 <x-buttons.delete wire:click="removePayment({{ $p['id'] }})" title="Eliminar" />
                             @endif
                         </td>
