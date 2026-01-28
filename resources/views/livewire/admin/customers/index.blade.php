@@ -77,7 +77,7 @@
 
                             <x-buttons.icon primary
                                 wire:click="$emitTo('admin.customers.customer-audit-modal', 'open1', {{ $item->id }})"
-                                icon="clock" spinner="update" />
+                                icon="clock" spinner="update" title="Ver auditorias"  />
 
                         </td>
                     </tr>

@@ -14,11 +14,16 @@ class CashClosing extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'closing_date'  => 'date',
+        'confirmed_at'  => 'datetime',
+    ];
+
     #appends
     protected function formatCreatedAt(): Attribute
     {
         return new Attribute(
-            get: fn () => $this->created_at->format('d-m-Y g:i A')
+            get: fn() => $this->closing_date->format('d-m-Y g:i A')
         );
     }
 
@@ -52,49 +57,49 @@ class CashClosing extends Model
 
         switch ($days) {
             case '1': //hoy
-                return $query->whereDate('created_at', Carbon::today());
+                return $query->whereDate('closing_date', Carbon::today());
                 break;
             case '2': //esta semana
                 $startWeek = Carbon::today()->startOfWeek();
                 $endWeek = Carbon::today()->endOfWeek()->endOfDay();
-                return $query->whereBetween('created_at', [$startWeek, $endWeek]);
+                return $query->whereBetween('closing_date', [$startWeek, $endWeek]);
                 break;
 
             case '3': //hace 7 dias
                 $startDay = Carbon::today()->subDays(7);
                 $endDay = Carbon::today()->endOfDay();
-                return $query->whereBetween('created_at', [$startDay, $endDay]);
+                return $query->whereBetween('closing_date', [$startDay, $endDay]);
                 break;
 
             case '4': //La semana pasada
                 $startWeek = Carbon::now()->subWeek()->startOfWeek();
                 $endWeek = Carbon::now()->subWeek()->endOfWeek()->endOfDay();
-                return $query->whereBetween('created_at', [$startWeek, $endWeek]);
+                return $query->whereBetween('closing_date', [$startWeek, $endWeek]);
                 break;
 
             case '5': //hace 5 dias
                 $startDay = Carbon::today()->subDays(15);
                 $endDay = Carbon::today()->endOfDay();
-                return $query->whereBetween('created_at', [$startDay, $endDay]);
+                return $query->whereBetween('closing_date', [$startDay, $endDay]);
                 break;
 
             case '6': //este mes
                 $startWeek = Carbon::today()->startOfMonth();
                 $endWeek = Carbon::today()->endOfMonth()->endOfDay();
-                return $query->whereBetween('created_at', [$startWeek, $endWeek]);
+                return $query->whereBetween('closing_date', [$startWeek, $endWeek]);
                 break;
 
             case '7': //mes pasado
                 $startWeek = Carbon::today()->subMonth()->startOfMonth();
                 $endWeek = Carbon::today()->subMonth()->endOfMonth()->endOfDay();
-                return $query->whereBetween('created_at', [$startWeek, $endWeek]);
+                return $query->whereBetween('closing_date', [$startWeek, $endWeek]);
                 break;
 
             case '8': //Rango de fechas
                 if ($startDate && $endDate) {
                     $startDate = Carbon::parse($startDate);
                     $endDate = Carbon::parse($endDate)->endOfDay();
-                    return $query->whereBetween('created_at', [$startDate, $endDate]);
+                    return $query->whereBetween('closing_date', [$startDate, $endDate]);
                 }
                 break;
 
@@ -102,5 +107,25 @@ class CashClosing extends Model
 
                 break;
         }
+    }
+
+    public function confirmedBy()
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    public function isConfirmed(): bool
+    {
+        return !is_null($this->confirmed_at);
+    }
+
+    public function scopeConfirmed($query)
+    {
+        return $query->whereNotNull('confirmed_at');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->whereNull('confirmed_at');
     }
 }

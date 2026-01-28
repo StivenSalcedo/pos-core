@@ -78,7 +78,10 @@
       <thead>
         <tr>
           <th left>
-            Fecha
+            Creacion
+          </th>
+          <th left>
+            Fecha de cierre
           </th>
           <th left>
             Sede
@@ -114,6 +117,9 @@
           <tr wire:key="cash-closing-{{ $item->id }}">
             <td left>
               {{ $item->created_at->format('d/m/Y - g:i A') }}
+            </td>
+            <td left>
+              {{ $item->closing_date->format('d/m/Y') }}
             </td>
             <td left>
               {{ $item->terminal->name }}

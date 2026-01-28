@@ -23,10 +23,12 @@ class Index extends Component
         $this->users = User::all()->pluck('name', 'id');
         $this->terminals = Terminal::where('status', Terminal::ACTIVE)->get();
         $this->arrayTerminals = Terminal::all()->pluck('name', 'id');
+       
     }
 
     public function render()
     {
+         
         $this->totales = CashClosing::date($this->filterDate, $this->startDate, $this->endDate)
             ->selectRaw('SUM(total_sales) as total_sales, SUM(outputs) as outputs, SUM(tip) as tips')
             ->terminal($this->terminal_id)
@@ -37,7 +39,7 @@ class Index extends Component
             ->date($this->filterDate, $this->startDate, $this->endDate)
             ->terminal($this->terminal_id)
             ->responsible($this->user_id)
-            ->latest()
+             ->orderByDesc('closing_date')
             ->paginate('10');
 
         return view('livewire.admin.cash-closing.index', compact('closings'))->layoutData(['title' => 'Cierres de caja']);

@@ -9,7 +9,10 @@ use Illuminate\Support\Stringable;
 class Kernel extends ConsoleKernel {
     
     protected function schedule(Schedule $schedule) {
-       
+        $schedule->command('cashclosing:generate')
+            ->dailyAt('23:59')
+            ->withoutOverlapping()
+            ->onOneServer();
     }
 
     protected function commands() {
