@@ -12,6 +12,7 @@ class AuditMessageService
         'updated_at',
         'created_at',
         'id',
+        'closing_date',
         \App\Models\Service::class => ['internal_note'],
     ];
 
@@ -93,7 +94,7 @@ class AuditMessageService
             'label' => 'Sede',
             'field' => 'name',
         ],
-         'component_id' => [
+        'component_id' => [
             'model' => \App\Models\Component::class,
             'label' => 'Componente',
             'field' => 'name',
@@ -101,6 +102,11 @@ class AuditMessageService
         'identification_document_id' => [
             'model' => \App\Models\IdentificationDocument::class,
             'label' => 'Tipo de Identificacion',
+            'field' => 'name',
+        ],
+        'confirmed_by' => [
+            'model' => \App\Models\User::class,
+            'label' => 'Usuario que confirmo el cierre',
             'field' => 'name',
         ],
         'user' => [
@@ -161,9 +167,19 @@ class AuditMessageService
         'direction' =>  [
             'label' => 'Direccion'
         ],
+        'confirmed_at' =>  [
+            'label' => 'Fecha Confirmación'
+        ],
+        'price' =>  [
+            'label' => 'Dinero real en caja'
+        ],
+        'base' =>  [
+            'label' => 'Base Inicial'
+        ],
+        'observations' => ['label' => 'Observaciones']
 
-        
-        
+
+
 
     ];
 

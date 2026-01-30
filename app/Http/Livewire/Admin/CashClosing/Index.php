@@ -8,42 +8,53 @@ use App\Models\Terminal;
 use App\Models\User;
 use Livewire\Component;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Livewire\WithPagination;
+use Carbon\Carbon;
 class Index extends Component
 {
+  use WithPagination;
 
+    protected $paginationTheme = 'tailwind';
     protected $listeners = ['render'];
 
     public $terminals, $arrayTerminals, $terminal_id = '', $openModal = false, $filterDate = '0', $startDate, $endDate;
     public $users, $user_id = '';
     public $totales;
+    public $confirmedFilter = 'all'; // confirmed
 
     public function mount()
     {
         $this->users = User::all()->pluck('name', 'id');
         $this->terminals = Terminal::where('status', Terminal::ACTIVE)->get();
         $this->arrayTerminals = Terminal::all()->pluck('name', 'id');
-       
     }
 
     public function render()
     {
-         
+        $today = Carbon::today();
+
+   // $this->resetPage();
         $this->totales = CashClosing::date($this->filterDate, $this->startDate, $this->endDate)
             ->selectRaw('SUM(total_sales) as total_sales, SUM(outputs) as outputs, SUM(tip) as tips')
+            ->whereDate('closing_date', '<=', $today)
             ->terminal($this->terminal_id)
             ->responsible($this->user_id)
+            ->confirmedFilter($this->confirmedFilter)
             ->first();
 
         $closings = CashClosing::with('user', 'terminal')
             ->date($this->filterDate, $this->startDate, $this->endDate)
+            ->whereDate('closing_date', '<=', $today)
             ->terminal($this->terminal_id)
             ->responsible($this->user_id)
-             ->orderByDesc('closing_date')
+            ->confirmedFilter($this->confirmedFilter)
+            ->orderByDesc('closing_date')
             ->paginate('10');
 
         return view('livewire.admin.cash-closing.index', compact('closings'))->layoutData(['title' => 'Cierres de caja']);
     }
+
+
 
     public function export()
     {

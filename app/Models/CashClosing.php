@@ -6,12 +6,13 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\Auditable;
+use App\Models\Audit;
 class CashClosing extends Model
 {
 
     use HasFactory;
-
+    use Auditable;
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -127,5 +128,30 @@ class CashClosing extends Model
     public function scopePending($query)
     {
         return $query->whereNull('confirmed_at');
+    }
+
+    public function scopeConfirmedFilter($query, $value)
+    {
+        return match ($value) {
+            'confirmed'   => $query->whereNotNull('confirmed_at'),
+            'unconfirmed' => $query->whereNull('confirmed_at'),
+            default       => $query, // all
+        };
+    }
+
+     public function getAuditParentId()
+    {
+        return $this->id;
+    }
+
+    public function getAuditParentType()
+    {
+        return self::class;
+    }
+
+    public function audits()
+    {
+        return $this->morphMany(Audit::class, 'parent')
+            ->orderByDesc('created_at');
     }
 }

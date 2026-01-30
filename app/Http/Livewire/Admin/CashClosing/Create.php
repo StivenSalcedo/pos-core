@@ -12,6 +12,8 @@ use App\Models\Terminal;
 use App\Traits\LivewireTrait;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Http\Livewire\Admin\CashClosing\CashClosingCalculator;
 
 class Create extends Component
 {
@@ -24,17 +26,56 @@ class Create extends Component
 
     public $bills, $lastRecord, $terminal;
 
-    public $cash, $credit_card, $debit_card, $transfer, $tip, $outputs, $cashRegister, $base, $price, $total_sales, $observations;
+    public $cash, $credit_card, $debit_card, $transfer, $tip, $outputs, $cashRegister = 0, $base, $price, $total_sales, $observations;
+
+    public $closing_date;
+    public $isFuture = false;
 
     public function mount()
     {
         $this->terminal = new Terminal();
+       
     }
+
+
 
     public function render()
     {
+
         return view('livewire.admin.cash-closing.create');
     }
+
+    public function updatedClosingDate($value)
+    {
+        $date = Carbon::parse($value)->startOfDay();
+
+        if ($date->isPast() && !$date->isToday()) {
+            $this->emit('alert', 'No puedes seleccionar fechas pasadas');
+            $this->closing_date = now()->toDateString();
+            return;
+        }
+        $this->isFuture = $date->isFuture();
+        $this->loadCalculatedValues();
+    }
+
+    public function loadCalculatedValues()
+    {
+        $calculator = new CashClosingCalculator();
+
+        $data = $calculator->calculate($this->terminal, Carbon::parse($this->closing_date));
+
+        $this->fill($data);
+        $previousClosing = CashClosing::where('terminal_id', $this->terminal->id)
+            ->whereDate('closing_date', Carbon::parse($this->closing_date))
+            ->first();
+        if ($previousClosing) {
+            $this->base = $previousClosing->base;
+            $this->price = $previousClosing->price;
+            $this->observations = $previousClosing->observations;
+            $this->getCashRegister();
+        }
+    }
+
 
     public function updatedBase()
     {
@@ -45,67 +86,15 @@ class Create extends Component
     {
         $this->terminal = $terminal;
         $this->openCreate = true;
-        $this->getData();
+        $this->closing_date = now()->toDateString();
+        $this->loadCalculatedValues();
+        $this->isFuture = Carbon::parse($this->closing_date)->isFuture();
     }
 
-    private function getData()
-    {
-        $this->lastRecord = CashClosing::latest('id')->where('terminal_id', $this->terminal->id)->first();
-        $this->getBills();
-        $this->getPaidServices();
-        $this->getFinances();
-        $this->getOutputs();
-        $this->getCashRegister();
-    }
+    
 
-    private function getBills()
-    {
 
-        if ($this->lastRecord) {
-            $this->bills = Bill::where('created_at', '>', $this->lastRecord->created_at)
-                ->where('terminal_id', $this->terminal->id)
-                ->where('status', Bill::ACTIVA)
-                ->doesntHave('finance')
-                ->select('id', 'tip', 'total', 'payment_method_id')
-                ->get();
-        } else {
 
-            $this->bills = Bill::where('status', Bill::ACTIVA)
-                ->where('terminal_id', $this->terminal->id)
-                ->select('id', 'tip', 'total', 'payment_method_id')
-                ->doesntHave('finance')
-                ->get();
-        }
-
-        if ($this->bills) {
-            $this->cash         = $this->bills->where('payment_method_id', PaymentMethod::CASH)->sum('total');
-            $this->credit_card  = $this->bills->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('total') + $this->bills->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('tip');
-            $this->debit_card   = $this->bills->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('total') + $this->bills->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('tip');
-            $this->transfer     = $this->bills->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('total') + $this->bills->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('tip');
-            $this->tip          = $this->bills->sum('tip');
-        }
-    }
-
-    private function getFinances()
-    {
-
-        $query = DetailFinance::query()->where('terminal_id', $this->terminal->id);
-
-        if ($this->lastRecord) {
-            $query->where('created_at', '>', $this->lastRecord->created_at);
-        } else {
-            $query->whereRelation('bill', 'bills.status', Bill::ACTIVA);
-        }
-
-        $finances = $query->get();
-
-        $this->cash         = $this->cash + $finances->where('payment_method_id', PaymentMethod::CASH)->sum('value');
-        $this->credit_card  = $this->credit_card + $finances->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('value');
-        $this->debit_card   = $this->debit_card + $finances->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('value');
-        $this->transfer     = $this->transfer + $finances->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('value');
-
-        $this->total_sales = $this->cash + $this->credit_card + $this->debit_card + $this->transfer;
-    }
 
     private function getCashRegister()
     {
@@ -114,21 +103,7 @@ class Create extends Component
         $this->cashRegister = $this->cash - intval($this->outputs);
     }
 
-    private function getOutputs()
-    {
-        if ($this->lastRecord) {
-            $this->outputs = Output::where('created_at', '>', $this->lastRecord->created_at)
-                ->where('terminal_id', $this->terminal->id)
-                ->where('from', CashRegisters::MAIN)
-                ->select('id', 'value')
-                ->sum('price');
-        } else {
-            $this->outputs = Output::select('id', 'value')
-                ->where('terminal_id', $this->terminal->id)
-                ->where('from', CashRegisters::MAIN)
-                ->sum('price');
-        }
-    }
+
 
     public function store()
     {
@@ -147,15 +122,73 @@ class Create extends Component
 
         $this->validateTerminal();
 
-        $this->validate($rules, null, $attributes);
+        if (Carbon::parse($this->closing_date)->isFuture()) {
+            // Solo base
+            CashClosing::create([
+                'closing_date' => $this->closing_date,
+                'base' => $this->base,
+                'terminal_id' => $this->terminal->id,
+                'user_id' => auth()->id(),
+                'price' => '0',
+                'cash' => '0',
+                'debit_card' => '0',
+                'credit_card' => '0',
+                'transfer' => '0',
+                'total_sales' => '0',
+                'tip' => '0',
+                'outputs' => '0',
+                'cash_register' => '0',
 
-        if ($this->cashRegister < 0) {
+            ]);
+
+            $this->emit('success', 'Base creada para cierre futuro');
+            $this->reset();
+            $this->terminal = new Terminal();
+            $this->emitTo('admin.cash-closing.index', 'render');
+        }
+        // HOY → cálculo completo
+        $calculator = new CashClosingCalculator();
+
+        $data = $calculator->calculate($this->terminal, Carbon::parse($this->closing_date));
+
+        if (($data['cash_register'] ?? 0) < 0) {
             return $this->emit('alert', 'El dinero esperado en caja no puede ser negativo');
         }
 
-        $this->getData();
+        $this->validate($rules, null, $attributes);
 
-        CashClosing::create([
+        /* if ($this->cashRegister < 0) {
+            return $this->emit('alert', 'El dinero esperado en caja no puede ser negativo');
+        }*/
+
+        //$this->getData();
+
+        $previousClosing = CashClosing::where('terminal_id', $this->terminal->id)
+            ->whereDate('closing_date', Carbon::parse($this->closing_date))
+            ->first();
+        if ($previousClosing) {
+            $previousClosing->update([
+                ...$data,
+                'base' => $this->base,
+                'price' => $this->price,
+                'observations' => $this->observations,
+            ]);
+        } else {
+
+            CashClosing::create([
+                ...$data,
+                'closing_date' => $this->closing_date,
+                'base' => $this->base,
+                'price' => $this->price,
+                'observations' => $this->observations,
+                'terminal_id' => $this->terminal->id,
+                'user_id' => auth()->id(),
+            ]);
+        }
+
+
+
+        /* CashClosing::create([
             'base' => $this->base,
             'cash' => $this->cash,
             'debit_card' => $this->debit_card,
@@ -169,49 +202,11 @@ class Create extends Component
             'observations' => $this->observations,
             'user_id' => auth()->user()->id,
             'terminal_id' => $this->terminal->id,
-        ]);
+        ]);*/
 
         $this->reset();
         $this->terminal = new Terminal();
         $this->emitTo('admin.cash-closing.index', 'render');
         $this->emit('success', 'Cierre de caja realizado con éxito');
-    }
-
-    private function getPaidServices()
-    {
-        $paidServiceIds = DB::query()
-            ->from('services')
-            ->select('services.id')
-            ->where('services.terminal_id', $this->terminal->id)
-            ->when(
-                $this->lastRecord,
-                fn($q) =>
-                $q->where('services.created_at', '>', $this->lastRecord->created_at)
-            )
-            ->whereRaw('
-            (
-                SELECT COALESCE(SUM(sp.total),0)
-                FROM service_products sp
-                WHERE sp.service_id = services.id
-            ) = (
-                SELECT COALESCE(SUM(pay.amount),0)
-                FROM service_payments pay
-                WHERE pay.service_id = services.id
-            )
-        ');
-
-        $services = DB::table('service_payments')
-            ->selectRaw('
-            payment_method_id,
-            SUM(amount) as total
-        ')
-            ->whereIn('service_id', $paidServiceIds)
-            ->groupBy('payment_method_id')
-            ->get();
-
-        $this->cash        += $services->where('payment_method_id', PaymentMethod::CASH)->sum('total');
-        $this->credit_card += $services->where('payment_method_id', PaymentMethod::CREDIT_CARD)->sum('total');
-        $this->debit_card  += $services->where('payment_method_id', PaymentMethod::DEBIT_CARD)->sum('total');
-        $this->transfer    += $services->where('payment_method_id', '>=', PaymentMethod::TRANSFER)->sum('total');
     }
 }
