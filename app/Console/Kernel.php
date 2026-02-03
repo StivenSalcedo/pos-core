@@ -10,7 +10,7 @@ class Kernel extends ConsoleKernel {
     
     protected function schedule(Schedule $schedule) {
         $schedule->command('cashclosing:generate')
-            ->dailyAt('23:59')
+            ->dailyAt('00:01')
             ->withoutOverlapping()
             ->onOneServer();
     }
