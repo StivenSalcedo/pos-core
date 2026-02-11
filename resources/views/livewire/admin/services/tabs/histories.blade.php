@@ -1,7 +1,5 @@
  <div x-data="{ tab: 'histories' }" class="space-y-6">
  <x-commons.table-responsive>
-       
-       
         <table class="table">
             <thead>
                 <tr>

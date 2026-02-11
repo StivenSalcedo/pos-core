@@ -103,21 +103,22 @@
         {{ $tab === 'details' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
                     Componentes
                 </button>
-
-                <button wire:click="{{ $service->id ? '$set(\'tab\', \'products\')' : '' }}"
-                    @if (!$service->id) disabled @endif
-                    class="hidden lg:block px-3 py-2 font-medium text-sm 
+                @can('productos')
+                    <button wire:click="{{ $service->id ? '$set(\'tab\', \'products\')' : '' }}"
+                        @if (!$service->id) disabled @endif
+                        class="hidden lg:block px-3 py-2 font-medium text-sm 
         {{ $tab === 'products' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
-                    Productos
-                </button>
+                        Productos
+                    </button>
 
-                <button wire:click="{{ $service->id ? '$set(\'tab\', \'payments\')' : '' }}"
-                    @if (!$service->id || count($service->products) == 0) disabled @endif
-                    class="hidden lg:block px-3 py-2 font-medium text-sm 
+
+                    <button wire:click="{{ $service->id ? '$set(\'tab\', \'payments\')' : '' }}"
+                        @if (!$service->id || count($service->products) == 0) disabled @endif
+                        class="hidden lg:block px-3 py-2 font-medium text-sm 
         {{ $tab === 'payments' ? 'border-b-2 border-primary-500 text-primary-600' : ($service->id || count($service->products) > 0 ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 cursor-not-allowed') }}">
-                    Pagos
-                </button>
-
+                        Pagos
+                    </button>
+                @endcan
                 <button wire:click="{{ $service->id ? '$set(\'tab\', \'photos\')' : '' }}"
                     @if (!$service->id) disabled @endif
                     class="hidden xl:block px-3 py-2 font-medium text-sm 
@@ -169,14 +170,17 @@
                             <x-dropdown-link wire:click="{{ $service->id ? '$set(\'tab\', \'photos\')' : '' }}">
                                 Fotos
                             </x-dropdown-link>
-                            <x-dropdown-link class="block lg:hidden"
-                                wire:click="{{ $service->id ? '$set(\'tab\', \'payments\')' : '' }}">
-                                Pagos
-                            </x-dropdown-link>
-                            <x-dropdown-link class="block lg:hidden"
-                                wire:click="{{ $service->id ? '$set(\'tab\', \'products\')' : '' }}">
-                                Productos
-                            </x-dropdown-link>
+
+                            @can('productos')
+                                <x-dropdown-link class="block lg:hidden"
+                                    wire:click="{{ $service->id ? '$set(\'tab\', \'products\')' : '' }}">
+                                    Productos
+                                </x-dropdown-link>
+                                <x-dropdown-link class="block lg:hidden"
+                                    wire:click="{{ $service->id ? '$set(\'tab\', \'payments\')' : '' }}">
+                                    Pagos
+                                </x-dropdown-link>
+                            @endcan
                             <x-dropdown-link class="block lg:hidden"
                                 wire:click="{{ $service->id ? '$set(\'tab\', \'details\')' : '' }}">
                                 Componentes

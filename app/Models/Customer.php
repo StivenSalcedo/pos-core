@@ -20,12 +20,38 @@ class Customer extends Model
         'status' => '0',
     ];
 
+    protected $auditParent = null;
+
+    public function setAuditParent($parent)
+    {
+        $this->auditParent = $parent;
+        return $this;
+    }
+
+    public function getAuditParentId()
+    {
+        return $this->auditParent
+            ? $this->auditParent->getKey()
+            : null;
+    }
+
+    public function getAuditParentType()
+    {
+        return $this->auditParent
+            ? get_class($this->auditParent)
+            : null;
+    }
+
+
+
+
+
     // Accessors & Mutators
     public function names(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => Str::title($value),
-            set: fn ($value) => Str::lower($value)
+            get: fn($value) => Str::title($value),
+            set: fn($value) => Str::lower($value)
         );
     }
 
@@ -67,15 +93,7 @@ class Customer extends Model
         return $query->select(['id', 'no_identification', 'names', 'phone'])->find(1);
     }
 
-     public function getAuditParentId()
-    {
-        return $this->id;
-    }
 
-    public function getAuditParentType()
-    {
-        return self::class;
-    }
 
     public function audits()
     {
@@ -83,4 +101,9 @@ class Customer extends Model
             ->orderByDesc('created_at');
     }
 
+    public function ownAudits()
+    {
+        return $this->morphMany(Audit::class, 'auditable')
+            ->orderByDesc('created_at');
+    }
 }

@@ -55,7 +55,7 @@
                         @endcan
                         @can('editar informacion del cliente')
                         <x-buttons.edit
-                            wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $selectedCustomer['id'] }})"
+                            wire:click="$emitTo('admin.customers.edit', 'openEdit', {{ $selectedCustomer['id'] }},{{$service->id}})"
                             title="Editar" />
                         @endcan
                     </div>

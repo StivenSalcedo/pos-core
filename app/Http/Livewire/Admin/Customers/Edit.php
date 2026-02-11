@@ -11,6 +11,7 @@ use App\Rules\Phone;
 use App\Traits\LivewireTrait;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use App\Models\Service;
 
 class Edit extends Component
 {
@@ -27,6 +28,7 @@ class Edit extends Component
     public $openEdit = false;
 
     public $customer;
+    public ?Service $service = null;
 
     protected function rules()
     {
@@ -73,11 +75,12 @@ class Edit extends Component
         return view('livewire.admin.customers.edit');
     }
 
-    public function openEdit(Customer $customer)
+    public function openEdit(Customer $customer, Service $service = null)
     {
         $this->customer = $customer;
+        $this->service = $service;
         $this->resetValidation();
-         $this->resetErrorBag();
+        $this->resetErrorBag();
         $this->openEdit = true;
     }
 
@@ -100,14 +103,17 @@ class Edit extends Component
         }
 
         $this->validate($rules, $this->messages());
+        if ($this->service) {
+            $this->customer->setAuditParent($this->service);
+        }
         $this->customer->save();
-        $this->emitTo('admin.services.edit', 'set-customer',$this->customer);
+        $this->emitTo('admin.services.edit', 'set-customer', $this->customer);
         $this->customer = new Customer();
 
         $this->openEdit = false;
 
         $this->emitTo('admin.customers.index', 'render');
-      
+
         $this->emit('success', 'Cliente actualizado con éxito');
     }
 }

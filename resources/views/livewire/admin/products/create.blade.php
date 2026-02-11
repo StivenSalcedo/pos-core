@@ -32,7 +32,7 @@
 
                     {{-- Impuestos --}}
                     <div class="relative">
-                        <x-wireui.input class="w-full" label="Impuestos" :value="$tax_rates->implode('format_rate', ', ')" readonly />
+                        <x-wireui.input class="w-full" name="tax_rates" label="Impuestos" :value="$tax_rates->implode('format_rate', ', ')" readonly />
                         {{-- Botón para crear nuevo --}}
                         <button class="absolute top-0 right-0" title="Crear nuevo impuesto" wire:click='openTaxRates'>
                             <i class="ico icon-add text-blue-600 text-sm"></i>

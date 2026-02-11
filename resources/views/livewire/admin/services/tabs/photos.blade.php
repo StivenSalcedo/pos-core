@@ -2,19 +2,10 @@
     <div class="flex items-center justify-between border-b pb-4 mb-4">
         <h3 class="font-medium whitespace-normal text-lg">Registro fotográfico</h3>
         <div class="text-right">
-            <x-wireui.button primary
-                wire:click="openPhotoUpload"
-                text="Agregar fotografía" icon="add" spinner="update" />
+            <x-wireui.button primary wire:click="openPhotoUpload" id="photo" text="Agregar fotografía" icon="add"
+                spinner="update" />
         </div>
     </div>
-
-    {{-- <div class="flex justify-between mb-3">
-        <h3 class="text-lg font-semibold text-gray-700"></h3>
-        <div class="flex space-x-2">
-            <x-wireui.button sm icon="camera" secondary x-on:click="$dispatch('openCameraCapture')" label="Tomar foto" />
-        </div>
-    </div> --}}
-
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         @forelse($service->attachments as $photoShow)
             <div class="relative w-52 border rounded-lg overflow-hidden group">
@@ -30,7 +21,6 @@
             <div class="col-span-4 text-center">
                 <small class="text-gray-400">No hay imágenes registradas.</small>
             </div>
-            
         @endforelse
     </div>
 
@@ -66,4 +56,3 @@
         </x-wireui.modal>
     </div>
 </div>
-

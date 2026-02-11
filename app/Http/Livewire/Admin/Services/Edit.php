@@ -488,6 +488,7 @@ class Edit extends Component
             $this->refreshProductDetails();
             Product::where('id', $product->product_id)->increment('stock', $product->quantity);
             $this->calculateTotals();
+            $this->emit('success', 'El producto fue eliminado correctamente.');
         }
     }
 
@@ -500,6 +501,7 @@ class Edit extends Component
             $payment->delete();
             $this->refreshPaymentDetails();
             $this->calculateTotals();
+            $this->emit('success', 'El pago fue eliminado correctamente.');
         }
     }
 

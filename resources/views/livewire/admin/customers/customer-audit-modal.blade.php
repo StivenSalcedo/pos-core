@@ -2,13 +2,13 @@
     <x-wireui.modal wire:model.defer="open1"   max-width="4xl">
         <x-wireui.card title="Historial de cambios del cliente">
 
-            @if (!$customer || $customer->audits->isEmpty())
+            @if (!$customer || $customer->ownAudits->isEmpty())
                 <div class="text-center text-gray-500 py-6">
                     No hay registros de auditoría.
                 </div>
             @else
                 <div class="space-y-4 max-h-[60vh] overflow-y-auto">
-                    @foreach ($customer->audits as $audit)
+                    @foreach ($customer->ownAudits as $audit)
                         <div class="border-b pb-3">
 
                             <div class="text-sm text-gray-500 mb-1">
