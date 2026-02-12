@@ -5,7 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Builder;
 class Sale extends Model {
 
     use HasFactory;
@@ -20,6 +20,31 @@ class Sale extends Model {
         if (count($array)) {
             return $query->whereIn('product_id', array_column($array, 'id'));
         }
+    }
+    public function scopeFilterByTerminalPermission(
+        Builder $query,
+        $user,
+        $terminalId = null
+    ) {
+        // ❌ Usuario SIN permiso → solo su sede actual
+        if (! $user->can('ver todas las sedes')) {
+            $currentTerminalId = optional($user->terminals->first())->id;
+
+            if ($currentTerminalId) {
+                $query->where('terminal_id', $currentTerminalId);
+            }
+
+            return $query;
+        }
+
+        // ✅ Usuario CON permiso
+        // 👉 si selecciona una sede, filtra
+        // 👉 si selecciona "todas", NO filtra
+        if (! empty($terminalId)) {
+            $query->where('terminal_id', $terminalId);
+        }
+
+        return $query;
     }
 
     public function scopeDate($query, $days, $startDate, $endDate){

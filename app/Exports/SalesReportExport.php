@@ -24,28 +24,35 @@ class SalesReportExport implements
     protected $from;
     protected $to;
     protected $orderUnits;
+    protected $terminal_id;
+    
 
-    public function __construct($search, $productIds, $from, $to, $orderUnits)
+    public function __construct($search, $productIds, $from, $to, $orderUnits,$terminal_id)
     {
         $this->search     = $search;
         $this->productIds = $productIds;
         $this->from       = $from;
         $this->to         = $to;
         $this->orderUnits = $orderUnits;
+        $this->terminal_id=$terminal_id;
     }
 
     public function collection()
     {
         return Sale::query()
             ->join('products', 'products.id', '=', 'sales.product_id')
+            ->join('terminals', 'products.terminal_id', '=', 'terminals.id')
             ->selectRaw('
                 products.reference,
                 sales.source,
                 products.name,
+                terminals.id as terminal_id,
+                terminals.name as terminal_name,
                 SUM(sales.quantity) as quantity,
                 SUM(sales.units) as units,
                 SUM(sales.total) as total
             ')
+            ->filterByTerminalPermission(auth()->user(), $this->terminal_id)
             ->when($this->from && $this->to, function ($q) {
                 $q->whereBetween('sales.created_at', [$this->from, $this->to]);
             })
@@ -61,7 +68,9 @@ class SalesReportExport implements
             ->groupBy(
                 'products.reference',
                 'products.name',
-                'sales.source'
+                'sales.source',
+                'terminals.id',
+                'terminals.name'
             )
             ->when($this->orderUnits, function ($q) {
                 $q->orderBy('quantity', $this->orderUnits);
@@ -72,6 +81,7 @@ class SalesReportExport implements
     public function headings(): array
     {
         return [
+            'Sede',
             'Referencia',
             'Origen',
             'Producto',
@@ -83,6 +93,7 @@ class SalesReportExport implements
     public function map($row): array
     {
         return [
+            $row->terminal_name,
             $row->reference,
             ucfirst($row->source), // bill | service
             $row->name,

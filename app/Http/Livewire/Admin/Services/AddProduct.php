@@ -85,8 +85,12 @@ class AddProduct extends Component
     {
         // Buscar por código exacto o nombre parcial
         $this->products = Product::query()
-            ->where('barcode', $this->search)
-            ->orWhere('name', 'like', "%{$this->search}%")
+            ->where('status', '0')
+            ->where('terminal_id', auth()->user()->terminals->first()->id)
+            ->where(function ($query) {
+                $query->where('barcode', $this->search)
+                    ->orWhere('name', 'like', "%{$this->search}%");
+            })
             ->limit(10)
             ->get()
             ->toArray();

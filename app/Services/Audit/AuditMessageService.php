@@ -171,12 +171,15 @@ class AuditMessageService
             'label' => 'Fecha Confirmación'
         ],
         'price' =>  [
-            'label' => 'Dinero real en caja'
+            'label' => 'Precio/Dinero real en caja'
         ],
         'base' =>  [
             'label' => 'Base Inicial'
         ],
         'observations' => ['label' => 'Observaciones']
+        ,
+        'reason' => ['label' => 'Motivo'],
+        'date' => ['label' => 'Fecha']
 
 
 

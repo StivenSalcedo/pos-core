@@ -1,6 +1,10 @@
 <div class="container">
 
     <x-commons.header>
+        @can('ver todas las sedes')
+                <x-wireui.native-select optionKeyValue  wire:model="terminal_id" :options="$terminals"
+                    placeholder="Todas las sedes" width="8" />
+            @endcan
         <x-wireui.range-date wire:model="filterDate" :options="[
             0 => 'Todos',
             1 => 'Hoy',
@@ -82,6 +86,9 @@
             <thead>
                 <tr>
                     <th left>
+                        Sede
+                    </th>
+                    <th left>
                         Referencia
                     </th>
                     <th left>
@@ -103,6 +110,9 @@
             <tbody>
                 @forelse ($products as $key => $item)
                     <tr wire:key="sale-{{ $key }}">
+                         <td left>
+                            {{ $item->terminal_name }}
+                        </td>
                         <td left>
                             {{ $item->reference }}
                         </td>

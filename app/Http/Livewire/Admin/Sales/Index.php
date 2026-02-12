@@ -14,6 +14,7 @@ use App\Exports\SalesReportExport;
 use App\Exports\PaymentMethodSummaryExport;
 use App\Exports\EmployeeSummaryExport;
 use App\Exports\CashRegisterDailyExport;
+use App\Models\Terminal;
 
 class Index extends Component
 {
@@ -25,11 +26,12 @@ class Index extends Component
     public $total = 0;
     public $ReportPayments = null;
     public $orderUnits = null; // asc | desc | null
-
+    public $terminals;
+    public $terminal_id = '';
 
     public function mount()
     {
-
+        $this->terminals = Terminal::all()->pluck('name', 'id');
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->endOfMonth()->format('Y-m-d');
 
@@ -59,14 +61,18 @@ class Index extends Component
     */
         $baseReportQuery = Sale::query()
             ->join('products', 'products.id', '=', 'sales.product_id')
+            ->join('terminals', 'products.terminal_id', '=', 'terminals.id')
             ->selectRaw('
             sales.product_id,
             products.reference,
             products.name,
+            terminals.id as terminal_id,
+            terminals.name as terminal_name,
             SUM(sales.quantity) as quantity,
             SUM(sales.units) as units,
             SUM(sales.total) as total
         ')
+            ->filterByTerminalPermission(auth()->user(), $this->terminal_id)
             ->when($from && $to, function ($q) use ($from, $to) {
                 $q->whereBetween('sales.created_at', [$from, $to]);
             })
@@ -82,7 +88,9 @@ class Index extends Component
             ->groupBy(
                 'sales.product_id',
                 'products.reference',
-                'products.name'
+                'products.name',
+                'terminals.id',
+                'terminals.name'
             );
 
         /*
@@ -102,17 +110,20 @@ class Index extends Component
     |--------------------------------------------------------------------------
     */
         $this->total = Sale::query()
+            ->join('products', 'products.id', '=', 'sales.product_id')
+            ->join('terminals', 'products.terminal_id', '=', 'terminals.id')
+            ->filterByTerminalPermission(auth()->user(), $this->terminal_id)
             ->when($from && $to, function ($q) use ($from, $to) {
-                $q->whereBetween('created_at', [$from, $to]);
+                $q->whereBetween('sales.created_at', [$from, $to]);
             })
             ->when($this->search, function ($q) {
                 $q->whereHas('product', function ($q) {
-                    $q->where('name', 'LIKE', "%{$this->search}%")
-                        ->orWhere('reference', 'LIKE', "%{$this->search}%");
+                    $q->where('products.name', 'LIKE', "%{$this->search}%")
+                        ->orWhere('products.reference', 'LIKE', "%{$this->search}%");
                 });
             })
             ->when($this->productsSelected, function ($q) {
-                $q->whereIn('product_id', $this->normalizeProductIds());
+                $q->whereIn('products.product_id', $this->normalizeProductIds());
             })
             ->sum('total');
 
@@ -121,11 +132,13 @@ class Index extends Component
         $reportPayments = Sale::query()
             ->join('payment_methods', 'payment_methods.id', '=', 'sales.payment_method_id')
             ->join('products', 'products.id', '=', 'sales.product_id')
+            ->join('terminals', 'products.terminal_id', '=', 'terminals.id')
             ->selectRaw('
             sales.payment_method_id as payment_method_id,
             payment_methods.name as name,
             SUM(sales.total) as total
         ')
+            ->filterByTerminalPermission(auth()->user(), $this->terminal_id)
             ->when($from && $to, function ($q) use ($from, $to) {
                 $q->whereBetween('sales.created_at', [$from, $to]);
             })
@@ -260,7 +273,8 @@ class Index extends Component
                 $this->normalizeProductIds(),
                 $from,
                 $to,
-                $this->orderUnits
+                $this->orderUnits,
+                $this->terminal_id
             ),
             $filename
         );

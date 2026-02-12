@@ -5,6 +5,9 @@
             <x-wireui.errors />
 
             <div class="space-y-6">
+                @can('ver todas las sedes')
+                    <x-wireui.native-select placeholder="Seleccione sede"  label="Seleccione sede" wire:model.defer="output.terminal_id" optionKeyValue="true" :options="$terminals"  label="Sede" />
+                @endcan
                 <x-wireui.input label="Fecha" wire:model.defer="date" onkeydown="return false" type="date"  />
                 <x-wireui.input label="Motivo" wire:model.defer="output.reason" />
                 <x-wireui.input onlyNumbers label="Valor" wire:model.defer="output.price" />

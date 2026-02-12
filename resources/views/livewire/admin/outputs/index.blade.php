@@ -11,11 +11,14 @@
             5 => 'Hace 15 días',
             6 => 'Este mes',
             7 => 'El mes pasado',
-            8 => 'Rango de fechas']" />
+            8 => 'Rango de fechas',
+        ]" />
 
-        <x-wireui.button wire:click="exportOutputs" icon="excel" success text="Exportar a excel" load textLoad="Exportando..." />
+        <x-wireui.button wire:click="exportOutputs" icon="excel" success text="Exportar a excel" load
+            textLoad="Exportando..." />
 
-        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.outputs.create', 'openCreate')"  text="Nuevo egreso" />
+        <x-wireui.button icon="user" x-on:click="$wire.emitTo('admin.outputs.create', 'openCreate')"
+            text="Nuevo egreso" />
 
     </x-commons.header>
 
@@ -26,6 +29,10 @@
         </x-slot:top>
 
         <x-slot:header>
+            @can('ver todas las sedes')
+                <x-wireui.native-select optionKeyValue wire:model="terminal_id" :options="$terminals"
+                    placeholder="Todas las sedes" width="8" />
+            @endcan
             <x-wireui.search placeholder="Buscar..." />
             @if ($filterDate == 8)
                 <x-wireui.input label="Desde" wire:model="startDate" type="date" onkeydown="return false" />
@@ -36,7 +43,9 @@
         <table class="table">
             <thead>
                 <tr>
-
+                    <th left>
+                        Sede
+                    </th>
                     <th left>
                         No Pago
                     </th>
@@ -45,7 +54,7 @@
                         Fecha
                     </th>
 
-                    
+
 
                     <th left>
                         Responsable
@@ -66,20 +75,19 @@
             <tbody>
                 @forelse ($outputs as $item)
                     <tr class="" wire:key="output-{{ $item->id }}">
-
                         <td left>
-                            {{$item->id}}
+                            {{ $item->terminal->name }}
+                        </td>
+                        <td left>
+                            {{ $item->id }}
                         </td>
 
                         <td left>
                             {{ $item->date->format('d-m-Y') }}
                         </td>
-
-                        
-
                         <td left class="leading-none">
                             {{ $item->user->name }} <br>
-                            <span class="text-xs font-bold leading-none">{{ $item->terminal->name}}</span>
+                            <span class="text-xs font-bold leading-none">{{ $item->terminal->name }}</span>
                         </td>
 
                         <td left>
@@ -91,12 +99,21 @@
                         </td>
 
                         <td actions>
-                            <x-buttons.download href="{{ route('admin.outputs.show', $item->id) }}" target="_blank" title="Descargar" />
-                            <x-buttons.show wire:click="$emitTo('admin.outputs.show', 'openShow', {{ $item->id }})" title="Visualizar" />
+                            <x-buttons.download href="{{ route('admin.outputs.show', $item->id) }}" target="_blank"
+                                title="Descargar" />
+
                             @can('isAccounted', $item)
-                                <x-buttons.edit wire:click="$emitTo('admin.outputs.edit', 'openEdit', {{ $item->id }})" title="Editar" />
-                                <x-buttons.delete wire:click="$emit('deleteOutput', {{ $item->id }})" title="Eliminar" />
+                                <x-buttons.edit wire:click="$emitTo('admin.outputs.edit', 'openEdit', {{ $item->id }})"
+                                    title="Editar" />
+                                <x-buttons.delete wire:click="$emit('deleteOutput', {{ $item->id }})"
+                                    title="Eliminar" />
+                            @else
+                                <x-buttons.show wire:click="$emitTo('admin.outputs.show', 'openShow', {{ $item->id }})"
+                                    title="Visualizar" />
                             @endcan
+                            <x-buttons.icon primary
+                                wire:click="$emitTo('admin.outputs.audit', 'open', {{ $item->id }})"
+                                icon="clock" spinner="update" title="Ver auditorias"  />
                         </td>
 
                     </tr>
@@ -114,15 +131,15 @@
     @endif
 
     <livewire:admin.outputs.create>
-    <livewire:admin.outputs.edit>
-    <livewire:admin.outputs.show>
+        <livewire:admin.outputs.edit>
+            <livewire:admin.outputs.show>
+                 <livewire:admin.outputs.audit>
 
 </div>
 
 @push('js')
-
     <script>
-        document.addEventListener('livewire:load', function () {
+        document.addEventListener('livewire:load', function() {
 
             Livewire.on('deleteOutput', id => {
                 Swal.fire({
@@ -144,5 +161,3 @@
         });
     </script>
 @endpush
-
-

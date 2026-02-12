@@ -45,6 +45,7 @@ class Search extends Component
         }])
             ->select(['products.id', 'products.barcode', 'products.reference', 'products.name', 'products.stock', 'products.quantity', 'products.units', 'products.price', 'products.has_inventory', 'products.has_presentations'])
             ->where('products.status', '0')
+             ->where('products.terminal_id',  auth()->user()->terminals->first()->id)
             ->orderBy('products.top', 'ASC')
             ->get()
             ->transform(function ($item) {

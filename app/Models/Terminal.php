@@ -34,4 +34,8 @@ class Terminal extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function outputs()
+    {
+        return $this->hasMany(Output::class);
+    }
 }
