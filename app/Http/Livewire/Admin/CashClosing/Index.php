@@ -17,7 +17,7 @@ class Index extends Component
     protected $paginationTheme = 'tailwind';
     protected $listeners = ['render'];
 
-    public $terminals, $arrayTerminals, $terminal_id = '', $openModal = false, $filterDate = '0', $startDate, $endDate;
+    public $terminals, $terminal_id = '', $openModal = false, $filterDate = '0', $startDate, $endDate;
     public $users, $user_id = '';
     public $totales;
     public $confirmedFilter = 'all'; // confirmed
@@ -25,14 +25,15 @@ class Index extends Component
     public function mount()
     {
         $this->users = User::all()->pluck('name', 'id');
-        $this->terminals = Terminal::where('status', Terminal::ACTIVE)->get();
-        $this->arrayTerminals = Terminal::all()->pluck('name', 'id');
+        $this->terminals = Terminal::where('status', Terminal::ACTIVE)->pluck('name', 'id');
+        $this->terminal_id = auth()->user()->terminals->first()->id;
+       
     }
 
     public function render()
     {
         $today = Carbon::today();
-
+   
    // $this->resetPage();
         $this->totales = CashClosing::date($this->filterDate, $this->startDate, $this->endDate)
             ->selectRaw('SUM(total_sales) as total_sales, SUM(outputs) as outputs, SUM(tip) as tips')

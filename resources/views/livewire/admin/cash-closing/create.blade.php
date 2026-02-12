@@ -10,8 +10,13 @@
                        x-bind:min="new Date().toISOString().split('T')[0]" />
                 </section>
                 <section>
+                    
+                    @can('ver todas las sedes')
+                    <x-wireui.native-select  label="Seleccione sede:" wire:model="terminal_id" optionKeyValue="true" :options="$terminals"   />
+                    @else
                     <span class="mr-1 font-semibold">Sede: </span>
                     <span class="text-sm font-semibold">{{ $terminal->name }}</span>
+                    @endcan
                 </section>
             </div>
 

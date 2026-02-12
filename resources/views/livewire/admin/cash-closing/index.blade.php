@@ -16,7 +16,8 @@
 
         <x-wireui.button icon="excel" success wire:click='export' text="Exportar a excel" />
 
-        <x-wireui.button icon="payment" x-on:click="$dispatch('open-modal')" text="Cerrar caja" />
+        <x-wireui.button icon="payment" x-on:click="$wire.emitTo('admin.cash-closing.create', 'openCreate')"
+            text="Cerrar caja" />
 
     </x-commons.header>
 
@@ -33,15 +34,12 @@
         </x-slot:top>
 
         <x-slot:header>
-
-            <x-wireui.native-select wire:model="terminal_id" label="Sedes" :optionKeyValue="true" placeholder="Seleccionar"
-                :options="$arrayTerminals" class="w-full" />
-
+            @can('ver todas las sedes')
+                <x-wireui.native-select placeholder="Todas las sedes" label="Seleccione sede:" wire:model="terminal_id"
+                    optionKeyValue="true" :options="$terminals" class="w-full" />
+            @endcan
             <x-wireui.native-select wire:model="user_id" label="Usuarios" :optionKeyValue="true" placeholder="Selecionar"
                 :options="$users" class="w-full" />
-
-
-
             @if ($filterDate == 8)
                 <x-wireui.input label="Desde" wire:model="startDate" type="date" onkeydown="return false" />
 
@@ -146,7 +144,7 @@
                             @if (auth()->user()->can('Editar cierre de caja') && !is_null($item->confirmed_at))
                                 <x-buttons.edit
                                     wire:click="$emitTo('admin.cash-closing.show', 'openShow', {{ $item->id }})"
-                                    text="Cerrar caja" title="Visualizar" />
+                                    text="Cerrar caja" title="Editar" />
                             @endif
                             @if (is_null($item->confirmed_at))
                                 <x-buttons.icon icon="check"
@@ -174,30 +172,5 @@
     <livewire:admin.cash-closing.create>
         <livewire:admin.cash-closing.show>
             <livewire:admin.cash-closing.audit-modal>
-
-                <x-wireui.modal wire:model.defer="openModal" max-width="lg">
-
-                    <x-wireui.card title="Sedes">
-                        <div x-on:open-modal.window="show=true">
-                            <p class="font-semibold">Selecciona la sede</p>
-                            <ul class="mt-2 divide-y-2 rounded border shadow">
-                                @foreach ($terminals as $item)
-                                    <li wire:key='terminal-{{ $item }}'
-                                        x-on:click="show=false; $wire.emitTo('admin.cash-closing.create', 'openCreate', {{ $item->id }})"
-                                        class="cursor-pointer py-2 text-center hover:bg-slate-200 hover:font-bold hover:text-blue-600">
-                                        {{ $item->name }}
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                        <x-slot:footer>
-                            <div class="text-right">
-                                <x-wireui.button secondary x-on:click="show=false" text="Cerrar" />
-                            </div>
-                        </x-slot:footer>
-                    </x-wireui.card>
-
-                </x-wireui.modal>
-
 
 </div>

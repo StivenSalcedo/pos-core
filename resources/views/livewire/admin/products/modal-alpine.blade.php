@@ -30,7 +30,7 @@
                         </thead>
                         <tbody>
                             <template x-for="item in filteredProducts" :key="item.id">
-                                <tr x-on:click="$dispatch('set-product', item); show=false" >
+                                <tr x-on:click="$dispatch('set-product',  getData(item)); show=false" >
                                     <td left x-text="item.reference" ></td>
                                     <td left x-text="item.name" ></td>
                                     <td x-text="item.stock" ></td>

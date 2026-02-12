@@ -13,6 +13,7 @@ use App\Traits\LivewireTrait;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+
 use App\Http\Livewire\Admin\CashClosing\CashClosingCalculator;
 
 class Create extends Component
@@ -30,11 +31,13 @@ class Create extends Component
 
     public $closing_date;
     public $isFuture = false;
+    public $terminals;
+    public $terminal_id = '';
+
 
     public function mount()
     {
         $this->terminal = new Terminal();
-       
     }
 
 
@@ -45,10 +48,21 @@ class Create extends Component
         return view('livewire.admin.cash-closing.create');
     }
 
+    public function updatedTerminalId($value)
+    {
+        if (!$this->closing_date) {
+            return;
+        }
+
+        $this->terminal = Terminal::find($value);
+
+        $this->loadCalculatedValues();
+    }
+
     public function updatedClosingDate($value)
     {
         $date = Carbon::parse($value)->startOfDay();
-
+        $this->terminal = Terminal::findOrFail($this->terminal_id);
         if ($date->isPast() && !$date->isToday()) {
             $this->emit('alert', 'No puedes seleccionar fechas pasadas');
             $this->closing_date = now()->toDateString();
@@ -82,16 +96,22 @@ class Create extends Component
         $this->getCashRegister();
     }
 
-    public function openCreate(Terminal $terminal)
+    public function openCreate()
     {
-        $this->terminal = $terminal;
+        $this->terminal_id = auth()->user()->terminals->first()->id;
+        $this->terminals = Terminal::all()->pluck('name', 'id');
+        if (auth()->user()->can('ver todas las sedes')) {
+            $this->terminal = Terminal::findOrFail($this->terminal_id);
+        } else {
+            $this->terminal = Terminal::findOrFail(auth()->user()->terminals->first()->id);
+        }
         $this->openCreate = true;
         $this->closing_date = now()->toDateString();
         $this->loadCalculatedValues();
         $this->isFuture = Carbon::parse($this->closing_date)->isFuture();
     }
 
-    
+
 
 
 
@@ -111,13 +131,15 @@ class Create extends Component
         $rules = [
             'base' => 'required|integer|min:0|max:99999999',
             'price' => 'required|integer|min:0|max:99999999',
-            'observations' => 'nullable|string|max:255'
+            'observations' => 'nullable|string|max:255',
+            'terminal_id' => 'required|exists:terminals,id'
         ];
 
         $attributes = [
             'base' => 'base inicial',
             'price' => 'dinero real en caja',
-            'observations' => 'observaciones'
+            'observations' => 'observaciones',
+            'terminal_id' => 'Sede'
         ];
 
         $this->validateTerminal();
@@ -127,7 +149,7 @@ class Create extends Component
             CashClosing::create([
                 'closing_date' => $this->closing_date,
                 'base' => $this->base,
-                'terminal_id' => $this->terminal->id,
+                'terminal_id' => $this->terminal_id,
                 'user_id' => auth()->id(),
                 'price' => '0',
                 'cash' => '0',

@@ -317,7 +317,7 @@
   @include('livewire.admin.bills.presentations')
 
   <livewire:admin.customers.create>
-
+  <livewire:admin.products.modal-alpine>
   <x-loads.panel-fixed text="Enviando factura" class="no-print z-[999]" wire:loading wire:target='store' />
 
   @include('livewire.admin.bills.change')
