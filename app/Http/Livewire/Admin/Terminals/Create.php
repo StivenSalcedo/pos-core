@@ -94,9 +94,13 @@ class Create extends Component
             'address' => 'nullable|string|max:250',
             'phone' => ['nullable', 'string', new Phone],
             'email' => 'nullable|string|email|max:250',
-            'factus_numbering_range_id' => 'nullable',
             'usersSelected' => 'array',
         ];
+
+        if($this->isApiFactusEnabled)
+            {
+                  $rules['factus_numbering_range_id'] = 'required|integer';
+            }
 
         $attributes = [
             'name' => 'nombre',
