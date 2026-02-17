@@ -38,7 +38,7 @@
                 <x-wireui.native-select placeholder="Todas las sedes" label="Seleccione sede:" wire:model="terminal_id"
                     optionKeyValue="true" :options="$terminals" class="w-full" />
             @endcan
-            <x-wireui.native-select wire:model="user_id" label="Usuarios" :optionKeyValue="true" placeholder="Selecionar"
+            <x-wireui.native-select wire:model="user_id" placeholder="Todos las usuarios" label="Usuarios" :optionKeyValue="true" 
                 :options="$users" class="w-full" />
             @if ($filterDate == 8)
                 <x-wireui.input label="Desde" wire:model="startDate" type="date" onkeydown="return false" />

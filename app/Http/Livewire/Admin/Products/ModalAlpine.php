@@ -20,6 +20,7 @@ class ModalAlpine extends Component {
 
         $this->products = Product::select(['id', 'reference', 'name', 'stock', 'price'])
                         ->where('status', '0')
+                        ->where('terminal_id',  auth()->user()->terminals->first()->id)
                         ->orderBy('top', 'ASC')
                         ->get()
                         ->toArray();

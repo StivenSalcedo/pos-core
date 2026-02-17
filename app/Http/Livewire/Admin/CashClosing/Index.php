@@ -10,9 +10,10 @@ use Livewire\Component;
 use Maatwebsite\Excel\Facades\Excel;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+
 class Index extends Component
 {
-  use WithPagination;
+    use WithPagination;
 
     protected $paginationTheme = 'tailwind';
     protected $listeners = ['render'];
@@ -24,17 +25,39 @@ class Index extends Component
 
     public function mount()
     {
-        $this->users = User::all()->pluck('name', 'id');
+
         $this->terminals = Terminal::where('status', Terminal::ACTIVE)->pluck('name', 'id');
         $this->terminal_id = auth()->user()->terminals->first()->id;
-       
+        $this->loadUsers();
     }
+    private function loadUsers()
+    {
+        if ($this->terminal_id > 0) {
+            $this->users = User::whereHas('terminals', function ($query) {
+                $query->where('terminals.id', $this->terminal_id);
+            })
+                ->pluck('name', 'id');
+        } else {
+            $this->users = User::all()->pluck('name', 'id');
+        }
+        $this->user_id = ''; // reset usuario seleccionado
+    }
+
+    public function updatedTerminalId()
+    {
+        if (auth()->user()->can('ver todas las sedes')) {
+            $this->loadUsers();
+        }
+    }
+
+
+
 
     public function render()
     {
         $today = Carbon::today();
-   
-   // $this->resetPage();
+
+        // $this->resetPage();
         $this->totales = CashClosing::date($this->filterDate, $this->startDate, $this->endDate)
             ->selectRaw('SUM(total_sales) as total_sales, SUM(outputs) as outputs, SUM(tip) as tips')
             ->whereDate('closing_date', '<=', $today)

@@ -105,7 +105,7 @@ class SalesReportExport implements
     public function styles(Worksheet $sheet)
     {
         return [
-            'E' => [
+            'F' => [
                 'numberFormat' => [
                     'formatCode' => '"$"#,##0'
                 ]
@@ -124,11 +124,11 @@ class SalesReportExport implements
                 $sheet = $event->sheet;
                 $lastRow = $sheet->getHighestRow() + 1;
 
-                $sheet->setCellValue("C{$lastRow}", 'TOTAL');
-                $sheet->setCellValue("D{$lastRow}", "=SUM(D2:D" . ($lastRow - 1) . ")");
+                $sheet->setCellValue("D{$lastRow}", 'TOTAL');
                 $sheet->setCellValue("E{$lastRow}", "=SUM(E2:E" . ($lastRow - 1) . ")");
+                $sheet->setCellValue("F{$lastRow}", "=SUM(F2:F" . ($lastRow - 1) . ")");
 
-                $sheet->getStyle("C{$lastRow}:E{$lastRow}")
+                $sheet->getStyle("C{$lastRow}:F{$lastRow}")
                     ->getFont()->setBold(true);
             }
         ];
