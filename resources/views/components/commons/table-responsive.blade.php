@@ -1,7 +1,7 @@
 <div {{ $attributes }} class="bg-white border border-slate-200 shadow-sm rounded-lg">
 
     @if (isset($top))
-        <div class="flex items-end justify-between py-1.5 px-2 bg-slate-100 border text-xs sm:text-sm md:text-tiny border-b shadow">
+        <div class="flex items-center justify-between py-1.5 px-2 bg-slate-100 border text-xs sm:text-sm md:text-tiny border-b shadow">
             <div>
                 <span class="font-bold text-2xl">{{ $top->attributes['title'] }}</span>
             </div>
